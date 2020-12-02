@@ -2,32 +2,32 @@
         (chicken io)
         (chicken process-context))
 
-(define (combinations l n)
+(define (combinations lst n)
   (cond ((zero? n)
          (list (list)))
-        ((null? l)
+        ((null? lst)
          (list))
         (else
           (append (map
                     (lambda (x)
-                      (cons (car l) x))
-                    (combinations (cdr l) (sub1 n)))
-                  (combinations (cdr l) n)))))
+                      (cons (car lst) x))
+                    (combinations (cdr lst) (sub1 n)))
+                  (combinations (cdr lst) n)))))
 
 (define (import-input path)
   (call-with-input-file path
     (lambda (file)
       (map string->number (read-lines file)))))
 
-(define (main l n)
+(define (solve input n)
   (display
     (apply * (car (filter
-                    (lambda (l)
-                      (= 2020 (apply + l)))
-                    (combinations l n)))))
+                    (lambda (lst)
+                      (= 2020 (apply + lst)))
+                    (combinations input n)))))
   (newline))
 
 (let ((args (command-line-arguments)))
-  (let ((l (import-input (car args))))
-    (main l 2)
-    (main l 3)))
+  (let ((lst (import-input (car args))))
+    (solve lst 2)
+    (solve lst 3)))
