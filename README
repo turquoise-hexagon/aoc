@@ -1,0 +1,14 @@
+aoc
+===
+    advent of code solutions written in scheme
+
+usage
+-----
+    $ cd $day
+    $ make
+    $ ./$day input
+
+depends on
+----------
+    * chicken
+    * srfi-1
