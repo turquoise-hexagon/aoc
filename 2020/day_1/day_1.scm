@@ -15,9 +15,7 @@
                   (combinations (cdr lst) n)))))
 
 (define (import-input path)
-  (call-with-input-file path
-    (lambda (file)
-      (map string->number (read-lines file)))))
+  (map string->number (read-lines (open-input-file path))))
 
 (define (solve input n)
   (display

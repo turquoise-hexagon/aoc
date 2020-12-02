@@ -4,12 +4,10 @@
         (srfi 1))
 
 (define (import-input path)
-  (call-with-input-file path
-    (lambda (file)
-      (map
-        (lambda (str)
-          (string-split str ": -"))
-        (read-lines file)))))
+  (map
+    (lambda (str)
+      (string-split str ": -"))
+    (read-lines (open-input-file path))))
 
 (define (is-valid-1? input)
   (let ((lower    (string->number (car  input)))
