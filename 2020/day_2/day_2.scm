@@ -1,7 +1,6 @@
 (import (chicken io)
         (chicken process-context)
         (chicken string)
-        (matchable)
         (srfi 1))
 
 (define (import-input path)
@@ -11,23 +10,27 @@
     (read-lines (open-input-file path))))
 
 (define (is-valid-1? input)
-  (match input
-         ((lower higher letter password)
-          (let ((cnt (length (filter
-                               (lambda (char)
-                                 (string=? letter (string char)))
-                               (string->list password)))))
-            (not (or (< cnt (string->number lower))
-                     (> cnt (string->number higher))))))))
+  (let ((lower    (string->number (car  input)))
+        (higher   (string->number (cadr input)))
+        (letter   (caddr  input))
+        (password (cadddr input)))
+    (let ((cnt (length (filter
+                         (lambda (char)
+                           (string=? letter (string char)))
+                         (string->list password)))))
+      (not (or (< cnt lower)
+               (> cnt higher))))))
 
 (define (is-valid-2? input)
-  (match input
-         ((index-1 index-2 letter password)
-          (letrec* ((helper (lambda (index)
-                              (string=? letter (string (string-ref password index)))))
-                    (res (not (equal? (helper (sub1 (string->number index-1)))
-                                      (helper (sub1 (string->number index-2)))))))
-            res))))
+  (let ((index-1 (sub1 (string->number (car  input))))
+        (index-2 (sub1 (string->number (cadr input))))
+        (letter   (caddr  input))
+        (password (cadddr input)))
+    (letrec* ((helper (lambda (index)
+                        (string=? letter (string (string-ref password index)))))
+              (res (not (equal? (helper index-1)
+                                (helper index-2)))))
+      res)))
 
 (define (solve proc lst)
   (display (length (filter proc lst)))
