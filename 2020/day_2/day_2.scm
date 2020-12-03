@@ -9,7 +9,7 @@
       (string-split str ": -"))
     (read-lines (open-input-file path))))
 
-(define (is-valid-1? input)
+(define (is-valid/1? input)
   (let ((lower    (string->number (car  input)))
         (higher   (string->number (cadr input)))
         (letter   (caddr  input))
@@ -21,7 +21,7 @@
       (not (or (< cnt lower)
                (> cnt higher))))))
 
-(define (is-valid-2? input)
+(define (is-valid/2? input)
   (let ((index-1 (sub1 (string->number (car  input))))
         (index-2 (sub1 (string->number (cadr input))))
         (letter   (caddr  input))
@@ -38,5 +38,5 @@
 
 (let ((args (command-line-arguments)))
   (let ((lst (import-input (car args))))
-    (solve is-valid-1? lst)
-    (solve is-valid-2? lst)))
+    (solve is-valid/1? lst)
+    (solve is-valid/2? lst)))

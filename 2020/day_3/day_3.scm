@@ -1,0 +1,32 @@
+(import (chicken io)
+        (chicken process-context))
+
+(define (import-input path)
+  (list->vector (map list->vector (map string->list (read-lines (open-input-file path))))))
+
+(define (encountered-trees input right down)
+  (let ((h (vector-length input))
+        (w (vector-length (vector-ref input 0))))
+    (do ((i 0 (+ i down))
+         (j 0 (+ j right))
+         (acc 0 (if (char=? #\# (vector-ref (vector-ref input (remainder i h))
+                                            (remainder j w)))
+                    (add1 acc)
+                    acc)))
+      ((>= i h) acc))))
+
+(define (solve vec . lst)
+  (display (apply * (map
+                      (lambda (lst)
+                        (encountered-trees vec (car lst) (cadr lst)))
+                      lst)))
+  (newline))
+
+(let ((args (command-line-arguments)))
+  (let ((vec (import-input (car args))))
+    (solve vec (list 3 1))
+    (solve vec (list 1 1)
+               (list 3 1)
+               (list 5 1)
+               (list 7 1)
+               (list 1 2))))
