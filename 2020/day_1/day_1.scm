@@ -31,6 +31,6 @@
   (newline))
 
 (let ((args (command-line-arguments)))
-  (let ((lst (import-input (car args))))
-    (solve/1 lst)
-    (solve/2 lst)))
+  (let ((input (import-input (car args))))
+    (solve/1 input)
+    (solve/2 input)))

@@ -15,18 +15,14 @@
                     acc)))
       ((>= i h) acc))))
 
-(define (solve vec . lst)
+(define (solve input lst)
   (display (apply * (map
                       (lambda (lst)
-                        (encountered-trees vec (car lst) (cadr lst)))
+                        (encountered-trees input (car lst) (cadr lst)))
                       lst)))
   (newline))
 
 (let ((args (command-line-arguments)))
-  (let ((vec (import-input (car args))))
-    (solve vec (list 3 1))
-    (solve vec (list 1 1)
-               (list 3 1)
-               (list 5 1)
-               (list 7 1)
-               (list 1 2))))
+  (let ((input (import-input (car args))))
+    (solve input '((3 1)))
+    (solve input '((1 1) (3 1) (5 1) (7 1) (1 2)))))
