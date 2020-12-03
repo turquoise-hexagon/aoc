@@ -1,31 +1,36 @@
-(import (srfi 1)
-        (chicken io)
+(import (chicken io)
         (chicken process-context))
-
-(define (combinations lst n)
-  (cond ((zero? n)
-         (list (list)))
-        ((null? lst)
-         (list))
-        (else
-          (append (map
-                    (lambda (x)
-                      (cons (car lst) x))
-                    (combinations (cdr lst) (sub1 n)))
-                  (combinations (cdr lst) n)))))
 
 (define (import-input path)
   (map string->number (read-lines (open-input-file path))))
 
-(define (solve input n)
+(define (solve/1 input)
   (display
-    (apply * (car (filter
-                    (lambda (lst)
-                      (= 2020 (apply + lst)))
-                    (combinations input n)))))
+    (call/cc
+      (lambda (return)
+        (do ((i input (cdr i))) ((null? i))
+          (do ((j (cdr i) (cdr j))) ((null? j))
+            (let ((a (car i))
+                  (b (car j)))
+              (when (= 2020 (+ a b))
+                (return (* a b)))))))))
+  (newline))
+
+(define (solve/2 input)
+  (display
+    (call/cc
+      (lambda (return)
+        (do ((i input (cdr i))) ((null? i))
+          (do ((j (cdr i) (cdr j))) ((null? j))
+            (do ((k (cdr j) (cdr k))) ((null? k))
+              (let ((a (car i))
+                    (b (car j))
+                    (c (car k)))
+                (when (= 2020 (+ a b c))
+                  (return (* a b c))))))))))
   (newline))
 
 (let ((args (command-line-arguments)))
   (let ((lst (import-input (car args))))
-    (solve lst 2)
-    (solve lst 3)))
+    (solve/1 lst)
+    (solve/2 lst)))
