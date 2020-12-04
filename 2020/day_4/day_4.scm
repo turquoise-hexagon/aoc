@@ -32,8 +32,7 @@
 
 (define (is-valid/2? hash)
   (define (in-range? num low high)
-    (and (>= num  low)
-         (<= num high)))
+    (<= low num high))
   (letrec* ((get
               (lambda (key)
                 (hash-table-ref/default hash key (list))))
@@ -56,9 +55,9 @@
                        ((string=? unt "in") (in-range? hgt   59 76))
                        (else #f)))
                #f))
-         (irregex-match? "#[0-9a-f]{6}"                  hcl)
-         (irregex-match? "(amb|blu|brn|gry|grn|hzl|oth)" ecl)
-         (irregex-match? "[0-9]{9}"                      pid))))
+         (irregex-match? "#[0-9a-f]{6}"                hcl)
+         (irregex-match? "amb|blu|brn|gry|grn|hzl|oth" ecl)
+         (irregex-match? "[0-9]{9}"                    pid))))
 
 (define (solve proc input)
   (display (length (filter proc input)))
