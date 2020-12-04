@@ -49,10 +49,9 @@
              (<= 2020 (string->number eyr) 2030)
              (let ((match (irregex-match "([0-9]+)(cm|in)" hgt)))
                (if (irregex-match-data? match)
-                   (let* ((unt (irregex-match-substring match 2))
-                          (hgt (irregex-match-substring match 1))
-                          (hgt (string->number hgt)))
-                     (case (string->symbol unt)
+                   (let ((unt (string->symbol (irregex-match-substring match 2)))
+                         (hgt (string->number (irregex-match-substring match 1))))
+                     (case unt
                        ((cm) (<= 150 hgt 193))
                        ((in) (<=  59 hgt  76))
                        (else #f)))
