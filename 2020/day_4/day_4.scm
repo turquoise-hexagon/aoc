@@ -6,22 +6,18 @@
         (srfi 69))
 
 (define (import-input path)
-  (call-with-input-file path
-    (lambda (port)
-      (let import-input/h ((line (read-line port)) (acc (list)) (hash (make-hash-table)))
-        (cond ((eof-object? line)
-               (cons hash acc))
-              ((zero? (string-length line))
-               (import-input/h (read-line port) (cons hash acc) (make-hash-table)))
-              (else
-                (for-each
-                  (lambda (lst)
-                    (hash-table-set! hash (car lst) (cadr lst)))
-                  (map
-                    (lambda (str)
-                      (string-split str ":"))
-                    (string-split line " ")))
-                (import-input/h (read-line port) acc hash)))))))
+  (map
+    (lambda (str)
+      (let ((hash (make-hash-table)))
+        (for-each
+          (lambda (lst)
+            (hash-table-set! hash (car lst) (cadr lst)))
+          (map
+            (lambda (str)
+              (string-split str ":"))
+            (string-split str)))
+        hash))
+    (irregex-split "\n\n" (read-string #f (open-input-file path)))))
 
 (define (is-valid/1? hash)
   (let* ((keys (hash-table-keys hash))
