@@ -1,9 +1,9 @@
-(import (srfi 69)
-        (srfi 1)
-        (chicken io)
+(import (chicken io)
+        (chicken irregex)
         (chicken process-context)
         (chicken string)
-        (chicken irregex))
+        (srfi 1)
+        (srfi 69))
 
 (define (import-input path)
   (call-with-input-file path
@@ -61,10 +61,7 @@
          (irregex-match? "[0-9]{9}"                      pid))))
 
 (define (solve proc input)
-  (display (length (filter
-                     (lambda (hash)
-                       (proc hash))
-                     input)))
+  (display (length (filter proc input)))
   (newline))
 
 (let ((args (command-line-arguments)))
