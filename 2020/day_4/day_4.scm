@@ -20,11 +20,13 @@
     (irregex-split "\n\n" (read-string #f (open-input-file path)))))
 
 (define (is-valid/1? hash)
-  (let* ((keys (hash-table-keys hash))
-         (len  (length keys)))
-    (or (and (= 7 len)
-             (not (member "cid" keys)))
-        (= 8 len))))
+  (call/cc
+    (lambda (return)
+      (for-each
+        (lambda (key)
+          (when (null? (hash-table-ref/default hash key (list)))
+            (return #f)))
+        (list "byr" "iyr" "eyr" "hgt" "hcl" "ecl" "pid")))))
 
 (define (is-valid/2? hash)
   (define (in-range? num low high)
