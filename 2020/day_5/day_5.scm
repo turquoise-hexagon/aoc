@@ -1,7 +1,6 @@
 (import (chicken io)
         (chicken process-context)
-        (srfi 1)
-        (chicken sort))
+        (srfi 1))
 
 (define (import-input path)
   (map string->list (read-lines (open-input-file path))))
