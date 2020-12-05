@@ -36,7 +36,7 @@
   (display (length (filter proc input)))
   (newline))
 
-(let ((args (command-line-arguments)))
-  (let ((input (import-input (car args))))
+(let ((path (car (command-line-arguments))))
+  (let ((input (import-input path)))
     (solve is-valid/1? input)
     (solve is-valid/2? input)))

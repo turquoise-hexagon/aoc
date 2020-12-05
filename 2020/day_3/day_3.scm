@@ -22,7 +22,7 @@
                       lst)))
   (newline))
 
-(let ((args (command-line-arguments)))
-  (let ((input (import-input (car args))))
+(let ((path (car (command-line-arguments))))
+  (let ((input (import-input path)))
     (solve input '((3 1)))
     (solve input '((1 1) (3 1) (5 1) (7 1) (1 2)))))

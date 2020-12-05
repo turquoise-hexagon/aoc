@@ -30,7 +30,7 @@
                   (return (* a b c))))))))))
   (newline))
 
-(let ((args (command-line-arguments)))
-  (let ((input (import-input (car args))))
+(let ((path (car (command-line-arguments))))
+  (let ((input (import-input path)))
     (solve/1 input)
     (solve/2 input)))
