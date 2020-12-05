@@ -1,0 +1,48 @@
+(import (chicken io)
+        (chicken process-context)
+        (srfi 1))
+
+(define (import-input path)
+  (map string->list (read-lines (open-input-file path))))
+
+(define (get-seat boarding-pass)
+  (let get-seat/h ((lst boarding-pass) (row-max 128) (row-min 0) (col-max 8) (col-min 0))
+    (if (null? lst)
+        (list row-min col-min)
+        (case (car lst)
+          ((#\F) (get-seat/h (cdr lst) (- row-max (/ (- row-max row-min) 2)) row-min col-max col-min))
+          ((#\B) (get-seat/h (cdr lst) row-max (+ row-min (/ (- row-max row-min) 2)) col-max col-min))
+          ((#\L) (get-seat/h (cdr lst) row-max row-min (- col-max (/ (- col-max col-min) 2)) col-min))
+          ((#\R) (get-seat/h (cdr lst) row-max row-min col-max (+ col-min (/ (- col-max col-min) 2))))))))
+
+(define (get-seat-id boarding-pass)
+  (let ((lst (get-seat boarding-pass)))
+    (+ (* (car lst) 8) (cadr lst))))
+
+(define (solve/1 input)
+  (display (apply max (map get-seat-id input)))
+  (newline))
+
+(define (solve/2 input)
+  (define (generate-seats)
+    (do ((rows (iota 128) (cdr rows))
+         (acc (list) (append acc (do ((cols (iota 8) (cdr cols))
+                                      (acc (list) (cons (list (car rows) (car cols)) acc)))
+                                   ((null? cols) acc)))))
+      ((null? rows) acc)))
+  (let* ((possible-seats (generate-seats))
+         (existing-seats (map get-seat input)))
+    (let ((lst (filter
+                 (lambda (lst)
+                   (<= 20 (car lst) 100))
+                 (filter
+                   (lambda (lst)
+                     (not (member lst existing-seats)))
+                   possible-seats))))
+      (display (+ (* (caar lst) 8) (cadar lst)))
+      (newline))))
+
+(let ((path (car (command-line-arguments))))
+  (let ((input (import-input path)))
+    (solve/1 input)
+    (solve/2 input)))
