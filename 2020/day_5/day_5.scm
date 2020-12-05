@@ -20,23 +20,22 @@
   (let ((lst (get-seat boarding-pass)))
     (+ (* (car lst) 8) (cadr lst))))
 
-(define (solve/1 input)
-  (display (apply max (map get-seat-id input)))
+(define (solve/1 ids)
+  (display (apply max ids))
   (newline))
 
-(define (solve/2 input)
-  (let ((ids (map get-seat-id input)))
-    (display
-      (call/cc
-        (lambda (return)
-          (for-each
-            (lambda (id)
-              (cond ((not (member (add1 id) ids)) (return (add1 id)))
-                    ((not (member (sub1 id) ids)) (return (sub1 id)))))
-            ids))))
-    (newline)))
+(define (solve/2 ids)
+  (display
+    (call/cc
+      (lambda (return)
+        (for-each
+          (lambda (id)
+            (cond ((not (member (add1 id) ids)) (return (add1 id)))
+                  ((not (member (sub1 id) ids)) (return (sub1 id)))))
+          ids))))
+  (newline))
 
 (let ((path (car (command-line-arguments))))
-  (let ((input (import-input path)))
-    (solve/1 input)
-    (solve/2 input)))
+  (let ((ids (map get-seat-id (import-input path))))
+    (solve/1 ids)
+    (solve/2 ids)))
