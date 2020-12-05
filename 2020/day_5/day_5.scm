@@ -1,6 +1,7 @@
 (import (chicken io)
         (chicken process-context)
-        (srfi 1))
+        (srfi 1)
+        (chicken sort))
 
 (define (import-input path)
   (map string->list (read-lines (open-input-file path))))
@@ -24,23 +25,16 @@
   (newline))
 
 (define (solve/2 input)
-  (define (generate-seats)
-    (do ((rows (iota 128) (cdr rows))
-         (acc (list) (append acc (do ((cols (iota 8) (cdr cols))
-                                      (acc (list) (cons (list (car rows) (car cols)) acc)))
-                                   ((null? cols) acc)))))
-      ((null? rows) acc)))
-  (let* ((possible-seats (generate-seats))
-         (existing-seats (map get-seat input)))
-    (let ((lst (filter
-                 (lambda (lst)
-                   (<= 20 (car lst) 100))
-                 (filter
-                   (lambda (lst)
-                     (not (member lst existing-seats)))
-                   possible-seats))))
-      (display (+ (* (caar lst) 8) (cadar lst)))
-      (newline))))
+  (let ((ids (map get-seat-id input)))
+    (display
+      (call/cc
+        (lambda (return)
+          (for-each
+            (lambda (id)
+              (cond ((not (member (add1 id) ids)) (return (add1 id)))
+                    ((not (member (sub1 id) ids)) (return (sub1 id)))))
+            ids))))
+    (newline)))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))
