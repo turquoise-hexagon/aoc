@@ -7,14 +7,14 @@
   (map string->list (read-lines (open-input-file path))))
 
 (define (get-seat boarding-pass)
-  (let get-seat/h ((lst boarding-pass) (row-max 128) (row-min 0) (col-max 8) (col-min 0))
+  (define (get-seat/h lst lower upper)
     (if (null? lst)
-        (list row-min col-min)
+        lower
         (case (car lst)
-          ((#\F) (get-seat/h (cdr lst) (- row-max (/ (- row-max row-min) 2)) row-min col-max col-min))
-          ((#\B) (get-seat/h (cdr lst) row-max (+ row-min (/ (- row-max row-min) 2)) col-max col-min))
-          ((#\L) (get-seat/h (cdr lst) row-max row-min (- col-max (/ (- col-max col-min) 2)) col-min))
-          ((#\R) (get-seat/h (cdr lst) row-max row-min col-max (+ col-min (/ (- col-max col-min) 2))))))))
+          ((#\F #\L) (get-seat/h (cdr lst) lower (/ (+ lower upper) 2)))
+          (else      (get-seat/h (cdr lst) (/ (+ lower upper) 2) upper)))))
+  (list (get-seat/h (take boarding-pass 7) 0 128)
+        (get-seat/h (drop boarding-pass 7) 0   8)))
 
 (define (get-seat-id boarding-pass)
   (let ((lst (get-seat boarding-pass)))
