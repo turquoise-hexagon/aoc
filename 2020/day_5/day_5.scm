@@ -7,11 +7,11 @@
 
 (define (get-seat boarding-pass)
   (define (get-seat/h lst)
-    (string->number (list->string (map
-                                    (lambda (c)
-                                      (case c ((#\B #\R) #\1) (else #\0)))
-                                    lst))
-                    2))
+    (do ((lst (reverse lst) (cdr lst))
+         (cnt 0 (add1 cnt))
+         (acc 0 (case (car lst)
+                  ((#\B #\R) (+ acc (expt 2 cnt))) (else acc))))
+      ((null? lst) acc)))
   (list (get-seat/h (take boarding-pass 7))
         (get-seat/h (drop boarding-pass 7))))
 
