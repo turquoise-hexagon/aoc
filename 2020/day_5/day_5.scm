@@ -5,19 +5,15 @@
 (define (import-input path)
   (map string->list (read-lines (open-input-file path))))
 
-(define (get-seat boarding-pass)
+(define (get-seat-id boarding-pass)
   (define (get-seat/h lst)
     (do ((lst (reverse lst) (cdr lst))
          (cnt 0 (add1 cnt))
          (acc 0 (case (car lst)
                   ((#\B #\R) (+ acc (expt 2 cnt))) (else acc))))
       ((null? lst) acc)))
-  (list (get-seat/h (take boarding-pass 7))
-        (get-seat/h (drop boarding-pass 7))))
-
-(define (get-seat-id boarding-pass)
-  (let ((lst (get-seat boarding-pass)))
-    (+ (* (car lst) 8) (cadr lst))))
+  (+ (* (get-seat/h (take boarding-pass 7)) 8)
+     (get-seat/h (drop boarding-pass 7))))
 
 (define (solve/1 ids)
   (display (apply max ids))
