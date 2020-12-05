@@ -6,14 +6,14 @@
   (map string->list (read-lines (open-input-file path))))
 
 (define (get-seat boarding-pass)
-  (define (get-seat/h lst lower upper)
-    (if (null? lst)
-        lower
-        (case (car lst)
-          ((#\F #\L) (get-seat/h (cdr lst) lower (/ (+ lower upper) 2)))
-          (else      (get-seat/h (cdr lst) (/ (+ lower upper) 2) upper)))))
-  (list (get-seat/h (take boarding-pass 7) 0 128)
-        (get-seat/h (drop boarding-pass 7) 0   8)))
+  (define (get-seat/h lst)
+    (string->number (list->string (map
+                                    (lambda (c)
+                                      (case c ((#\B #\R) #\1) (else #\0)))
+                                    lst))
+                    2))
+  (list (get-seat/h (take boarding-pass 7))
+        (get-seat/h (drop boarding-pass 7))))
 
 (define (get-seat-id boarding-pass)
   (let ((lst (get-seat boarding-pass)))
