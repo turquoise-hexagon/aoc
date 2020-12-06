@@ -2,18 +2,19 @@
         (chicken process-context)
         (chicken irregex)
         (chicken string)
-        (srfi 69))
+        (srfi 69)
+        (srfi 1))
 
 (define (import-input path)
   (map
     (lambda (str)
-      (let ((hash  (make-hash-table))
-            (split (string-split str)))
+      (let ((hash (make-hash-table))
+            (lst  (string-split str)))
         (for-each
           (lambda (char)
             (hash-table-set! hash char (add1 (hash-table-ref/default hash char 0))))
-          (string->list (apply string-append split)))
-        (list hash (length split))))
+          (string->list (apply string-append lst)))
+        (list hash (length lst))))
     (irregex-split "\n\n" (read-string #f (open-input-file path)))))
 
 (define (solve/1 input)
@@ -25,10 +26,10 @@
                       (lambda (lst)
                         (let ((hash (car  lst))
                               (numb (cadr lst)))
-                          (apply + (map
-                                     (lambda (key)
-                                       (if (= (hash-table-ref/default hash key 0) numb) 1 0))
-                                     (hash-table-keys hash)))))
+                          (length (filter
+                                    (lambda (key)
+                                      (= (hash-table-ref hash key) numb))
+                                    (hash-table-keys hash)))))
                       input)))
   (newline))
 
