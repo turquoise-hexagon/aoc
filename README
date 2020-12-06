@@ -13,3 +13,5 @@ depends on
     * chicken
     * srfi-1
     * srfi-69
+    * srfi-113
+    * srfi-128
