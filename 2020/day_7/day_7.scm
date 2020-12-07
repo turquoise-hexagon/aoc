@@ -35,23 +35,16 @@
     hash))
 
 (define (solve/1 input color)
-  (let ((can-contain (make-hash-table)))
-    (hash-table-set! can-contain color 0)
-    (let loop ()
-      (let ((can-contain-keys (hash-table-keys can-contain)))
-        (for-each
-          (lambda (can-contain-key)
-            (for-each
-              (lambda (input-key)
-                (let ((query (hash-table-ref/default (hash-table-ref input input-key) can-contain-key (list))))
-                  (unless (null? query)
-                    (hash-table-set! can-contain input-key 0))))
-              (hash-table-keys input)))
-          can-contain-keys)
-        (unless (equal? can-contain-keys (hash-table-keys can-contain))
-          (loop))))
-    (display (sub1 (length (hash-table-keys can-contain))))
-    (newline)))
+  (define (solve/1/h key)
+    (let ((hash (hash-table-ref input key)))
+      (cond ((null? (hash-table-keys hash))
+             0)
+            ((not (null? (hash-table-ref/default hash color (list))))
+             1)
+            (else
+             (if (member 1 (map solve/1/h (hash-table-keys hash))) 1 0)))))
+  (display (apply + (map solve/1/h (hash-table-keys input))))
+  (newline))
 
 (define (solve/2 input color)
   (define (solve/2/h color)
