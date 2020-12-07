@@ -54,27 +54,15 @@
     (newline)))
 
 (define (solve/2 input color)
-  (set! cnt 0)
-  (let ((to-check (make-hash-table)))
-    (hash-table-set! to-check color 1)
-    (let loop ()
-      (let ((to-check-keys (sort (hash-table-keys to-check) string<?)))
-        (for-each
-          (lambda (to-check-key)
-            (let ((value (hash-table-ref to-check to-check-key))
-                  (check (hash-table-ref input    to-check-key)))
-              (set! cnt (+ cnt value))
-              (unless (null? (hash-table-keys check))
-                (for-each
-                  (lambda (check-key)
-                    (let ((new-value (* value (hash-table-ref check check-key))))
-                      (hash-table-set! to-check check-key (+ new-value (hash-table-ref/default to-check check-key 0)))))
-                  (hash-table-keys check)))
-              (hash-table-delete! to-check to-check-key)))
-          to-check-keys)
-        (unless (null? to-check-keys)
-          (loop)))))
-  (display (sub1 cnt))
+  (define (solve/2/h color)
+    (let ((hash (hash-table-ref input color)))
+      (if (null? (hash-table-keys hash))
+          1
+          (apply + (cons 1 (map
+                             (lambda (key)
+                               (* (hash-table-ref hash key) (solve/2/h key)))
+                             (hash-table-keys hash)))))))
+  (display (sub1 (solve/2/h color)))
   (newline))
 
 (let ((path (car (command-line-arguments))))
