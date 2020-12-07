@@ -3,8 +3,6 @@
         (chicken irregex)
         (srfi 69))
 
-(import (chicken sort))
-
 (define (parse-line line)
   (map
     (lambda (str)
