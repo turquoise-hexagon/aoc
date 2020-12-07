@@ -14,20 +14,23 @@
           (list num col))))
     (irregex-split "(, | contain | bags?|\\.)" line)))
 
+(define (lst->hash lst)
+  (let ((hash (make-hash-table)))
+    (for-each
+      (lambda (lst)
+        (let ((key (cadr lst))
+              (val (car  lst)))
+          (unless (string=? key "no other")
+            (hash-table-set! hash key val))))
+      lst)
+    hash))
+
 (define (import-input path)
   (let ((hash (make-hash-table)))
     (for-each
       (lambda (lst)
         (let ((key (cadar lst))
-              (val (let ((tmp (make-hash-table)))
-                     (for-each
-                       (lambda (lst)
-                         (let ((key (cadr lst))
-                               (val (car  lst)))
-                           (unless (string=? key "no other")
-                             (hash-table-set! tmp key val))))
-                       (cdr lst))
-                     tmp)))
+              (val (lst->hash (cdr lst))))
           (hash-table-set! hash key val)))
       (map parse-line (read-lines (open-input-file path))))
     hash))
