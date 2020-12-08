@@ -1,0 +1,47 @@
+(import (chicken io)
+        (chicken process-context)
+        (chicken string)
+        (srfi 69))
+
+(define (import-input path)
+  (list->vector
+    (map
+      (lambda (str)
+        (let ((lst (string-split str " ")))
+          (list (car lst) (string->number (cadr lst)))))
+      (read-lines (open-input-file path)))))
+
+(define (run-instructions input)
+  (let ((hash (make-hash-table)) (len (vector-length input)))
+    (let run-instructions/h ((acc 0) (ptr 0))
+      (if (or (hash-table-exists? hash ptr) (= ptr len))
+          (list acc ptr)
+          (let ((instruction (vector-ref input ptr)))
+            (hash-table-set! hash ptr 0)
+            (case (string->symbol (car instruction))
+              ((acc) (run-instructions/h (+ acc (cadr instruction)) (+ ptr 1)))
+              ((jmp) (run-instructions/h acc (+ ptr (cadr instruction))))
+              ((nop) (run-instructions/h acc (+ ptr 1)))))))))
+
+(define (solve/1 input)
+  (display (car (run-instructions input)))
+  (newline))
+
+(define (solve/2 input)
+  (display
+    (let ((len (vector-length input)))
+      (let solve/2/h ((ptr 0))
+        (let ((new-input (list->vector (vector->list input))) (instruction (vector-ref input ptr)))
+          (case (string->symbol (car instruction))
+            ((jmp) (vector-set! new-input ptr (list "nop" (cadr instruction))))
+            ((nop) (vector-set! new-input ptr (list "jmp" (cadr instruction)))))
+          (let ((lst (run-instructions new-input)))
+            (if (= (cadr lst) len)
+                (car lst)
+                (solve/2/h (+ ptr 1))))))))
+  (newline))
+
+(let ((path (car (command-line-arguments))))
+  (let ((input (import-input path)))
+    (solve/1 input)
+    (solve/2 input)))
