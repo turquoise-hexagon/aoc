@@ -1,7 +1,8 @@
 (import (chicken io)
         (chicken process-context)
         (chicken irregex)
-        (srfi 69))
+        (srfi 69)
+        (srfi 1))
 
 (define (parse-line line)
   (map
@@ -11,29 +12,18 @@
                (col (irregex-match-substring match 2))
                (num (let ((tmp (string->number num)))
                       (if tmp tmp 1))))
-          (list num col))))
+          (cons col num))))
     (irregex-split "(, | contain | bags?|\\.)" line)))
 
-(define (lst->hash lst)
-  (let ((hash (make-hash-table)))
-    (for-each
-      (lambda (lst)
-        (let ((key (cadr lst))
-              (val (car  lst)))
-          (unless (string=? key "no other")
-            (hash-table-set! hash key val))))
-      lst)
-    hash))
+(define (line->alist line)
+  (let ((lst (parse-line line)))
+    (cons (caar lst) (filter (lambda (lst) (not (string=? (car lst) "no other"))) (cdr lst)))))
 
 (define (import-input path)
-  (let ((hash (make-hash-table)))
-    (for-each
-      (lambda (lst)
-        (let ((key (cadar lst))
-              (val (lst->hash (cdr lst))))
-          (hash-table-set! hash key val)))
-      (map parse-line (read-lines (open-input-file path))))
-    hash))
+  (alist->hash-table (map
+                       (lambda (lst)
+                         (cons (car lst) (alist->hash-table (cdr lst))))
+                       (map line->alist (read-lines (open-input-file path))))))
 
 (define (solve/1 input color)
   (define (solve/1/h hash)
