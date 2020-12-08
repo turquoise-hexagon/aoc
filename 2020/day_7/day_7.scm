@@ -36,13 +36,17 @@
     hash))
 
 (define (solve/1 input color)
-  (define (solve/1/h key)
-    (let ((hash (hash-table-ref input key)))
-      (cond ((null? (hash-table-keys hash))  0)
-            ((hash-table-exists? hash color) 1)
-            (else
-              (if (member 1 (map solve/1/h (hash-table-keys hash))) 1 0)))))
-  (display (apply + (map solve/1/h (hash-table-keys input))))
+  (define (solve/1/h hash)
+    (let ((keys (hash-table-keys hash)))
+      (hash-table-for-each input
+                           (lambda (key/i hash/i)
+                             (for-each
+                               (lambda (key)
+                                 (when (hash-table-exists? hash/i key)
+                                   (hash-table-set! hash key/i 0)))
+                               keys)))
+      (if (equal? keys (hash-table-keys hash)) keys (solve/1/h hash))))
+  (display (sub1 (length (solve/1/h (alist->hash-table `((,color . 0)))))))
   (newline))
 
 (define (solve/2 input color)
