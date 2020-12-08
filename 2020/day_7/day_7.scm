@@ -17,13 +17,13 @@
 
 (define (line->alist line)
   (let ((lst (parse-line line)))
-    (cons (caar lst) (filter (lambda (lst) (not (string=? (car lst) "no other"))) (cdr lst)))))
+    (cons (caar lst) (alist->hash-table (filter
+                                          (lambda (lst)
+                                            (not (string=? (car lst) "no other")))
+                                          (cdr lst))))))
 
 (define (import-input path)
-  (alist->hash-table (map
-                       (lambda (lst)
-                         (cons (car lst) (alist->hash-table (cdr lst))))
-                       (map line->alist (read-lines (open-input-file path))))))
+  (alist->hash-table (map line->alist (read-lines (open-input-file path)))))
 
 (define (solve/1 input color)
   (define (solve/1/h hash)
@@ -35,7 +35,9 @@
                                  (when (hash-table-exists? hash/i key)
                                    (hash-table-set! hash key/i 0)))
                                keys)))
-      (if (equal? keys (hash-table-keys hash)) keys (solve/1/h hash))))
+      (if (equal? keys (hash-table-keys hash))
+          keys
+          (solve/1/h hash))))
   (display (sub1 (length (solve/1/h (alist->hash-table `((,color . 0)))))))
   (newline))
 
