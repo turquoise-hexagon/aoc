@@ -38,10 +38,8 @@
 (define (solve/1 input color)
   (define (solve/1/h key)
     (let ((hash (hash-table-ref input key)))
-      (cond ((null? (hash-table-keys hash))
-             0)
-            ((not (null? (hash-table-ref/default hash color (list))))
-             1)
+      (cond ((null? (hash-table-keys hash))  0)
+            ((hash-table-exists? hash color) 1)
             (else
              (if (member 1 (map solve/1/h (hash-table-keys hash))) 1 0)))))
   (display (apply + (map solve/1/h (hash-table-keys input))))
