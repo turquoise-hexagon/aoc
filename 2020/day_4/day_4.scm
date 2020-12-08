@@ -12,10 +12,7 @@
         (for-each
           (lambda (lst)
             (hash-table-set! hash (car lst) (cadr lst)))
-          (map
-            (lambda (str)
-              (string-split str ":"))
-            (string-split str)))
+          (map (cut string-split <> ":") (string-split str)))
         hash))
     (irregex-split "\n\n" (read-string #f (open-input-file path)))))
 
