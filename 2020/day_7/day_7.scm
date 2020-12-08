@@ -41,7 +41,7 @@
       (cond ((null? (hash-table-keys hash))  0)
             ((hash-table-exists? hash color) 1)
             (else
-             (if (member 1 (map solve/1/h (hash-table-keys hash))) 1 0)))))
+              (if (member 1 (map solve/1/h (hash-table-keys hash))) 1 0)))))
   (display (apply + (map solve/1/h (hash-table-keys input))))
   (newline))
 
@@ -50,10 +50,9 @@
     (let ((hash (hash-table-ref input color)))
       (if (null? (hash-table-keys hash))
           1
-          (apply + (cons 1 (map
-                             (lambda (key)
-                               (* (hash-table-ref hash key) (solve/2/h key)))
-                             (hash-table-keys hash)))))))
+          (apply + (cons 1 (hash-table-map hash
+                                           (lambda (key hash)
+                                             (* hash (solve/2/h key)))))))))
   (display (sub1 (solve/2/h color)))
   (newline))
 
