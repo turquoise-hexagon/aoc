@@ -24,7 +24,7 @@
     (lambda (return)
       (for-each
         (lambda (key)
-          (when (null? (hash-table-ref/default hash key (list)))
+          (unless (hash-table-exists? hash key)
             (return #f)))
         (list "byr" "iyr" "eyr" "hgt" "hcl" "ecl" "pid")))))
 
@@ -33,10 +33,9 @@
     (lambda (return)
       (letrec* ((get
                   (lambda (key)
-                    (let ((res (hash-table-ref/default hash key (list))))
-                      (if (null? res)
-                          (return #f)
-                          res))))
+                    (if (hash-table-exists? hash key)
+                        (hash-table-ref     hash key)
+                        (return #f))))
                 (byr (get "byr"))
                 (iyr (get "iyr"))
                 (eyr (get "eyr"))
