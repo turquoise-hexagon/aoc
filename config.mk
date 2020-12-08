@@ -11,6 +11,6 @@ $(BIN) : $(SRC)
 	$(CSC) $(CSCFLAGS) $< -o $@
 
 clean :
-	rm $(BIN)
+	rm -f $(BIN)
 
 .PHONY : all clean
