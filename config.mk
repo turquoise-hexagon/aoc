@@ -1,5 +1,5 @@
 CSC      ?= csc
-CSCFLAGS += -O5
+CSCFLAGS ?= -O5
 
 NAME = $(shell basename $(PWD))
 BIN  = $(NAME)

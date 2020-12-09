@@ -1,0 +1,56 @@
+(import (chicken io)
+        (chicken process-context)
+        (srfi 1)
+        (srfi 69))
+
+(define (import-input path)
+  (map string->number (read-lines (open-input-file path))))
+
+(define (generate-hash lst)
+  (let ((hash (make-hash-table)))
+    (do ((i lst (cdr i))) ((null? i))
+      (do ((j (cdr i) (cdr j))) ((null? j))
+        (let ((a (car i)) (b (car j)))
+          (hash-table-set! hash (+ a b) (+ (hash-table-ref/default hash (+ a b) 0) 1)))))
+    hash))
+
+(define (increment-hash hash old new tail)
+  (for-each
+    (lambda (i)
+      (let ((query (hash-table-ref hash (+ old i))))
+        (if (= 1 query)
+            (hash-table-delete! hash (+ old i))
+            (hash-table-set! hash (+ old i) (- query 1)))))
+    tail)
+  (for-each
+    (lambda (i)
+      (hash-table-set! hash (+ new i) (+ (hash-table-ref/default hash (+ new i) 0) 1)))
+    tail))
+
+(define (solve/1 input)
+  (let* ((pre (take input 25))
+         (lst (drop input 25))
+         (hash (generate-hash pre)))
+    (define (solve/1/h pre lst)
+      (if (hash-table-exists? hash (car lst))
+          (begin
+            (increment-hash hash (car pre) (car lst) (cdr pre))
+            (solve/1/h (append (cdr pre) (list (car lst))) (cdr lst)))
+          (car lst)))
+    (solve/1/h pre lst)))
+
+(define (solve/2 part/1 input)
+  (display (call/cc
+             (lambda (return)
+               (do ((input input (cdr input))) ((null? input))
+                 (let solve/2/h ((lst input) (acc (list)) (sum 0))
+                   (cond ((= sum part/1) (return (+ (apply max acc)
+                                                    (apply min acc))))
+                         ((< sum part/1)
+                          (solve/2/h (cdr lst) (cons (car lst) acc) (+ sum (car lst))))))))))
+  (newline))
+
+(let ((path (car (command-line-arguments))))
+  (let* ((input (import-input path)) (part/1 (solve/1 input)))
+    (display part/1) (newline)
+    (solve/2 part/1 input)))
