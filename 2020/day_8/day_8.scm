@@ -8,9 +8,9 @@
   (list->vector (map
                   (lambda (str)
                     (match (string-split str)
-                           ((operator argument)
-                            (list (string->symbol operator)
-                                  (string->number argument)))))
+                      ((operator argument)
+                       (list (string->symbol operator)
+                             (string->number argument)))))
                   (read-lines (open-input-file path)))))
 
 (define (run-program input)
