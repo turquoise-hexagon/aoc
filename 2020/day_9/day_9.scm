@@ -8,7 +8,7 @@
   (map string->number (read-lines (open-input-file path))))
 
 (define (generate-bag pre)
-  (let ((acc (bag (make-equal-comparator))))
+  (let ((acc (bag (make-default-comparator))))
     (do ((i pre (cdr i))) ((null? i))
       (do ((j (cdr i) (cdr j))) ((null? j))
         (let ((a (car i))
