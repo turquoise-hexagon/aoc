@@ -16,19 +16,16 @@
      (get-seat/h (drop boarding-pass 7))))
 
 (define (solve/1 ids)
-  (display (apply max ids))
-  (newline))
+  (print (apply max ids)))
 
 (define (solve/2 ids)
-  (display
-    (call/cc
-      (lambda (return)
-        (for-each
-          (lambda (id)
-            (cond ((not (member (add1 id) ids)) (return (add1 id)))
-                  ((not (member (sub1 id) ids)) (return (sub1 id)))))
-          ids))))
-  (newline))
+  (print (call/cc
+           (lambda (return)
+             (for-each
+               (lambda (id)
+                 (cond ((not (member (add1 id) ids)) (return (add1 id)))
+                       ((not (member (sub1 id) ids)) (return (sub1 id)))))
+               ids)))))
 
 (let ((path (car (command-line-arguments))))
   (let ((ids (map get-seat-id (import-input path))))

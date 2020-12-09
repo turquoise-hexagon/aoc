@@ -15,8 +15,7 @@
     (irregex-split "\n\n" (read-string #f (open-input-file path)))))
 
 (define (solve proc input)
-  (display (apply + (map set-size (map (cut apply proc <>) input))))
-  (newline))
+  (print (apply + (map set-size (map (cut apply proc <>) input)))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))

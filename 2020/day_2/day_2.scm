@@ -1,40 +1,32 @@
 (import (chicken io)
         (chicken process-context)
         (chicken string)
+        (matchable)
         (srfi 1))
+
+(define-record policy index-1 index-2 letter password)
 
 (define (import-input path)
   (map
-    (lambda (str)
-      (string-split str ": -"))
-    (read-lines (open-input-file path))))
+    (lambda (lst)
+      (match lst
+        ((index-1 index-2 letter password)
+         (make-policy (string->number index-1) (string->number index-2) letter (map string (string->list password))))))
+  (map (cut string-split <> ": -") (read-lines (open-input-file path)))))
 
-(define (is-valid/1? line)
-  (let ((lower    (string->number (car  line)))
-        (higher   (string->number (cadr line)))
-        (letter   (caddr  line))
-        (password (cadddr line)))
-    (let ((cnt (length (filter
-                         (lambda (char)
-                           (string=? letter (string char)))
-                         (string->list password)))))
-      (not (or (< cnt lower)
-               (> cnt higher))))))
+(define (is-valid/1? input)
+  (match input
+    (($ policy index-1 index-2 letter password)
+     (<= index-1 (length (filter (cut string=? letter <>) password)) index-2))))
 
-(define (is-valid/2? line)
-  (let ((index-1 (sub1 (string->number (car  line))))
-        (index-2 (sub1 (string->number (cadr line))))
-        (letter   (caddr  line))
-        (password (cadddr line)))
-    (letrec* ((helper (lambda (index)
-                        (string=? letter (string (string-ref password index)))))
-              (res (not (equal? (helper index-1)
-                                (helper index-2)))))
-      res)))
+(define (is-valid/2? input)
+  (match input
+    (($ policy index-1 index-2 letter password)
+     (not (equal? (string=? letter (list-ref password (sub1 index-1)))
+                  (string=? letter (list-ref password (sub1 index-2))))))))
 
 (define (solve proc input)
-  (display (length (filter proc input)))
-  (newline))
+  (print (length (filter proc input))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))

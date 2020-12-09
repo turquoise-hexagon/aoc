@@ -40,17 +40,16 @@
     (solve/1/h pre lst)))
 
 (define (solve/2 part/1 input)
-  (display (call/cc
-             (lambda (return)
-               (do ((input input (cdr input))) ((null? input))
-                 (let solve/2/h ((lst input) (acc (list)) (sum 0))
-                   (cond ((= sum part/1) (return (+ (apply max acc)
-                                                    (apply min acc))))
-                         ((< sum part/1)
-                          (solve/2/h (cdr lst) (cons (car lst) acc) (+ sum (car lst))))))))))
-  (newline))
+  (print (call/cc
+           (lambda (return)
+             (do ((input input (cdr input))) ((null? input))
+               (let solve/2/h ((lst input) (acc (list)) (sum 0))
+                 (cond ((= sum part/1) (return (+ (apply max acc)
+                                                  (apply min acc))))
+                       ((< sum part/1)
+                        (solve/2/h (cdr lst) (cons (car lst) acc) (+ sum (car lst)))))))))))
 
 (let ((path (car (command-line-arguments))))
   (let* ((input (import-input path)) (part/1 (solve/1 input)))
-    (display part/1) (newline)
+    (print part/1)
     (solve/2 part/1 input)))

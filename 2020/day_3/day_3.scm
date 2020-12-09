@@ -16,11 +16,10 @@
       ((>= i h) acc))))
 
 (define (solve input lst)
-  (display (apply * (map
-                      (lambda (lst)
-                        (encountered-trees input (car lst) (cadr lst)))
-                      lst)))
-  (newline))
+  (print (apply * (map
+                    (lambda (lst)
+                      (encountered-trees input (car lst) (cadr lst)))
+                    lst))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))
