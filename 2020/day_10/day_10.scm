@@ -24,15 +24,15 @@
             (length (filter (cut = <> 3) input)))))
 
 (define (solve/2 input)
-  (print (apply * (map
-                    (lambda (n)
-                      (tribonacci (+ n 2)))
-                    (fold
-                      (lambda (a acc)
-                        (if (= a 1)
-                            (cons (+ 1 (car acc)) (cdr acc))
-                            (cons 0 acc)))
-                      (list 0) input)))))
+  (print (fold
+           (lambda (a acc)
+             (* (tribonacci (+ a 2)) acc))
+           1 (fold
+               (lambda (a acc)
+                 (if (= a 1)
+                     (cons (+ 1 (car acc)) (cdr acc))
+                     (cons 0 acc)))
+               (list 0) input))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))
