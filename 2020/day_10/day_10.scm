@@ -28,14 +28,12 @@
   (print (apply * (map
                     (lambda (n)
                       (tribonacci (+ n 2)))
-                    (do ((lst (diffs input) (cdr lst))
-                         (cnt 0 (if (= (car lst) 1)
-                                    (+ cnt 1)
-                                    0))
-                         (acc (list) (if (= (car lst) 1)
-                                         acc
-                                         (cons cnt acc))))
-                      ((null? lst) (cons cnt acc)))))))
+                    (fold
+                      (lambda (a acc)
+                        (if (= a 1)
+                            (cons (+ 1 (car acc)) (cdr acc))
+                            (cons 0 acc)))
+                      (list 0) (diffs input))))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))
