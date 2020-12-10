@@ -14,11 +14,10 @@
         (tribonacci/h b c (+ a b c) (- n 1)))))
 
 (define (diffs input)
-  (do ((lst input (cdr lst))
-       (acc (list) (cons (- (cadr lst)
-                            (car  lst))
-                         acc)))
-    ((null? (cdr lst)) acc)))
+  (fold
+    (lambda (a b acc)
+      (cons (- b a) acc))
+    (list) input (cdr input)))
 
 (define (solve/1 input)
   (let ((diffs (diffs input)))
