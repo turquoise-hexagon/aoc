@@ -26,16 +26,17 @@
               (length (filter (cut = <> 3) diffs))))))
 
 (define (solve/2 input)
-  (let* ((diffs (diffs input))
-         (queue (do ((lst diffs (cdr lst))
-                     (cnt 0 (if (= (car lst) 1)
-                                (+ cnt 1)
-                                0))
-                     (acc (list) (if (= (car lst) 1)
-                                     acc
-                                     (cons cnt acc))))
-                  ((null? lst) (cons cnt acc)))))
-    (print (apply * (map (lambda (n) (tribonacci (+ n 2))) queue)))))
+  (print (apply * (map
+                    (lambda (n)
+                      (tribonacci (+ n 2)))
+                    (do ((lst (diffs input) (cdr lst))
+                         (cnt 0 (if (= (car lst) 1)
+                                    (+ cnt 1)
+                                    0))
+                         (acc (list) (if (= (car lst) 1)
+                                         acc
+                                         (cons cnt acc))))
+                      ((null? lst) (cons cnt acc)))))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))
