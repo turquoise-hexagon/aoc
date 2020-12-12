@@ -40,9 +40,9 @@
        ((key value)
         (let ((proc (cdr (assoc key moveset))))
           (case key
-            ((F)       (match (proc position waypoint value) ((a . b) (set! position a))))
-            ((N S E W) (match (proc waypoint waypoint value) ((a . b) (set! waypoint a))))
-            ((L R)     (match (proc waypoint waypoint value) ((a . b) (set! waypoint b)))))))))
+            ((N S E W) (set! waypoint (car (proc waypoint waypoint value))))
+            ((L R)     (set! waypoint (cdr (proc waypoint waypoint value))))
+            ((F)       (set! position (car (proc position waypoint value)))))))))
     input)
   (print (apply + (map abs (list (real-part position)
                                  (imag-part position))))))
