@@ -40,9 +40,9 @@
                                 ((id . offset)
                                  (= (modulo (+ current offset) id) 0))))
                             offsets)))
-                 (if (= (length lst) (length offsets))
+                 (if (equal? lst offsets)
                      current
-                     (solve/2/h (+ current (apply lcm (map car lst))))))))))))
+                     (solve/2/h (+ current (apply * (map car lst))))))))))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))
