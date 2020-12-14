@@ -11,13 +11,10 @@
     (lambda (lst)
       (match lst
         ((mask . instructions)
-         (list mask
-               (map
-                 (lambda (instruction)
-                   (match (string-split instruction "[]= ")
-                     ((_ address value)
-                      (map string->number (list address value)))))
-                 instructions)))))
+         (list mask (map
+                      (lambda (instructions)
+                        (map string->number (cdr (string-split instructions "[]= "))))
+                      instructions)))))
     (map (cut string-split <> "\n") (irregex-split "mask = " (read-string #f (open-input-file path))))))
 
 (define (parse-mask mask)
