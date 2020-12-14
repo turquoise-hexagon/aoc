@@ -38,29 +38,22 @@
           (case (car mask)
             ((#\0) (generate-combinations/h (cdr address) (cdr mask) (cons (car address) acc)))
             ((#\1) (generate-combinations/h (cdr address) (cdr mask) (cons #\1           acc)))
-            ((#\X)
-             (append (generate-combinations/h (cdr address) (cdr mask) (cons #\0 acc))
-                     (generate-combinations/h (cdr address) (cdr mask) (cons #\1 acc)))))))
+            ((#\X) (append (generate-combinations/h (cdr address) (cdr mask) (cons #\0 acc))
+                           (generate-combinations/h (cdr address) (cdr mask) (cons #\1 acc)))))))
     (map (cut string->number <> 2) (generate-combinations/h (string->list address) (string->list mask) (list)))))
 
-(define (solve/1 input)
-  (let ((memory (make-hash-table)))
-    (for-each
-      (lambda (lst)
-        (match lst
-          ((mask . (instructions))
-           (match (parse-mask mask)
-            ((mask1 mask2)
-             (for-each
-               (lambda (instruction)
-                 (match instruction
-                  ((address value)
-                   (hash-table-set! memory address (bitwise-ior (bitwise-and value mask1) mask2)))))
-               instructions))))))
-      input)
-    (print (apply + (hash-table-values memory)))))
+(define (proc/1 memory mask address value)
+  (match (parse-mask mask)
+    ((mask1 mask2)
+     (hash-table-set! memory address (bitwise-ior (bitwise-and value mask1) mask2)))))
 
-(define (solve/2 input)
+(define (proc/2 memory mask address value)
+  (for-each
+    (lambda (address)
+      (hash-table-set! memory address value))
+    (generate-combinations address mask)))
+
+(define (solve proc input)
   (let ((memory (make-hash-table)))
     (for-each
       (lambda (lst)
@@ -70,15 +63,12 @@
              (lambda (instruction)
                (match instruction
                  ((address value)
-                  (for-each
-                    (lambda (address)
-                      (hash-table-set! memory address value))
-                    (generate-combinations address mask)))))
-             instructions))))
+                  (proc memory mask address value))))
+              instructions))))
       input)
     (print (apply + (hash-table-values memory)))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))
-    (solve/1 input)
-    (solve/2 input)))
+    (solve proc/1 input)
+    (solve proc/2 input)))
