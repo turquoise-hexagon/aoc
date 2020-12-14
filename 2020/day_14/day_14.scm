@@ -18,9 +18,8 @@
     (map (cut string-split <> "\n") (irregex-split "mask = " (read-string #f (open-input-file path))))))
 
 (define (parse-mask mask)
-  (let* ((mask1 (irregex-replace/all "[01]" mask  "0"))
-         (mask1 (irregex-replace/all   "X"  mask1 "1"))
-         (mask2 (irregex-replace/all   "X"  mask  "0")))
+  (let* ((mask1 (irregex-replace/all "X"  mask "1"))
+         (mask2 (irregex-replace/all "X"  mask "0")))
     (map (cut string->number <> 2) (list mask1 mask2))))
 
 (define (combinations address mask)
