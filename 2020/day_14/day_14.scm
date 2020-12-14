@@ -26,8 +26,7 @@
             (case (car mask)
               ((#\1) (proc "1"))
               ((#\0) (proc (string (car address))))
-              ((#\X) (append (proc "0")
-                             (proc "1")))))))))
+              ((#\X) (append (proc "0") (proc "1")))))))))
 
 (define (proc/1 memory mask address value)
   (let ((mask1 (string->number (irregex-replace/all "X" mask "1") 2))
