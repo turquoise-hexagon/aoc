@@ -17,11 +17,6 @@
                       instructions)))))
     (map (cut string-split <> "\n") (irregex-split "mask = " (read-string #f (open-input-file path))))))
 
-(define (parse-mask mask)
-  (let* ((mask1 (irregex-replace/all "X"  mask "1"))
-         (mask2 (irregex-replace/all "X"  mask "0")))
-    (map (cut string->number <> 2) (list mask1 mask2))))
-
 (define (combinations address mask)
   (let ((address (do ((acc (number->string address 2) (string-append "0" acc))) ((= (string-length acc) (string-length mask)) acc))))
     (map (cut string->number <> 2)
@@ -35,9 +30,9 @@
                                 (combinations/h (cdr address) (cdr mask) (cons #\1 acc))))))))))
 
 (define (proc/1 memory mask address value)
-  (match (parse-mask mask)
-    ((mask1 mask2)
-     (hash-table-set! memory address (bitwise-ior (bitwise-and value mask1) mask2)))))
+  (let ((mask1 (string->number (irregex-replace/all "X" mask "1") 2))
+        (mask2 (string->number (irregex-replace/all "X" mask "0") 2)))
+    (hash-table-set! memory address (bitwise-ior (bitwise-and value mask1) mask2))))
 
 (define (proc/2 memory mask address value)
   (for-each
