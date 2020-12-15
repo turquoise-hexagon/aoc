@@ -22,8 +22,8 @@
 (define (is-valid/2? input)
   (match input
     (($ policy index-1 index-2 letter password)
-     (not (equal? (string=? letter (list-ref password (sub1 index-1)))
-                  (string=? letter (list-ref password (sub1 index-2))))))))
+     (not (equal? (string=? letter (list-ref password (- index-1 1)))
+                  (string=? letter (list-ref password (- index-2 1))))))))
 
 (define (solve proc input)
   (print (length (filter proc input))))
