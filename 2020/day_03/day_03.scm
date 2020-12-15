@@ -11,7 +11,7 @@
     (do ((i 0 (+ i down))
          (j 0 (+ j right))
          (acc 0 (if (char=? #\# (vector-ref (vector-ref input (remainder i h)) (remainder j w)))
-                    (add1 acc)
+                    (+ acc 1)
                     acc)))
       ((>= i h) acc))))
 
