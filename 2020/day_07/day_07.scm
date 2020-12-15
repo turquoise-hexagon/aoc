@@ -38,7 +38,7 @@
       (if (equal? keys (hash-table-keys hash))
           keys
           (solve/1/h hash))))
-  (print (sub1 (length (solve/1/h (alist->hash-table `((,color . 0))))))))
+  (print (- (length (solve/1/h (alist->hash-table `((,color . 0))))) 1)))
 
 (define (solve/2 input color)
   (define (solve/2/h color)
@@ -48,7 +48,7 @@
           (apply + (cons 1 (hash-table-map hash
                                            (lambda (key hash)
                                              (* hash (solve/2/h key)))))))))
-  (print (sub1 (solve/2/h color))))
+  (print (- (solve/2/h color) 1)))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))
