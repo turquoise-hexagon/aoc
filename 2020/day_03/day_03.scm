@@ -1,5 +1,6 @@
 (import (chicken io)
-        (chicken process-context))
+        (chicken process-context)
+        (matchable))
 
 (define (import-input path)
   (list->vector (map list->vector (map string->list (read-lines (open-input-file path))))))
@@ -9,8 +10,7 @@
         (w (vector-length (vector-ref input 0))))
     (do ((i 0 (+ i down))
          (j 0 (+ j right))
-         (acc 0 (if (char=? #\# (vector-ref (vector-ref input (remainder i h))
-                                            (remainder j w)))
+         (acc 0 (if (char=? #\# (vector-ref (vector-ref input (remainder i h)) (remainder j w)))
                     (add1 acc)
                     acc)))
       ((>= i h) acc))))
@@ -18,7 +18,7 @@
 (define (solve input lst)
   (print (apply * (map
                     (lambda (lst)
-                      (encountered-trees input (car lst) (cadr lst)))
+                      (match lst ((right down) (encountered-trees input right down))))
                     lst))))
 
 (let ((path (car (command-line-arguments))))
