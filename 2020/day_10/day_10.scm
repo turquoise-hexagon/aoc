@@ -15,7 +15,7 @@
 
 (define (tribonacci n)
   (let tribonacci/h ((a 0) (b 0) (c 1) (n n))
-    (if (zero? n)
+    (if (= n 0)
         a
         (tribonacci/h b c (+ a b c) (- n 1)))))
 
