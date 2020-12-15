@@ -9,11 +9,10 @@
   (map string->number (string-split (read-string #f (open-input-file path)) ",\n")))
 
 (define (solve input n)
-  (let ((hash (fold
-                (lambda (a b acc)
-                  (hash-table-set! acc a b)
-                  acc)
-                (make-hash-table) input (iota (length input) 1 1))))
+  (let ((hash (alist->hash-table (fold
+                                   (lambda (a b acc)
+                                     (cons (cons a b) acc))
+                                   (list) input (iota (length input) 1 1)))))
     (let solve/1/h ((turn (length input)) (last (car (reverse input))))
       (if (= turn n) (print last)
           (let ((new (match (hash-table-ref/default hash last #f)
