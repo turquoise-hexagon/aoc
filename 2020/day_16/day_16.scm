@@ -82,14 +82,8 @@
   (let ((matches (make-hash-table))
         (unmatched-fields  (make-hash-table))
         (unmatched-columns (make-hash-table)))
-    (for-each
-      (lambda (field)
-        (hash-table-set! unmatched-fields  field  0))
-      fields)
-    (for-each
-      (lambda (column)
-        (hash-table-set! unmatched-columns column 0))
-      (iota (length (car valid-tickets))))
+    (for-each (lambda (field)  (hash-table-set! unmatched-fields  field  0)) fields)
+    (for-each (lambda (column) (hash-table-set! unmatched-columns column 0)) (iota (length (car valid-tickets))))
     (let list-matches/h ()
       (if (null? (hash-table-keys unmatched-columns))
           matches
