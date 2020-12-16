@@ -2,8 +2,7 @@
         (chicken process-context)
         (chicken irregex)
         (matchable)
-        (srfi 1)
-        (srfi 69))
+        (srfi 1))
 
 (define-record field name items)
 
@@ -74,25 +73,17 @@
                                                     acc))))))
 
 (define (list-matches fields valid-tickets)
-  (let ((matches (make-hash-table))
-        (unmatched-fields  (make-hash-table))
-        (unmatched-columns (make-hash-table)))
-    (for-each (lambda (field)  (hash-table-set! unmatched-fields  field  0)) fields)
-    (for-each (lambda (column) (hash-table-set! unmatched-columns column 0)) (iota (length (car valid-tickets))))
-    (let list-matches/h ()
-      (if (null? (hash-table-keys unmatched-columns))
-          matches
-          (begin
-            (for-each
-              (lambda (column)
-                (match (list-possible-matches (map (cut list-ref <> column) valid-tickets) (hash-table-keys unmatched-fields))
-                  ((field)
-                   (hash-table-delete! unmatched-fields  field)
-                   (hash-table-delete! unmatched-columns column)
-                   (hash-table-set! matches field column))
-                  (_ void)))
-            (hash-table-keys unmatched-columns))
-            (list-matches/h))))))
+  (let list-matches/h ((fields fields) (columns (iota (length (car valid-tickets)))) (acc (list)))
+    (call/cc
+      (lambda (return)
+        (for-each
+          (lambda (column)
+            (match (list-possible-matches (map (cut list-ref <> column) valid-tickets) fields)
+              ((field)
+               (return (list-matches/h (delete field fields) (delete column columns) (cons (list field column) acc))))
+              (_ void)))
+          columns)
+        (return acc)))))
 
 (define (solve/2 input)
   (match input
@@ -101,10 +92,12 @@
        (print (apply * (map (cut list-ref (car yours) <>)
                             (fold
                               (lambda (a acc)
-                                (if (irregex-match? "departure.*" (field-name a))
-                                    (cons (hash-table-ref matches a) acc)
-                                    acc))
-                              (list) (hash-table-keys matches)))))))))
+                                (match a
+                                  ((field position)
+                                   (if (irregex-match? "departure.*" (field-name field))
+                                       (cons position acc)
+                                       acc))))
+                              (list) matches))))))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))
