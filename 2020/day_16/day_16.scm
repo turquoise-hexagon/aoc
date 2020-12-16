@@ -59,7 +59,7 @@
 (define (solve/1 input)
   (match input
     ((fields yours others)
-     (print (apply + (map (cut apply + <>) (filter list? (map (cut is-valid-ticket? <> fields) others))))))))
+     (print (apply + (is-valid-ticket? (apply append others) fields))))))
 
 (define (list-valid-tickets fields yours others)
   (fold
