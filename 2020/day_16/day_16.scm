@@ -40,9 +40,7 @@
                      (<= lower value higher))))
                 (fold
                   (lambda (a acc)
-                    (match a
-                      (($ field _ items)
-                       (append items acc))))
+                    (append (field-items a) acc))
                   (list) fields)))))
 
 (define (is-valid-ticket? ticket fields)
