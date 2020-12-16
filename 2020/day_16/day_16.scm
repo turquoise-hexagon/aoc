@@ -38,10 +38,7 @@
                   (match constraint
                     ((lower higher)
                      (<= lower value higher))))
-                (fold
-                  (lambda (a acc)
-                    (append (field-items a) acc))
-                  (list) fields)))))
+                (apply append (map field-items fields))))))
 
 (define (is-valid-ticket? ticket fields)
   (let ((result (fold
