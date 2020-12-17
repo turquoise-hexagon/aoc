@@ -46,22 +46,19 @@
 (define (iterate-world input)
   (match input
     (($ world content h-start h-end w-start w-end d-start d-end)
-     (let ((copy-content (hash-table-copy content))
-           (copy-h-start (- h-start 1)) (copy-h-end (+ h-end 1))
-           (copy-w-start (- w-start 1)) (copy-w-end (+ w-end 1))
-           (copy-d-start (- d-start 1)) (copy-d-end (+ d-end 1)))
-       (do ((i copy-h-start (+ i 1))) ((= i copy-h-end))
-         (do ((j copy-w-start (+ j 1))) ((= j copy-w-end))
-           (do ((k copy-d-start (+ k 1))) ((= k copy-d-end))
+     (let ((copy-content (hash-table-copy content)))
+       (do ((i (- h-start 1) (+ i 1))) ((= i (+ h-end 1)))
+         (do ((j (- w-start 1) (+ j 1))) ((= j (+ w-end 1)))
+           (do ((k (- d-start 1) (+ k 1))) ((= k (+ d-end 1)))
              (let ((cnt (count-neighbors input i j k)) (point (make-point i j k)))
                (case cnt
                  ((2))
                  ((3)  (hash-table-set! copy-content point #\#))
                  (else (hash-table-set! copy-content point #\.)))))))
        (make-world copy-content
-                   copy-h-start copy-h-end
-                   copy-w-start copy-w-end
-                   copy-d-start copy-d-end)))))
+                   (- h-start 1) (+ h-end 1)
+                   (- w-start 1) (+ w-end 1)
+                   (- d-start 1) (+ d-end 1))))))
 
 (define (solve/1 input n)
   (let solve/1/h ((n n) (input input))
