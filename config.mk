@@ -1,13 +1,13 @@
 CSC      ?= csc
 CSCFLAGS ?= -O5
 
-NAME = $(shell basename $(PWD))
-BIN  = $(NAME)
-SRC  = $(NAME).scm
+BIN = $(shell printf '%s\n' *.scm | sed 's|\.scm$$||g')
+#BIN  = $(NAME)
+#SRC  = $(NAME).scm
 
 all : $(BIN)
 
-$(BIN) : $(SRC)
+% : %.scm
 	$(CSC) $(CSCFLAGS) $< -o $@
 
 clean :
