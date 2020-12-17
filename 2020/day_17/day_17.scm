@@ -39,22 +39,24 @@
             acc))
     (list) offsets))
 
-(define (iterate-world tuples-table offsets)
-  (let ((next (make-hash-table)) (neighbors (make-hash-table)))
+(define (generate-neighbors-table tuples-table offsets)
+  (let ((neighbors (make-hash-table)))
     (for-each
       (lambda (tuple)
         (hash-table-set! neighbors tuple (+ (hash-table-ref/default neighbors tuple 0) 1)))
       (fold
         (lambda (a acc)
-          (append (filter
-                    (lambda (b)
-                      (not (equal? a b)))
-                    (generate-neighbors a offsets))
-                  acc))
+          (append (delete a (generate-neighbors a offsets)) acc))
         (list) (hash-table-keys tuples-table)))
-    (hash-table-for-each neighbors
+    neighbors))
+
+(define (iterate-world tuples-table offsets)
+  (let ((next (make-hash-table)))
+    (hash-table-for-each (generate-neighbors-table tuples-table offsets)
       (lambda (tuple count)
-        (when (or (and (hash-table-exists? tuples-table tuple) (= count 2)) (= count 3))
+        (when (or      (= count 3)
+                  (and (= count 2)
+                       (hash-table-exists? tuples-table tuple)))
           (hash-table-set! next tuple 0))))
     next))
 
