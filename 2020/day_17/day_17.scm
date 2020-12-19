@@ -18,15 +18,11 @@
   (append lst (iota (- size (length lst)) 0 0)))
 
 (define (input->tuples-table input size)
-  (let ((table (make-hash-table)))
-    (for-each
-      (lambda (i)
-        (for-each
-          (lambda (j)
-            (when (char=? (list-ref (list-ref input i) j) #\#)
-              (hash-table-set! table (init-tuple (list i j) size) 0)))
-          (iota (length (list-ref input 0)))))
-      (iota (length input)))
+  (let ((h (length input)) (w (length (list-ref input 0))) (table (make-hash-table)))
+    (do ((i 0 (+ i 1))) ((= i h))
+      (do ((j 0 (+ j 1))) ((= j w))
+        (when (char=? (list-ref (list-ref input i) j) #\#)
+          (hash-table-set! table (init-tuple (list i j) size) 0))))
     table))
 
 (define (generate-neighbors tuple offsets)
