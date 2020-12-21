@@ -130,32 +130,47 @@
                       (cons (take (drop a 1) (- w 2)) acc))
                     (list) (take (drop content 1) (- h 2))))))))
 
-(define (put-image-together matched-tiles)
+(define (fix-matched-tiles matched-tiles)
   (let* ((lst (hash-table-values matched-tiles))
-         (x-min (apply min (map car  lst)))
-         (x-max (apply max (map car  lst)))
-         (y-min (apply min (map cadr lst)))
-         (y-max (apply max (map cadr lst))))
-    (let* ((h (+ 1 (abs x-min) (abs x-max))) (w (+ 1 (abs y-min) (abs y-max))) (array (make-vector (* h 8))))
-      (for-each
-        (cut vector-set! array <> (make-vector (* w 8)))
-        (iota (* h 8)))
+         (h-min (apply min (map car  lst)))
+         (w-min (apply min (map cadr lst))))
+    (let ((hash (make-hash-table)))
       (hash-table-for-each matched-tiles
         (lambda (tile coordinates)
           (match coordinates
-            ((x y) (let ((x (- x x-min)) (y (- y y-min)))
-              (let ((cut (cut-tile-to-size tile)))
-                (match cut
-                  ((_ content)
-                   (let ((h (length content)) (w (length (list-ref content 0))))
-                     (for-each
-                       (lambda (i)
-                         (for-each
-                           (lambda (j)
-                             (vector-set! (vector-ref array (+ (* x h) i)) (+ (* y w) j) (list-ref (list-ref content i) j)))
-                           (iota w)))
-                       (iota h)))))))))))
-      (list 0 (map vector->list (vector->list array))))))
+            ((x y) (hash-table-set! hash (cut-tile-to-size tile) `(,(- x h-min) ,(- y w-min)))))))
+      hash)))
+
+(define (allocate-vector matched-tiles)
+  (let* ((lst (hash-table-values matched-tiles))
+         (h-max (apply max (map car  lst)))
+         (w-max (apply max (map cadr lst))))
+    (match (car (hash-table-keys matched-tiles))
+      ((_ content)
+       (let ((h (length content)) (w (length (list-ref content 0))))
+         (let ((array (make-vector (* h (+ h-max 1)))))
+           (for-each
+             (cut vector-set! array <> (make-vector (* w (+ w-max 1))))
+             (iota (* h (+ h-max 1))))
+           array))))))
+
+(define (put-image-together matched-tiles)
+  (let* ((fixed-tiles (fix-matched-tiles matched-tiles)) (array (allocate-vector fixed-tiles)))
+    (hash-table-for-each fixed-tiles
+      (lambda (tile coordinates)
+        (match coordinates
+          ((x y)
+           (match tile
+             ((_ content)
+              (let ((h (length content)) (w (length (list-ref content 0))))
+                (for-each
+                  (lambda (i)
+                    (for-each
+                      (lambda (j)
+                        (vector-set! (vector-ref array (+ (* x h) i)) (+ (* y w) j) (list-ref (list-ref content i) j)))
+                      (iota w)))
+                  (iota h)))))))))
+    (list 0 (map vector->list (vector->list array)))))
 
 (define (check-for-sea-monster content i j)
   (let ((h (length sea-monster)) (w (length (list-ref sea-monster 0))))
