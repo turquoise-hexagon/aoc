@@ -32,16 +32,15 @@
     ((name content)
      (list name (reverse content)))))
 
-(define (generate-tile-permutations tile)
-  (let ((a tile))
-    (let* ((b (rotate-tile a))
-           (c (rotate-tile b))
-           (d (rotate-tile c))
-           (e (flip-tile   a))
-           (f (rotate-tile e))
-           (g (rotate-tile f))
-           (h (rotate-tile g)))
-      (list a b c d e f g h))))
+(define (generate-tile-permutations a)
+  (let* ((b (rotate-tile a))
+         (c (rotate-tile b))
+         (d (rotate-tile c))
+         (e (flip-tile   a))
+         (f (rotate-tile e))
+         (g (rotate-tile f))
+         (h (rotate-tile g)))
+    (list a b c d e f g h)))
 
 (define (get-border tile arg)
   (match tile
@@ -81,15 +80,15 @@
        (hash-table-set! hash head '(0 0))
        (let match-tile/h ()
          (hash-table-for-each hash
-           (lambda (hash-key hash-value)
-             (for-each
-               (lambda (todo-key)
-                 (match (list hash-value (match-tile hash-key (assoc todo-key input)))
-                   (((x y) ((a b) tile))
-                    (hash-table-delete! todo todo-key)
-                    (hash-table-set! hash tile (list (+ x a) (+ y b))))
-                   (_ void)))
-               (hash-table-keys todo))))
+            (lambda (hash-key hash-value)
+              (match hash-value
+                ((x y) (for-each
+                  (lambda (todo-key)
+                    (match (match-tile hash-key (assoc todo-key input))
+                      (((a b) tile)
+                       (hash-table-delete! todo todo-key) (hash-table-set! hash tile `(,(+ x a) ,(+ y b))))
+                      (_ void)))
+                  (hash-table-keys todo))))))
          (unless (null? (hash-table-keys todo))
            (match-tile/h)))
        hash))))
@@ -130,27 +129,30 @@
                     (list) (take (drop content 1) (- h 2))))))))
 
 (define (put-image-together matched-tiles)
-  (let* ((lst (hash-table-values matched-tiles)) (x-s (map car lst)) (y-s (map cadr lst))
-         (x-min (apply min x-s)) (x-max (apply max x-s))
-         (y-min (apply min y-s)) (y-max (apply max y-s)))
+  (let* ((lst (hash-table-values matched-tiles))
+         (x-min (apply min (map car  lst)))
+         (x-max (apply max (map car  lst)))
+         (y-min (apply min (map cadr lst)))
+         (y-max (apply max (map cadr lst))))
     (let* ((h (+ 1 (abs x-min) (abs x-max))) (w (+ 1 (abs y-min) (abs y-max))) (array (make-vector (* h 8))))
-      (for-each (cut vector-set! array <> (make-vector (* w 8))) (iota (* h 8)))
+      (for-each
+        (cut vector-set! array <> (make-vector (* w 8)))
+        (iota (* h 8)))
       (hash-table-for-each matched-tiles
         (lambda (tile coordinates)
           (match coordinates
-            ((x y)
-             (let ((x (- x x-min)) (y (- y y-min)))
-               (let ((cut (cut-tile-to-size tile)))
-                 (match cut
-                   ((_ content)
-                    (let ((h (length content)) (w (length (list-ref content 0))))
-                      (for-each
-                        (lambda (i)
-                          (for-each
-                            (lambda (j)
-                              (vector-set! (vector-ref array (+ (* x h) i)) (+ (* y w) j) (list-ref (list-ref content i) j)))
-                            (iota w)))
-                        (iota h)))))))))))
+            ((x y) (let ((x (- x x-min)) (y (- y y-min)))
+              (let ((cut (cut-tile-to-size tile)))
+                (match cut
+                  ((_ content)
+                   (let ((h (length content)) (w (length (list-ref content 0))))
+                     (for-each
+                       (lambda (i)
+                         (for-each
+                           (lambda (j)
+                             (vector-set! (vector-ref array (+ (* x h) i)) (+ (* y w) j) (list-ref (list-ref content i) j)))
+                           (iota w)))
+                       (iota h)))))))))))
       (list 0 (map vector->list (vector->list array))))))
 
 (define (check-for-sea-monster content i j)
