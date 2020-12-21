@@ -147,12 +147,11 @@
          (w-max (apply max (map cadr lst))))
     (match (car (hash-table-keys matched-tiles))
       ((_ content)
-       (let ((h (length content)) (w (length (list-ref content 0))))
-         (let ((array (make-vector (* h (+ h-max 1)))))
-           (for-each
-             (cut vector-set! array <> (make-vector (* w (+ w-max 1))))
-             (iota (* h (+ h-max 1))))
-           array))))))
+       (let* ((h (length content)) (w (length (list-ref content 0))) (array (make-vector (* h (+ h-max 1)))))
+         (for-each
+           (cut vector-set! array <> (make-vector (* w (+ w-max 1))))
+           (iota (* h (+ h-max 1))))
+         array)))))
 
 (define (put-image-together matched-tiles)
   (let* ((fixed-tiles (fix-matched-tiles matched-tiles)) (array (allocate-vector fixed-tiles)))
