@@ -76,7 +76,9 @@
   (match input
     ((head . tail)
      (let ((hash (make-hash-table)) (todo (make-hash-table)))
-       (for-each (cut hash-table-set! todo <> 0) (map car tail))
+       (for-each
+         (cut hash-table-set! todo <> 0)
+         (map car tail))
        (hash-table-set! hash head '(0 0))
        (let match-tile/h ()
          (hash-table-for-each hash
@@ -162,13 +164,12 @@
       (lambda (return)
         (for-each
           (lambda (x)
+            (when (= (+ x i) h-max) (return #f))
             (for-each
               (lambda (y)
-                (when (or (= (+ x i) h-max)
-                          (= (+ y j) w-max))
-                  (return #f))
+                (when (= (+ y j) w-max) (return #f))
                 (when (and (char=? #\# (list-ref (list-ref sea-monster x) y))
-                           (not (char=? #\# (list-ref (list-ref content (+ x i)) (+ y j)))))
+                           (char=? #\. (list-ref (list-ref content (+ x i)) (+ y j))))
                   (return #f)))
               (iota w)))
           (iota h))
