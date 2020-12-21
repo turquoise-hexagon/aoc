@@ -28,9 +28,7 @@
                   (list) (iota (length (list-ref content 0))))))))
 
 (define (flip-tile tile)
-  (match tile
-    ((name content)
-     (list name (reverse content)))))
+  (match tile ((name content) (list name (reverse content)))))
 
 (define (generate-tile-permutations a)
   (let* ((b (rotate-tile a))
@@ -82,13 +80,13 @@
        (hash-table-set! hash head '(0 0))
        (let match-tile/h ()
          (hash-table-for-each hash
-            (lambda (hash-key hash-value)
-              (match hash-value
-                ((x y) (for-each
+           (lambda (hash-key hash-value)
+             (match hash-value
+               ((x y)
+                (for-each
                   (lambda (todo-key)
                     (match (match-tile hash-key (assoc todo-key input))
-                      (((a b) tile)
-                       (hash-table-delete! todo todo-key) (hash-table-set! hash tile `(,(+ x a) ,(+ y b))))
+                      (((a b) tile) (hash-table-delete! todo todo-key) (hash-table-set! hash tile `(,(+ x a) ,(+ y b))))
                       (_ void)))
                   (hash-table-keys todo))))))
          (unless (null? (hash-table-keys todo))
@@ -113,10 +111,10 @@
     (print (apply * (fold
                       (lambda (a acc)
                         (match a
-                               ((key val)
-                                (if (= 2 (count-neighbors val lst))
-                                    (cons key acc)
-                                    acc))))
+                          ((key val)
+                           (if (= 2 (count-neighbors val lst))
+                               (cons key acc)
+                               acc))))
                       (list) (hash-table-map matched-tiles
                                (lambda (key val)
                                  (list (car key) val))))))))
@@ -146,12 +144,11 @@
          (h-max (apply max (map car  lst)))
          (w-max (apply max (map cadr lst))))
     (match (car (hash-table-keys matched-tiles))
-      ((_ content)
-       (let* ((h (length content)) (w (length (list-ref content 0))) (array (make-vector (* h (+ h-max 1)))))
-         (for-each
-           (cut vector-set! array <> (make-vector (* w (+ w-max 1))))
-           (iota (* h (+ h-max 1))))
-         array)))))
+      ((_ content) (let* ((h (length content)) (w (length (list-ref content 0))) (array (make-vector (* h (+ h-max 1)))))
+                     (for-each
+                       (cut vector-set! array <> (make-vector (* w (+ w-max 1))))
+                       (iota (* h (+ h-max 1))))
+                     array)))))
 
 (define (put-image-together matched-tiles)
   (let* ((fixed-tiles (fix-matched-tiles matched-tiles)) (array (allocate-vector fixed-tiles)))
@@ -210,9 +207,7 @@
                          a))))
       0 lst))
   (match tile
-    ((_ content)
-     (- (water-roughness/h content)
-        (* (count-sea-monsters tile) (water-roughness/h sea-monster))))))
+    ((_ content) (- (water-roughness/h content) (* (count-sea-monsters tile) (water-roughness/h sea-monster))))))
 
 (define (solve/2 image)
   (print (apply min (map water-roughness (generate-tile-permutations image)))))
