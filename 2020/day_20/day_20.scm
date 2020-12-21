@@ -176,16 +176,15 @@
   (match tile
     ((_ content)
      (let ((h (length content)) (w (length (list-ref content 0))))
-       (set! cnt 0)
-       (for-each
-         (lambda (i)
-           (for-each
-             (lambda (j)
-               (when (check-for-sea-monster content i j)
-                 (set! cnt (+ cnt 1))))
-             (iota (- w (length (list-ref sea-monster 0))))))
-           (iota (- h (length sea-monster))))
-       cnt))))
+       (fold
+         (lambda (a acc)
+           (+ acc (fold
+                    (lambda (b acc)
+                      (if (check-for-sea-monster content a b)
+                          (+ acc 1)
+                          acc))
+                    0 (iota (- w (length (list-ref sea-monster 0)))))))
+         0 (iota (- h (length sea-monster))))))))
 
 (define (water-roughness tile)
   (define (water-roughness/h lst)
