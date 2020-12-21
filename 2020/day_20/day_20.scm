@@ -3,18 +3,21 @@
         (chicken irregex)
         (chicken string)
         (matchable)
-        (srfi 1)
-        (srfi 69))
+        (srfi 69)
+        (srfi 1))
+
+(define sea-monster
+  (map string->list (list "                  # "
+                          "#    ##    ##    ###"
+                          " #  #  #  #  #  #   ")))
 
 (define (chunk->tile chunk)
   (match (string-split chunk "\n")
     ((name . content)
      (list (string->number (car (irregex-extract "[0-9]+" name))) (map string->list content)))))
 
-(define sea-monster
-  (map string->list (list "                  # "
-                          "#    ##    ##    ###"
-                          " #  #  #  #  #  #   ")))
+(define (import-input path)
+  (map chunk->tile (irregex-split "\n\n" (read-string #f (open-input-file path)))))
 
 (define (rotate-tile tile)
   (match tile
@@ -28,9 +31,6 @@
   (match tile
     ((name content)
      (list name (reverse content)))))
-
-(define (import-input path)
-  (map chunk->tile (irregex-split "\n\n" (read-string #f (open-input-file path)))))
 
 (define (generate-tile-permutations tile)
   (let ((a tile))
