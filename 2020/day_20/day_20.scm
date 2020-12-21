@@ -170,18 +170,16 @@
 
 (define (check-for-sea-monster content i j)
   (let ((h (length sea-monster)) (w (length (list-ref sea-monster 0))))
-    (call/cc
-      (lambda (return)
-        (for-each
-          (lambda (x)
-            (for-each
-              (lambda (y)
-                (when (and (char=? #\# (list-ref (list-ref sea-monster x) y))
-                           (char=? #\. (list-ref (list-ref content (+ x i)) (+ y j))))
-                  (return #f)))
-              (iota w)))
-          (iota h))
-        (return #t)))))
+    (fold
+      (lambda (a acc)
+        (and acc (fold
+                   (lambda (b acc)
+                     (if (and (char=? #\# (list-ref (list-ref sea-monster a) b))
+                              (char=? #\. (list-ref (list-ref content (+ i a)) (+ j b))))
+                         #f
+                         acc))
+                   #t (iota w))))
+      #t (iota h))))
 
 (define (count-sea-monsters tile)
   (match tile
