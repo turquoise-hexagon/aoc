@@ -76,27 +76,22 @@
 (define (match-tiles input)
   (match input
     ((head . tail)
-     (let ((hash (make-hash-table))
-           (todo (make-hash-table)))
-       (for-each
-         (cut hash-table-set! todo <> 0)
-         (map car tail))
-       (hash-table-set! hash head (list 0 0))
-       (let match-tiles/h ()
+     (let ((hash (make-hash-table)) (todo (make-hash-table)))
+       (for-each (cut hash-table-set! todo <> 0) (map car tail))
+       (hash-table-set! hash head '(0 0))
+       (let match-tile/h ()
          (hash-table-for-each hash
            (lambda (hash-key hash-value)
-             (match hash-value
-               ((x y)
-                (for-each
-                  (lambda (todo-key)
-                    (match (match-tile hash-key (assoc todo-key input))
-                      (((a b) tile)
-                       (hash-table-delete! todo todo-key)
-                       (hash-table-set! hash tile (list (+ x a) (+ y b))))
-                      (_ void)))
-                  (hash-table-keys todo))))))
+             (for-each
+               (lambda (todo-key)
+                 (match (list hash-value (match-tile hash-key (assoc todo-key input)))
+                   (((x y) ((a b) tile))
+                    (hash-table-delete! todo todo-key)
+                    (hash-table-set! hash tile (list (+ x a) (+ y b))))
+                   (_ void)))
+               (hash-table-keys todo))))
          (unless (null? (hash-table-keys todo))
-           (match-tiles/h)))
+           (match-tile/h)))
        hash))))
 
 (define (count-neighbors item lst)
