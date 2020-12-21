@@ -158,16 +158,13 @@
       (list 0 (map vector->list (vector->list array))))))
 
 (define (check-for-sea-monster content i j)
-  (let ((h (length sea-monster)) (w (length (list-ref sea-monster 0)))
-        (h-max (length content)) (w-max (length (list-ref content 0))))
+  (let ((h (length sea-monster)) (w (length (list-ref sea-monster 0))))
     (call/cc
       (lambda (return)
         (for-each
           (lambda (x)
-            (when (= (+ x i) h-max) (return #f))
             (for-each
               (lambda (y)
-                (when (= (+ y j) w-max) (return #f))
                 (when (and (char=? #\# (list-ref (list-ref sea-monster x) y))
                            (char=? #\. (list-ref (list-ref content (+ x i)) (+ y j))))
                   (return #f)))
@@ -186,8 +183,8 @@
              (lambda (j)
                (when (check-for-sea-monster content i j)
                  (set! cnt (+ cnt 1))))
-             (iota w)))
-           (iota h))
+             (iota (- w (length (list-ref sea-monster 0))))))
+           (iota (- h (length sea-monster))))
        cnt))))
 
 (define (water-roughness tile)
