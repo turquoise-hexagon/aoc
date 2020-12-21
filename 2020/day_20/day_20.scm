@@ -199,10 +199,7 @@
   (define (water-roughness/h lst)
     (fold
       (lambda (a acc)
-        (+ acc (length (filter
-                         (lambda (char)
-                           (char=? #\# char))
-                         a))))
+        (+ acc (length (filter (cut char=? #\# <>) a))))
       0 lst))
   (match tile
     ((_ content) (- (water-roughness/h content) (* (count-sea-monsters tile) (water-roughness/h sea-monster))))))
