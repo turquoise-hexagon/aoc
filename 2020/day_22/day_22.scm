@@ -38,7 +38,7 @@
                         (<= (car b) (length (cdr b))))
                    (match (play-combat/2 (take (cdr a) (car a))
                                          (take (cdr b) (car b)))
-                     ((winner deck)
+                     ((winner _)
                       (case winner
                         ((a) (play-combat/2/h (append (cdr a) (list (car a) (car b))) (cdr b)))
                         ((b) (play-combat/2/h (cdr a) (append (cdr b) (list (car b) (car a)))))))))
