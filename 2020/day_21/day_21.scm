@@ -4,8 +4,6 @@
         (chicken string)
         (chicken sort)
         (matchable)
-        (srfi 128)
-        (srfi 113)
         (srfi 69)
         (srfi 1))
 
@@ -17,23 +15,20 @@
     (read-lines (open-input-file path))))
 
 (define (allergen-ingredients input)
-  (let ((comparator (make-default-comparator)))
-    (define (allergen-ingredients/h allergen)
-      (set->list (apply set-intersection
-                        (fold
-                          (lambda (lst acc)
-                            (match lst
-                              ((a b)
-                               (if (member allergen b)
-                                   (cons (list->set comparator a) acc)
-                                   acc))))
-                          (list) input))))
-    (let ((hash (make-hash-table)))
-      (for-each
-        (lambda (allergen)
-          (hash-table-set! hash allergen (allergen-ingredients/h allergen)))
-        (apply append (map cadr input)))
-      hash)))
+  (define (allergen-ingredients/h allergen)
+    (apply lset-intersection string=?
+           (fold
+             (lambda (lst acc)
+               (match lst ((a b) (if (member allergen b)
+                                     (cons a acc)
+                                     acc))))
+             (list) input)))
+  (let ((hash (make-hash-table)))
+    (for-each
+      (lambda (allergen)
+        (hash-table-set! hash allergen (allergen-ingredients/h allergen)))
+      (apply append (map cadr input)))
+    hash))
 
 (define (identify-allergens hash)
   (let identify-allergens/h ()
