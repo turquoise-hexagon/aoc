@@ -2,6 +2,7 @@
         (chicken process-context)
         (chicken irregex)
         (matchable)
+        (srfi 69)
         (srfi 1))
 
 (define-record field name items)
@@ -63,41 +64,43 @@
           acc))
     (list) (cons (car yours) others)))
 
-(define (list-possible-matches column fields)
-  (let list-possible-matches/h ((fields fields) (acc (list)))
-    (if (null? fields)
-        acc
-        (list-possible-matches/h (cdr fields) (let ((field (car fields)))
-                                                (if (boolean? (is-valid-ticket? column (list field)))
-                                                    (cons field acc)
-                                                    acc))))))
+(define (list-possible-matches fields valid-tickets)
+  (let ((hash (make-hash-table)))
+    (for-each
+      (lambda (field)
+        (for-each
+          (lambda (index)
+            (when (boolean? (is-valid-ticket? (map (cut list-ref <> index) valid-tickets) (list field)))
+              (hash-table-set! hash field (cons index (hash-table-ref/default hash field (list))))))
+          (iota (length (car valid-tickets)))))
+      fields)
+    hash))
 
 (define (list-matches fields valid-tickets)
-  (let list-matches/h ((fields fields) (columns (iota (length (car valid-tickets)))) (acc (list)))
-    (call/cc
-      (lambda (return)
+  (let ((hash (list-possible-matches fields valid-tickets)))
+    (let list-matches/h ()
+      (let* ((vals (hash-table-values hash)) (uniques (map car (filter (lambda (val) (= 1 (length val))) vals))))
         (for-each
-          (lambda (column)
-            (match (list-possible-matches (map (cut list-ref <> column) valid-tickets) fields)
-              ((field)
-               (return (list-matches/h (delete field fields) (delete column columns) (cons (list field column) acc))))
-              (_ void)))
-          columns)
-        (return acc)))))
+          (lambda (unique)
+            (hash-table-for-each hash
+              (lambda (key val)
+                (unless (= 1 (length val))
+                  (hash-table-set! hash key (delete unique val))))))
+          uniques)
+        (unless (= (length uniques) (length vals))
+          (list-matches/h))))
+    hash))
 
 (define (solve/2 input)
   (match input
     ((fields yours others)
-     (let ((matches (list-matches fields (list-valid-tickets fields yours others))))
-       (print (apply * (map (cut list-ref (car yours) <>)
-                            (fold
-                              (lambda (a acc)
-                                (match a
-                                  ((field position)
-                                   (if (irregex-match? "departure.*" (field-name field))
-                                       (cons position acc)
-                                       acc))))
-                              (list) matches))))))))
+     (print (apply * (map (cut list-ref (car yours) <>)
+                          (hash-table-fold (list-matches fields (list-valid-tickets fields yours others))
+                            (lambda (key value acc)
+                              (if (irregex-match? "departure.*" (field-name key))
+                                  (cons (car value) acc)
+                                  acc))
+                            (list))))))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))
