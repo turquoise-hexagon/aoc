@@ -17,7 +17,7 @@
 (define (is-valid/1? input)
   (match input
     (($ policy index-1 index-2 letter password)
-     (<= index-1 (length (filter (cut string=? letter <>) password)) index-2))))
+     (<= index-1 (count (cut string=? letter <>) password) index-2))))
 
 (define (is-valid/2? input)
   (match input
@@ -26,7 +26,7 @@
                   (string=? letter (list-ref password (- index-2 1))))))))
 
 (define (solve proc input)
-  (print (length (filter proc input))))
+  (print (count proc input)))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))

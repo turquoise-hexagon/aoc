@@ -32,7 +32,7 @@
 
 (define (solve rules messages key lim)
   (let ((regex (generate-regex rules key lim)))
-    (print (length (filter (cut irregex-match? regex <>) messages)))))
+    (print (count (cut irregex-match? regex <>) messages))))
 
 (let ((path (car (command-line-arguments))))
   (match (import-input path)

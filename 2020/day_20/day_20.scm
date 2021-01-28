@@ -95,16 +95,15 @@
 
 (define (count-neighbors item lst)
   (let ((offsets '((-1 0) (+1 0) (0 -1) (0 +1))))
-    (length (filter
-              (lambda (item)
-                (member item lst))
-              (map
-                (lambda (offset)
-                  (fold-right
-                    (lambda (a b acc)
-                      (cons (+ a b) acc))
-                    (list) item offset))
-                offsets)))))
+    (count
+      (cut member <> lst)
+      (map
+        (lambda (offset)
+          (fold-right
+            (lambda (a b acc)
+              (cons (+ a b) acc))
+            (list) item offset))
+        offsets))))
 
 (define (solve/1 matched-tiles)
   (let ((lst (hash-table-values matched-tiles)))
@@ -199,7 +198,7 @@
   (define (water-roughness/h lst)
     (fold
       (lambda (a acc)
-        (+ acc (length (filter (cut char=? #\# <>) a))))
+        (+ acc (count (cut char=? #\# <>) a)))
       0 lst))
   (match tile
     ((_ content) (- (water-roughness/h content) (* (count-sea-monsters tile) (water-roughness/h sea-monster))))))

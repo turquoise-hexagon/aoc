@@ -55,7 +55,7 @@
           (irregex-match? "[0-9]{9}"                    pid)))))
 
 (define (solve/2 input)
-  (print (length (filter is-valid? input))))
+  (print (count is-valid? input)))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))

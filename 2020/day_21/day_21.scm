@@ -45,10 +45,10 @@
 
 (define (solve/1 input hash)
   (let ((allergens (map car (hash-table-values hash))))
-    (print (length (filter
-                     (lambda (ingredient)
-                       (not (member ingredient allergens)))
-                     (apply append (map car input)))))))
+    (print (count
+             (lambda (ingredient)
+               (not (member ingredient allergens)))
+             (apply append (map car input))))))
 
 (define (solve/2 hash)
   (let ((sorted (map cadr (sort (hash-table-map hash

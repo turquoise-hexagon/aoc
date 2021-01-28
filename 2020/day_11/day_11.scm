@@ -17,7 +17,7 @@
     (make-world hash h w)))
 
 (define (count-occupied tuples-table)
-  (length (filter (cut char=? #\# <>) (hash-table-values tuples-table))))
+  (count (cut char=? #\# <>) (hash-table-values tuples-table)))
 
 (define (helper/1 tuples-table i j a b)
   (if (char=? (hash-table-ref/default tuples-table (list (+ i a) (+ j b)) #\!) #\#) 1 0))

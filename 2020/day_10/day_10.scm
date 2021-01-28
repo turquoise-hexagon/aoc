@@ -20,8 +20,8 @@
         (tribonacci/h b c (+ a b c) (- n 1)))))
 
 (define (solve/1 input)
-  (print (* (length (filter (cut = <> 1) input))
-            (length (filter (cut = <> 3) input)))))
+  (print (* (count (cut = <> 1) input)
+            (count (cut = <> 3) input))))
 
 (define (solve/2 input)
   (print (fold
