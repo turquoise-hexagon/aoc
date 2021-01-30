@@ -27,7 +27,7 @@
     (for-each
       (lambda (allergen)
         (hash-table-set! hash allergen (allergen-ingredients/h allergen)))
-      (apply append (map cadr input)))
+      (concatenate (map cadr input)))
     hash))
 
 (define (identify-allergens hash)
@@ -48,7 +48,7 @@
     (print (count
              (lambda (ingredient)
                (not (member ingredient allergens)))
-             (apply append (map car input))))))
+             (concatenate (map car input))))))
 
 (define (solve/2 hash)
   (let ((sorted (map cadr (sort (hash-table-map hash

@@ -38,7 +38,7 @@
                   (match constraint
                     ((lower higher)
                      (<= lower value higher))))
-                (apply append (map field-items fields))))))
+                (concatenate (map field-items fields))))))
 
 (define (is-valid-ticket? ticket fields)
   (let ((result (fold
@@ -54,7 +54,7 @@
 (define (solve/1 input)
   (match input
     ((fields yours others)
-     (print (apply + (is-valid-ticket? (apply append others) fields))))))
+     (print (apply + (is-valid-ticket? (concatenate others) fields))))))
 
 (define (list-valid-tickets fields yours others)
   (fold
