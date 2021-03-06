@@ -46,10 +46,10 @@
                   ((> (car b) (car a)) (play-combat/2/h (cdr a) (append (cdr b) (list (car b) (car a)))))))))))
 
 (define (solve proc input)
-  (match input
-    ((a b)
-     (match (proc a b)
-       ((_ deck) (print (compute-score deck)))))))
+  (match-let*
+    (((a b) input)
+     ((_ deck) (proc a b)))
+    (print (compute-score deck))))
 
 (let ((path (car (command-line-arguments))))
   (let ((input (import-input path)))

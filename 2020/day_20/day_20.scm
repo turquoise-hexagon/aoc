@@ -153,18 +153,17 @@
   (let* ((fixed-tiles (fix-matched-tiles matched-tiles)) (array (allocate-vector fixed-tiles)))
     (hash-table-for-each fixed-tiles
       (lambda (tile coordinates)
-        (match coordinates
-          ((x y)
-           (match tile
-             ((_ content)
-              (let ((h (length content)) (w (length (list-ref content 0))))
+        (match-let
+          (((x y) coordinates)
+           ((_ content) tile))
+          (let ((h (length content)) (w (length (car content))))
+            (for-each
+              (lambda (i)
                 (for-each
-                  (lambda (i)
-                    (for-each
-                      (lambda (j)
-                        (vector-set! (vector-ref array (+ (* x h) i)) (+ (* y w) j) (list-ref (list-ref content i) j)))
-                      (iota w)))
-                  (iota h)))))))))
+                  (lambda (j)
+                    (vector-set! (vector-ref array (+ (* x h) i)) (+ (* y w) j) (list-ref (list-ref content i) j)))
+                  (iota w)))
+              (iota h))))))
     (list 0 (map vector->list (vector->list array)))))
 
 (define (check-for-sea-monster content i j)

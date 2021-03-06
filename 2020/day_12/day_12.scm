@@ -22,27 +22,25 @@
 
 (define (solve/1 position facing input)
   (for-each
-    (lambda (lst)
-      (match lst
-        ((key value)
-         (match ((cdr (assoc key moveset)) position facing value)
-           ((a . b)
-            (set! position a)
-            (set! facing   b))))))
+    (match-lambda
+      ((key value)
+       (match ((cdr (assoc key moveset)) position facing value)
+         ((a . b)
+          (set! position a)
+          (set! facing   b)))))
     input)
   (print (apply + (map abs (list (real-part position)
                                  (imag-part position))))))
 
 (define (solve/2 position waypoint input)
   (for-each
-    (lambda (lst)
-      (match lst
-       ((key value)
-        (let ((proc (cdr (assoc key moveset))))
-          (case key
-            ((N S E W) (set! waypoint (car (proc waypoint waypoint value))))
-            ((L R)     (set! waypoint (cdr (proc waypoint waypoint value))))
-            ((F)       (set! position (car (proc position waypoint value)))))))))
+    (match-lambda
+      ((key value)
+       (let ((proc (cdr (assoc key moveset))))
+         (case key
+           ((N S E W) (set! waypoint (car (proc waypoint waypoint value))))
+           ((L R)     (set! waypoint (cdr (proc waypoint waypoint value))))
+           ((F)       (set! position (car (proc position waypoint value))))))))
     input)
   (print (apply + (map abs (list (real-part position)
                                  (imag-part position))))))

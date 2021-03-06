@@ -35,10 +35,9 @@
                      (list) schedule (iota (length schedule)))))
       (print (let solve/2/h ((current 0))
                (let ((lst (filter
-                            (lambda (lst)
-                              (match lst
-                                ((id . offset)
-                                 (= (modulo (+ current offset) id) 0))))
+                            (match-lambda
+                              ((id . offsets)
+                               (= (modulo (+ current offsets) id) 0)))
                             offsets)))
                  (if (equal? lst offsets)
                      current

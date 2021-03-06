@@ -35,9 +35,7 @@
 (define (is-valid-value? value fields)
   (not (null? (filter
                 (lambda (constraint)
-                  (match constraint
-                    ((lower higher)
-                     (<= lower value higher))))
+                  (apply (cut <= <> value <>) constraint))
                 (concatenate (map field-items fields))))))
 
 (define (is-valid-ticket? ticket fields)

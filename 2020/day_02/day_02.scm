@@ -8,10 +8,9 @@
 
 (define (import-input path)
   (map
-    (lambda (lst)
-      (match lst
-        ((index-1 index-2 letter password)
-         (make-policy (string->number index-1) (string->number index-2) letter (map string (string->list password))))))
+    (match-lambda
+      ((index-1 index-2 letter password)
+       (make-policy (string->number index-1) (string->number index-2) letter (map string (string->list password)))))
   (map (cut string-split <> ": -") (read-lines (open-input-file path)))))
 
 (define (is-valid/1? input)

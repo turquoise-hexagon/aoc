@@ -8,13 +8,12 @@
 
 (define (import-input path)
   (map
-    (lambda (lst)
-      (match lst
-        ((mask . instructions)
-         (list mask (map
-                      (lambda (instructions)
-                        (map string->number (cdr (string-split instructions "[]= "))))
-                      instructions)))))
+    (match-lambda
+      ((mask . instructions)
+       (list mask (map
+                    (lambda (instructions)
+                      (map string->number (cdr (string-split instructions "[]= "))))
+                    instructions))))
     (map (cut string-split <> "\n") (irregex-split "mask = " (read-string #f (open-input-file path))))))
 
 (define (pad address mask)
@@ -48,15 +47,13 @@
 (define (solve proc input)
   (let ((memory (make-hash-table)))
     (for-each
-      (lambda (lst)
-        (match lst
-          ((mask . (instructions))
-           (for-each
-             (lambda (instruction)
-               (match instruction
-                 ((address value)
-                  (proc memory mask address value))))
-              instructions))))
+      (match-lambda
+        ((mask . (instructions))
+         (for-each
+           (match-lambda
+             ((address value)
+              (proc memory mask address value)))
+           instructions)))
       input)
     (print (apply + (hash-table-values memory)))))
 
