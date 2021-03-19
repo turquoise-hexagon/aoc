@@ -16,22 +16,24 @@
                         (modulo (* b r) m)
                         r)))))
 
-(define (discrete-log a b m)
-  (let ([n (inexact->exact (ceiling (sqrt m)))] [hash (make-hash-table)])
-    (for-each
-      (lambda (i)
-        (hash-table-set! hash (expt-mod a (* i n) m) i))
-      (iota n 1))
-    (let discrete-log/h ([i 0])
-      (if (= i n)
-          -1
-          (let ([cur (modulo (* (expt-mod a i m) b) m)])
-            (if (hash-table-exists? hash cur)
-                (let ([ans (- (* (hash-table-ref hash cur) n) i)])
-                  (if (< ans m)
-                      ans
-                      (discrete-log/h (+ i 1))))
-                (discrete-log/h (+ i 1))))))))
+(define (discrete-log g h p)
+  (let ((n (+ 1 (inexact->exact (floor (sqrt p))))))
+    (let ((mem (make-hash-table)))
+      (for-each
+        (lambda (i)
+          (hash-table-set! mem (expt-mod g i p) i))
+        (iota n))
+      (let ((c (expt-mod g (* n (- p 2)) p)))
+        (call/cc
+          (lambda (return)
+            (for-each
+              (lambda (i)
+                (let ((t (modulo (* h (expt-mod c i p)) p)))
+                  (let ((res (hash-table-ref/default mem t #f)))
+                    (when res (let ((ans (+ (* i n) res)))
+                      (when (> ans 0) (return ans)))))))
+              (iota n))
+            (return -1)))))))
 
 (define (solve/1 input)
   (let ([m 20201227])
