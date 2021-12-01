@@ -10,5 +10,4 @@
 
 (let ((input (import-input)))
   (print (solve input))
-  (let ((input (map + input (cdr input) (cddr input))))
-    (print (solve input))))
+  (print (solve (map + input (cdr input) (cddr input)))))
