@@ -6,7 +6,7 @@ usage
 -----
     $ cd $day
     $ make
-    $ ./$day input
+    $ cat input | ./$day
 
 depends on
 ----------
@@ -15,4 +15,5 @@ depends on
     * srfi-69
     * srfi-113
     * srfi-128
+    * euler
     * matchable
