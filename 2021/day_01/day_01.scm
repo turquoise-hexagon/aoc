@@ -6,10 +6,7 @@
   (map string->number (read-lines)))
 
 (define (solve input)
-  (count
-    (lambda (lst)
-      (apply (cut < <> <>) lst))
-    (zip input (cdr input))))
+  (count (cut apply < <>) (zip input (cdr input))))
 
 (let ((input (import-input)))
   (print (solve input))
