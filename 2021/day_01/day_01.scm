@@ -6,9 +6,9 @@
   (map string->number (read-lines)))
 
 (define (solve input)
-  (count (cut apply < <>) (zip input (cdr input))))
+  (count < input (cdr input)))
 
 (let ((input (import-input)))
   (print (solve input))
-  (let ((input (map (cut apply + <>) (zip input (cdr input) (cddr input)))))
+  (let ((input (map + input (cdr input) (cddr input))))
     (print (solve input))))
