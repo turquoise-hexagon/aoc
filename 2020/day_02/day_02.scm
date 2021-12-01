@@ -1,33 +1,30 @@
-(import (chicken io)
-        (chicken process-context)
-        (chicken string)
-        (matchable)
-        (srfi 1))
+(import
+  (chicken io)
+  (chicken string)
+  (srfi 1))
 
-(define-record policy index-1 index-2 letter password)
+(define (parse-passport str)
+  (let ((lst (string-split str ":- ")))
+    (receive (a b char password) (apply values lst)
+      (list (string->number a)
+            (string->number b)
+            char (string-chop password 1)))))
 
-(define (import-input path)
-  (map
-    (match-lambda
-      ((index-1 index-2 letter password)
-       (make-policy (string->number index-1) (string->number index-2) letter (map string (string->list password)))))
-  (map (cut string-split <> ": -") (read-lines (open-input-file path)))))
+(define (import-input)
+  (map parse-passport (read-lines)))
 
-(define (is-valid/1? input)
-  (match input
-    (($ policy index-1 index-2 letter password)
-     (<= index-1 (count (cut string=? letter <>) password) index-2))))
+(define (is-valid/1? passport)
+  (receive (a b char password) (apply values passport)
+    (<= a (count (cut string=? char <>) password) b)))
 
-(define (is-valid/2? input)
-  (match input
-    (($ policy index-1 index-2 letter password)
-     (not (equal? (string=? letter (list-ref password (- index-1 1)))
-                  (string=? letter (list-ref password (- index-2 1))))))))
+(define (is-valid/2? passport)
+  (receive (a b char password) (apply values passport)
+    (not (equal? (string=? char (list-ref password (- a 1)))
+                 (string=? char (list-ref password (- b 1)))))))
 
-(define (solve proc input)
-  (print (count proc input)))
+(define (solve input proc)
+  (count proc input))
 
-(let ((path (car (command-line-arguments))))
-  (let ((input (import-input path)))
-    (solve is-valid/1? input)
-    (solve is-valid/2? input)))
+(let ((input (import-input)))
+  (print (solve input is-valid/1?))
+  (print (solve input is-valid/2?)))
