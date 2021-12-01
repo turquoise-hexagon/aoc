@@ -5,9 +5,9 @@
 (define (import-input)
   (map string->number (read-lines)))
 
-(define (solve input)
-  (count < input (cdr input)))
+(define (solve input proc)
+  (count < input (proc input)))
 
 (let ((input (import-input)))
-  (print (solve input))
-  (print (solve (map + input (cdr input) (cddr input)))))
+  (print (solve input cdr))
+  (print (solve input cdddr))) 
