@@ -3,32 +3,24 @@
   (chicken string)
   (matchable))
 
+(define (parse-command str)
+  (receive (direction value) (apply values (string-split str " "))
+    (list (string->symbol direction) (string->number value))))
+
 (define (import-input)
-  (map
-    (lambda (str)
-      (receive (direction value) (apply values (string-split str " "))
-        (list (string->symbol direction) (string->number value))))
-    (read-lines)))
+  (map parse-command (read-lines)))
 
-(define (part/1 aim horizontal depth direction value)
-  (case direction
-    ((down)    (list aim horizontal (+ depth value)))
-    ((up)      (list aim horizontal (- depth value)))
-    ((forward) (list aim (+ horizontal value) depth))))
-
-(define (part/2 aim horizontal depth direction value)
- (case direction
-   ((down)    (list (+ aim value) horizontal depth))
-   ((up)      (list (- aim value) horizontal depth))
-   ((forward) (list aim (+ horizontal value) (+ depth (* aim value))))))
-
-(define (solve input proc)
-  (apply * (cdr (foldl
-                  (match-lambda*
-                    (((aim horizontal depth) (direction value))
-                     (proc aim horizontal depth direction value)))
-                  '(0 0 0) input))))
+(define (solve input)
+  (foldl
+    (match-lambda*
+      (((position depth/1 depth/2) (direction value))
+       (case direction
+         ((down)    (list position (+ depth/1 value) depth/2))
+         ((up)      (list position (- depth/1 value) depth/2))
+         ((forward) (list (+ position value) depth/1 (+ depth/2 (* depth/1 value)))))))
+    '(0 0 0) input))
 
 (let ((input (import-input)))
-  (print (solve input part/1))
-  (print (solve input part/2)))
+  (receive (position depth/1 depth/2) (apply values (solve input))
+    (print (* position depth/1))
+    (print (* position depth/2))))
