@@ -21,15 +21,15 @@
         1))))
 
 (define (oxy-and-co2/h lst proc)
-  (let oxy-and-co2/h/h ((lst lst) (i 0))
+  (let loop ((lst lst) (i 0))
     (if (= (length lst) 1)
       (car lst)
       (let ((tmp (proc (column lst i))))
-        (oxy-and-co2/h/h (filter
-                           (lambda (lst)
-                             (= tmp (list-ref lst i)))
-                           lst)
-                         (+ i 1))))))
+        (loop (filter
+                (lambda (lst)
+                  (= tmp (list-ref lst i)))
+                lst)
+              (+ i 1))))))
 
 (define (gamma lst) (gamma-and-epsil/h lst > 1))
 (define (epsil lst) (gamma-and-epsil/h lst < 0))
