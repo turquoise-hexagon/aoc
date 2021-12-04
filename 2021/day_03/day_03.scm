@@ -36,7 +36,7 @@
 (define (co2 lst) (oxy-and-co2/h lst epsil))
 
 (define (solve/1 input)
-  (let ((cols (map (cut column input <>) (iota (length (car input))))))
+  (let ((cols (apply (cut map list <...>) input)))
     (* (list->number (map gamma cols) 2)
        (list->number (map epsil cols) 2))))
 
