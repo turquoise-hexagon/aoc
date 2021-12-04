@@ -22,6 +22,7 @@
   (let loop ((lst lst) (i 0))
     (if (= (length lst) 1)
       (car lst)
+      ;; run proc on ith column from lst
       (let ((tmp (proc (map (cut list-ref <> i) lst))))
         (loop (filter
                 (lambda (lst)
@@ -33,6 +34,7 @@
 (define (co2 lst) (oxy-and-co2/h lst epsil))
 
 (define (solve/1 input)
+  ;; get columns from input
   (let ((cols (apply map list input)))
     (* (list->number (map gamma cols) 2)
        (list->number (map epsil cols) 2))))

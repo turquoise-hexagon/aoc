@@ -17,6 +17,7 @@
 
 (define (has numbers board)
   (any (cut lset<= = <> numbers)
+    ;; make list of lines and columns from board
     (append board (apply map list board))))
 
 (define (unmarked numbers board)
