@@ -8,9 +8,6 @@
   (map (cut map string->number <>)
     (map (cut string-chop <> 1) (read-lines))))
 
-(define (column lst n)
-  (map (cut list-ref <> n) lst))
-
 (define (gamma lst)
   (let ((cnt-0 (count (cut = 0 <>) lst))
         (cnt-1 (count (cut = 1 <>) lst)))
@@ -25,7 +22,7 @@
   (let loop ((lst lst) (i 0))
     (if (= (length lst) 1)
       (car lst)
-      (let ((tmp (proc (column lst i))))
+      (let ((tmp (proc (map (cut list-ref <> i) lst))))
         (loop (filter
                 (lambda (lst)
                   (= tmp (list-ref lst i)))
