@@ -28,10 +28,7 @@
     (append board (rotate board))))
 
 (define (unmarked numbers board)
-  (filter
-    (lambda (i)
-      (not (member i numbers)))
-    (flatten board)))
+  (lset-difference = (flatten board) numbers))
 
 (define (solve/1 input)
   (receive (numbers boards) (apply values input)
