@@ -7,10 +7,8 @@
   (map string->number (irregex-split "," str)))
 
 (define (parse-board str)
-  (map
-    (lambda (str)
-      (map string->number (irregex-split " " str)))
-    (irregex-split "\n" str)))
+  (map (cut map string->number <>)
+    (map (cut irregex-split " " <>) (irregex-split "\n" str))))
 
 (define (import-input)
   (let ((lst (irregex-split "\n{2}" (read-string #f))))
