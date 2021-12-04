@@ -22,10 +22,7 @@
     (iota (length (car board)))))
 
 (define (has numbers board)
-  (any
-    (lambda (lst)
-      (every (cut member <> numbers) lst))
-    (append board (rotate board))))
+  (any (cut lset<= = <> numbers) (append board (rotate board))))
 
 (define (unmarked numbers board)
   (lset-difference = (flatten board) numbers))
