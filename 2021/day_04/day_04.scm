@@ -17,7 +17,7 @@
 
 (define (has numbers board)
   (any (cut lset<= = <> numbers)
-    (append board (apply (cut map list <...>) board))))
+    (append board (apply map list board))))
 
 (define (unmarked numbers board)
   (lset-difference = (flatten board) numbers))
