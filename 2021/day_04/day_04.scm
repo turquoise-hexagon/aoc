@@ -16,10 +16,7 @@
       (list (parse-numbers numbers) (map parse-board boards)))))
 
 (define (rotate board)
-  (map
-    (lambda (i)
-      (map (cut list-ref <> i) board))
-    (iota (length (car board)))))
+  (apply (cut map list <...>) board))
 
 (define (has numbers board)
   (any (cut lset<= = <> numbers) (append board (rotate board))))
