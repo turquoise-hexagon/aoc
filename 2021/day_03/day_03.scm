@@ -36,7 +36,7 @@
 (define (co2 lst) (oxy-and-co2/h lst epsil))
 
 (define (solve/1 input)
-  (let ((cols (apply (cut map list <...>) input)))
+  (let ((cols (apply map list input)))
     (* (list->number (map gamma cols) 2)
        (list->number (map epsil cols) 2))))
 
