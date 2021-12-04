@@ -35,7 +35,7 @@
 
 (define (solve/1 input)
   ;; get columns from input
-  (let ((cols (apply map list input)))
+  (let ((cols (apply zip input)))
     (* (list->number (map gamma cols) 2)
        (list->number (map epsil cols) 2))))
 
