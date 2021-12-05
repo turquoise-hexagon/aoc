@@ -19,7 +19,7 @@
 
 (define (segment->points lst)
   (receive (a b) (apply values lst)
-    (let ((offsets (map (cut apply offset <>) (zip a b))))
+    (let ((offsets (map (cut offset <> <>) a b)))
       (let loop ((t a) (acc '()))
         (let ((acc (cons t acc)))
           (if (equal? t b)
