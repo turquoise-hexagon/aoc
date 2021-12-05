@@ -9,6 +9,9 @@
     (map (cut irregex-split "," <>)
        (irregex-split " -> " str))))
 
+(define (import-input)
+  (map parse-segment (read-lines)))
+
 (define (offset a b)
   (cond ((> a b) -1)
         ((< a b)  1)
@@ -16,15 +19,12 @@
 
 (define (segment->points lst)
   (receive (a b) (apply values lst)
-    (let ((offsets (map (cut apply offset <>) (apply zip lst))))
+    (let ((offsets (map (cut apply offset <>) (zip a b))))
       (let loop ((t a) (acc '()))
         (let ((acc (cons t acc)))
           (if (equal? t b)
             acc
             (loop (map + t offsets) acc)))))))
-
-(define (import-input)
-  (map parse-segment (read-lines)))
 
 (define (place-points lst)
   (let ((mem (make-hash-table)))
