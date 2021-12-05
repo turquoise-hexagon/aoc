@@ -37,15 +37,9 @@
       lst)
     mem))
 
-(define (filter-lines lst)
-  (filter
-    (lambda (segment)
-      (any (cut apply = <>) (apply zip segment)))
-    lst))
-
 (define (solve input)
   (count (cut > <> 1) (hash-table-values (place-points input))))
 
 (let ((input (import-input)))
-  (print (solve (filter-lines input)))
+  (print (solve (filter (cut apply any = <>) input)))
   (print (solve input)))
