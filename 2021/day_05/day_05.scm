@@ -10,7 +10,9 @@
        (irregex-split " -> " str))))
 
 (define (import-input)
-  (map parse-segment (read-lines)))
+  (let ((lst (map parse-segment (read-lines))))
+    ;; split lst in lines and diagonals
+    (partition (cut apply any = <>) lst)))
 
 (define (offset a b)
   (cond ((> a b) -1)
@@ -26,20 +28,17 @@
             acc
             (loop (map + t offsets) acc)))))))
 
-(define (place-points lst)
+(define (solve mem lst)
+  (for-each
+    (lambda (segment)
+      (for-each
+        (lambda (point)
+          (hash-table-set! mem point (+ (hash-table-ref/default mem point 0) 1)))
+        (segment->points segment)))
+    lst)
+  (count (cut > <> 1) (hash-table-values mem)))
+
+(receive (lines diags) (import-input)
   (let ((mem (make-hash-table)))
-    (for-each
-      (lambda (segment)
-        (for-each
-          (lambda (point)
-            (hash-table-set! mem point (+ (hash-table-ref/default mem point 0) 1)))
-          (segment->points segment)))
-      lst)
-    mem))
-
-(define (solve input)
-  (count (cut > <> 1) (hash-table-values (place-points input))))
-
-(let ((input (import-input)))
-  (print (solve (filter (cut apply any = <>) input)))
-  (print (solve input)))
+    (print (solve mem lines))
+    (print (solve mem diags))))
