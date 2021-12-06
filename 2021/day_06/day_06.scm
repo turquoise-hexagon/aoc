@@ -4,9 +4,9 @@
   (srfi 1)
   (srfi 69))
 
-(define (increment! mem key value)
-  (hash-table-set! mem key
-    (+ (hash-table-ref/default mem key 0) value)))
+(define (increment! table key increment)
+  (hash-table-set! table key
+    (+ (hash-table-ref/default table key 0) increment)))
 
 (define (import-input)
   (let ((mem (make-hash-table)))
@@ -14,21 +14,24 @@
       (map string->number (string-split (read-line) ",")))
     mem))
 
-(define (iterate mem)
+(define (iterate table)
   (let ((next (make-hash-table)))
-    (hash-table-for-each mem
+    (hash-table-for-each table
       (lambda (i n)
         (for-each (cut increment! next <> n)
           (if (= i 0) `(6 8) `(,(- i 1))))))
     next))
 
-(define (solve input n)
-  (let ((res (foldl
-               (lambda (acc _)
-                 (iterate acc))
-               input (iota n))))
-    (apply + (hash-table-values res))))
+(define (accumulate table n)
+  (reverse (foldl
+             (lambda (acc _)
+               (cons (iterate (car acc)) acc))
+             `(,table) (iota n))))
+
+(define (solve lst n)
+  (apply + (hash-table-values (list-ref lst n))))
 
 (let ((input (import-input)))
-  (print (solve input 80))
-  (print (solve input 256)))
+  (let ((res (accumulate input 256)))
+    (print (solve res 80))
+    (print (solve res 256))))
