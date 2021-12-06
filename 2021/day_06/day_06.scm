@@ -7,21 +7,23 @@
 (define (import-input)
   (map string->number (string-split (read-line) ",")))
 
-(define (increment mem key value)
+(define (increment! mem key value)
   (hash-table-set! mem key
     (+ (hash-table-ref/default mem key 0) value)))
 
 (define (iterate mem)
-  (let ((new (make-hash-table)))
+  (let ((next (make-hash-table)))
     (hash-table-for-each mem
       (lambda (i n)
-        (for-each (cut increment new <> n)
-          (if (= i 0) '(6 8) (list (- i 1))))))
-    new))
+        (for-each (cut increment! next <> n)
+          (if (= i 0)
+            '(6 8)
+            (list (- i 1))))))
+    next))
 
-(define (solve x n)
+(define (solve input n)
   (let ((mem (make-hash-table)))
-    (for-each (cut increment mem <> 1) x)
+    (for-each (cut increment! mem <> 1) input)
     (apply + (hash-table-values
                (foldl
                  (lambda (acc _)
