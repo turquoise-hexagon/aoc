@@ -19,8 +19,7 @@
     (hash-table-for-each mem
       (lambda (i n)
         (for-each (cut increment! next <> n)
-          (if (= i 0) '(6 8)
-            (list (- i 1))))))
+          (if (= i 0) `(6 8) `(,(- i 1))))))
     next))
 
 (define (solve input n)
