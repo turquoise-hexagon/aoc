@@ -9,10 +9,10 @@
     (+ (hash-table-ref/default mem key 0) value)))
 
 (define (import-input)
-  (let ((lst (map string->number (string-split (read-line) ","))))
-    (let ((mem (make-hash-table)))
-      (for-each (cut increment! mem <> 1) lst)
-      mem)))
+  (let ((mem (make-hash-table)))
+    (for-each (cut increment! mem <> 1)
+      (map string->number (string-split (read-line) ",")))
+    mem))
 
 (define (iterate mem)
   (let ((next (make-hash-table)))
