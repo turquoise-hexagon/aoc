@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+# ---
+# constants
+# ---
+
+readonly URL=https://adventofcode.com
+
+readonly   YEAR=$1
+readonly    DAY=$2
+readonly    ARG=$3
+readonly ANSWER=$4
+
+if [[ ! $AOC_COOKIE ]]; then
+    die "error : '\$AOC_COOKIE' not set"
+fi
+
+# ---
+# functions
+# ---
+
+die() {
+    printf '%s\n' \
+        "${1:-usage : ${0##*/} <year> <day> <input|<part> <answer>>}" >&2
+
+    exit 1
+}
+
+request() {
+    curl -b "$AOC_COOKIE" "$@" 2> /dev/null
+}
+
+input() {
+    local _out=$(request "$URL/$YEAR/day/$DAY/input") ||
+        die "error : failed to send request for '$YEAR/$DAY'"
+
+    case $_out in
+        "Please don't repeatedly request this endpoint"*)
+            die "error : input for '$YEAR/$DAY' isn't available yet"
+    esac
+
+    printf '%s\n' "$_out" > input
+}
+
+answer() {
+    local _out=$(request "$URL/$YEAR/day/$DAY/answer" \
+        --data-raw "level=$ARG&answer=$ANSWER") ||
+        die "error : failed to send request for '$YEAR/$DAY'"
+
+    case $_out in
+        *"You gave an answer too recently"*) die 'error : rate limited';;
+        *"That's not the right answer"*)     die 'error : wrong answer';;
+        *"Did you already complete it"*)     die 'error : already completed'
+    esac
+}
+
+# ---
+# argument parsing
+# ---
+
+if (($# < 3)); then
+    die
+fi
+
+if [[ $ARG != input && ! $ANSWER ]]; then
+    die
+fi
+
+case $ARG in
+    1|2)
+        answer
+        printf 'right answer !\n'
+        ;;
+    input)
+        input
+        ;;
+    *) die
+esac
