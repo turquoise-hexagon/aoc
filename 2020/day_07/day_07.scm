@@ -1,56 +1,51 @@
-(import (chicken io)
-        (chicken process-context)
-        (chicken irregex)
-        (srfi 69)
-        (srfi 1))
+(import
+  (chicken io)
+  (chicken irregex)
+  (srfi 1)
+  (srfi 69))
 
-(define (parse-line line)
-  (map
-    (lambda (str)
-      (let ((match (irregex-match "^([0-9]*) ?(.*)$" str)))
-        (let* ((num (irregex-match-substring match 1))
-               (col (irregex-match-substring match 2))
-               (num (let ((tmp (string->number num)))
-                      (if tmp tmp 1))))
-          (cons col num))))
-    (irregex-split "(, | contain | bags?|\\.)" line)))
+(define (parse-bag str)
+  (let ((matches (irregex-match "([0-9]+) (.+)" str)))
+    (let ((matches (map (cut irregex-match-substring matches <>) '(1 2))))
+      (receive (num color) (apply values matches)
+        `(,color . ,(string->number num))))))
 
-(define (line->alist line)
-  (let ((lst (parse-line line)))
-    (cons (caar lst) (alist->hash-table (filter
-                                          (lambda (lst)
-                                            (not (string=? (car lst) "no other")))
-                                          (cdr lst))))))
+(define (parse-rule str)
+  (let ((lst (irregex-split " ?(contains?|bags?[,.]?) ?" str)))
+    (receive (color . content) (apply values lst)
+      `(,color . ,(alist->hash-table (map parse-bag content))))))
 
-(define (import-input path)
-  (alist->hash-table (map line->alist (read-lines (open-input-file path)))))
+(define (import-input)
+  (alist->hash-table
+    (filter-map
+      (lambda (str)
+        (if (irregex-match? ".*no other.*" str)
+          #f
+          (parse-rule str)))
+      (read-lines))))
 
-(define (solve/1 input color)
-  (define (solve/1/h hash)
-    (let ((keys (hash-table-keys hash)))
-      (hash-table-for-each input
-        (lambda (key/i hash/i)
-          (for-each
-            (lambda (key)
-              (when (hash-table-exists? hash/i key)
-                (hash-table-set! hash key/i 0)))
-            keys)))
-      (if (equal? keys (hash-table-keys hash))
-          keys
-          (solve/1/h hash))))
-  (print (- (length (solve/1/h (alist->hash-table `((,color . 0))))) 1)))
+(define (true? bool)
+  (equal? bool #t))
 
-(define (solve/2 input color)
-  (define (solve/2/h color)
-    (let ((hash (hash-table-ref input color)))
-      (if (null? (hash-table-keys hash))
-          1
-          (apply + (cons 1 (hash-table-map hash
-                             (lambda (key hash)
-                               (* hash (solve/2/h key)))))))))
-  (print (- (solve/2/h color) 1)))
+(define (solve/1 input main)
+  (define (helper color)
+    (if (string=? color main)
+      #t
+      (if (hash-table-exists? input color)
+        (let ((content (hash-table-ref input color)))
+          (any true? (map helper (hash-table-keys content))))
+        #f)))
+  (- (count true? (map helper (hash-table-keys input))) 1))
 
-(let ((path (car (command-line-arguments))))
-  (let ((input (import-input path)))
-    (solve/1 input "shiny gold")
-    (solve/2 input "shiny gold")))
+(define (solve/2 input main)
+  (define (helper color)
+    (if (hash-table-exists? input color)
+      (foldl + 1 (hash-table-map (hash-table-ref input color)
+                    (lambda (key val)
+                      (* val (helper key)))))
+      1))
+  (- (helper main) 1))
+
+(let ((input (import-input)))
+  (print (solve/1 input "shiny gold"))
+  (print (solve/2 input "shiny gold")))
