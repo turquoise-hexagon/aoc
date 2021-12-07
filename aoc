@@ -11,10 +11,6 @@ readonly    DAY=$2
 readonly    ARG=$3
 readonly ANSWER=$4
 
-if [[ ! $AOC_COOKIE ]]; then
-    die "error : '\$AOC_COOKIE' not set"
-fi
-
 # ---
 # functions
 # ---
@@ -57,6 +53,10 @@ answer() {
 # ---
 # argument parsing
 # ---
+
+if [[ ! $AOC_COOKIE ]]; then
+    die "error : '\$AOC_COOKIE' not set"
+fi
 
 if (($# < 3)); then
     die
