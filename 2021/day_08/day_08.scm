@@ -3,8 +3,7 @@
   (chicken string)
   (chicken sort)
   (euler)
-  (srfi 1)
-  (srfi 69))
+  (srfi 1))
 
 (define valid
   (map (cut string-chop <> 1)
@@ -12,18 +11,10 @@
 
 (define (generate-permutations)
   (let ((chars (string-chop "abcdefg" 1)))
-    (map
-      (lambda (permutation)
-        (let ((mem (make-hash-table)))
-          (for-each
-            (lambda (lst)
-              (apply (cut hash-table-set! mem <> <>) lst))
-            (zip chars permutation))
-          mem))
-      (permutations chars))))
+    (map (cut map cons chars <>) (permutations chars))))
 
 (define (generate-list permutation lst)
-  (sort (map (cut hash-table-ref permutation <>) lst) string<?))
+  (sort (map cdr (map (cut assoc <> permutation) lst)) string<?))
 
 (define (find-permutation permutations patterns)
   (find
