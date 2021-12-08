@@ -31,6 +31,7 @@
 (define (translate-entry permutations valids entry)
   (receive (patterns output) (apply values entry)
     (let ((permutation (find-permutation permutations valids patterns)))
+      ;; generate output based on valid permutation
       (map cdr (map (cut assoc <> valids) (map (cut generate-list permutation <>) output))))))
 
 (define (translate-all lst)
