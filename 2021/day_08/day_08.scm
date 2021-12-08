@@ -7,9 +7,7 @@
   (srfi 69))
 
 (define valid
-  (map
-    (lambda (str)
-      (string-chop str 1))
+  (map (cut string-chop <> 1)
     (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg")))
 
 (define (generate-permutations)
