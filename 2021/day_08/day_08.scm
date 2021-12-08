@@ -6,10 +6,6 @@
   (srfi 1)
   (srfi 69))
 
-(define signals
-  (map (cut string-chop <> 1)
-    (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"))) 
-
 (define (signals->frequencies lst)
   (let ((mem (make-hash-table)))
     (for-each
@@ -28,12 +24,14 @@
     mem))
 
 (define signals-identifiers
-  (let ((ids (signals->identifiers signals)) (mem (make-hash-table)))
-    (for-each
-      (lambda (signal identifier)
-        (hash-table-set! mem (hash-table-ref ids signal) identifier))
-      signals (iota (length signals)))
-    mem))
+  (let ((signals (map (cut string-chop <> 1)
+                   (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"))))
+    (let ((ids (signals->identifiers signals)) (mem (make-hash-table)))
+      (for-each
+        (lambda (signal identifier)
+          (hash-table-set! mem (hash-table-ref ids signal) identifier))
+        signals (iota (length signals)))
+      mem)))
 
 (define (translate entry)
   (receive (patterns output) (apply values entry)
