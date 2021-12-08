@@ -5,15 +5,26 @@
   (euler)
   (srfi 1))
 
+(define valids
+  (list "abcefg"
+        "cf"
+        "acdeg"
+        "acdfg"
+        "bcdf"
+        "abdfg"
+        "abdefg"
+        "acf"
+        "abcdefg"
+        "abcdfg"))
+
+(define (generate-valids)
+  (let ((lst (map (cut string-chop <> 1) valids)))
+    (map cons lst (iota (length lst)))))
+
 (define (generate-permutations)
   (let ((chars (string-chop "abcdefg" 1)))
     ;; generate permutations on "abcdefg"
     (map (cut map cons chars <>) (permutations chars))))
-
-(define (generate-valids)
-  (let ((lst (map (cut string-chop <> 1)
-               (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"))))
-    (map cons lst (iota (length lst)))))
 
 (define (generate-list permutation lst)
   ;; generate a list based on a permutation
@@ -35,7 +46,7 @@
       (map cdr (map (cut assoc <> valids) (map (cut generate-list permutation <>) output))))))
 
 (define (translate-all lst)
-  (let ((permutations (generate-permutations)) (valids (generate-valids)))
+  (let ((valids (generate-valids)) (permutations (generate-permutations)))
     (map (cut translate-entry permutations valids <>) lst)))
 
 (define (parse-entry str)
