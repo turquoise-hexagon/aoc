@@ -18,8 +18,7 @@
   (let ((freqs (signals->frequencies lst)) (mem (make-hash-table)))
     (for-each
       (lambda (signal)
-        (let ((identifier (apply + (map (cut hash-table-ref freqs <>) signal))))
-          (hash-table-set! mem signal identifier)))
+        (hash-table-set! mem signal (foldl + 0 (map (cut hash-table-ref freqs <>) signal))))
       lst)
     mem))
 
