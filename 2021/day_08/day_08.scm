@@ -5,39 +5,37 @@
   (euler)
   (srfi 1))
 
-(define valid
-  (map (cut string-chop <> 1)
-    (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg")))
-
 (define (generate-permutations)
   (let ((chars (string-chop "abcdefg" 1)))
     ;; generate permutations on "abcdefg"
     (map (cut map cons chars <>) (permutations chars))))
 
+(define (generate-valids)
+  (let ((lst (map (cut string-chop <> 1)
+               (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"))))
+    (map cons lst (iota (length lst)))))
+
 (define (generate-list permutation lst)
   ;; generate a list based on a permutation
   (sort (map cdr (map (cut assoc <> permutation) lst)) string<?))
 
-(define (find-permutation permutations patterns)
+(define (find-permutation permutations valids patterns)
   (find
     (lambda (permutation)
       (every
         (lambda (lst)
-          (member (generate-list permutation lst) valid))
+          (assoc (generate-list permutation lst) valids))
         patterns))
     permutations))
 
-(define (translate-entry permutations entry)
+(define (translate-entry permutations valids entry)
   (receive (patterns output) (apply values entry)
-    (let ((permutation (find-permutation permutations patterns)))
-      (map
-        (lambda (lst)
-          (list-index (cut equal? <> lst) valid))
-        (map (cut generate-list permutation <>) output)))))
+    (let ((permutation (find-permutation permutations valids patterns)))
+      (map cdr (map (cut assoc <> valids) (map (cut generate-list permutation <>) output))))))
 
 (define (translate-all lst)
-  (let ((permutations (generate-permutations)))
-    (map (cut translate-entry permutations <>) lst)))
+  (let ((permutations (generate-permutations)) (valids (generate-valids)))
+    (map (cut translate-entry permutations valids <>) lst)))
 
 (define (parse-entry str)
   (map
