@@ -11,9 +11,11 @@
 
 (define (generate-permutations)
   (let ((chars (string-chop "abcdefg" 1)))
+    ;; generate permutations on "abcdefg"
     (map (cut map cons chars <>) (permutations chars))))
 
 (define (generate-list permutation lst)
+  ;; generate a list based on a permutation
   (sort (map cdr (map (cut assoc <> permutation) lst)) string<?))
 
 (define (find-permutation permutations patterns)
