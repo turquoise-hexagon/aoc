@@ -1,7 +1,6 @@
 (import
   (chicken io)
   (chicken string)
-  (chicken sort)
   (euler)
   (srfi 1)
   (srfi 69))
@@ -18,46 +17,38 @@
       (flatten lst))
     mem))
 
-(define (signals->identifiers lst)
-  (let ((freqs (signals->frequencies lst)) (mem (make-hash-table)))
-    (for-each
-      (lambda (signal)
-        (hash-table-set! mem signal
-          (foldl + 0 (map (cut hash-table-ref freqs <>) signal))))
-      lst)
-    mem))
+(define (signal->identifier freqs signal)
+  (foldl + 0 (map (cut hash-table-ref freqs <>) signal)))
 
 (define signals-identifiers
-  (let ((ids (signals->identifiers signals)) (mem (make-hash-table)))
+  (let ((freqs (signals->frequencies signals)) (mem (make-hash-table)))
     (for-each
-      (lambda (signal identifier)
-        (hash-table-set! mem (hash-table-ref ids signal) identifier))
+      (lambda (signal number)
+        (hash-table-set! mem (signal->identifier freqs signal) number))
       signals (iota (length signals)))
     mem))
 
 (define (translate entry)
   (receive (patterns output) (apply values entry)
-    (let ((ids (signals->identifiers patterns)))
+    (let ((freqs (signals->frequencies patterns)))
       (map
         (lambda (signal)
-          (hash-table-ref signals-identifiers
-            (hash-table-ref ids signal)))
+          (hash-table-ref signals-identifiers (signal->identifier freqs signal)))
         output))))
 
-(define (parse-signals str)
-  (map (cut sort <> string<?)
-    (map (cut string-chop <> 1) (string-split str " "))))
-
 (define (parse-entry str)
-  (map parse-signals (string-split str "|")))
+  (map
+    (lambda (lst)
+      (map (cut string-chop <> 1) lst))
+    (map (cut string-split <> " ") (string-split str "|"))))
 
 (define (import-input)
   (map translate (map parse-entry (read-lines))))
 
 (define (solve/1 input)
   (count
-    (lambda (i)
-      (case i
+    (lambda (n)
+      (case n
         ((1 4 7 8) #t)
         (else #f)))
     (flatten input)))
