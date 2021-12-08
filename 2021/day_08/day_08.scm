@@ -23,8 +23,7 @@
     mem))
 
 (define signals-identifiers
-  (let ((signals (map (cut string-chop <> 1)
-                   (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"))))
+  (let ((signals (map (cut string-chop <> 1) (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"))))
     (let ((ids (signals->identifiers signals)) (mem (make-hash-table)))
       (for-each
         (lambda (signal identifier)
