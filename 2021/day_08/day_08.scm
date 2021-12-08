@@ -3,60 +3,56 @@
   (chicken string)
   (chicken sort)
   (euler)
-  (srfi 1))
+  (srfi 1)
+  (srfi 69))
 
-(define valids
-  (list "abcefg"
-        "cf"
-        "acdeg"
-        "acdfg"
-        "bcdf"
-        "abdfg"
-        "abdefg"
-        "acf"
-        "abcdefg"
-        "abcdfg"))
+(define segments
+  (map (cut string-chop <> 1)
+    (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"))) 
 
-(define (generate-valids)
-  (let ((lst (map (cut string-chop <> 1) valids)))
-    (map cons lst (iota (length lst)))))
+(define (segments->frequencies lst)
+  (let ((mem (make-hash-table)))
+    (for-each
+      (lambda (char)
+        (hash-table-set! mem char (+ (hash-table-ref/default mem char 0) 1)))
+      (flatten lst))
+    mem))
 
-(define (generate-permutations)
-  (let ((chars (string-chop "abcdefg" 1)))
-    ;; generate permutations on "abcdefg"
-    (map (cut map cons chars <>) (permutations chars))))
+(define (segments->identifiers lst)
+  (let ((freqs (segments->frequencies lst)) (mem (make-hash-table)))
+    (for-each
+      (lambda (segment)
+        (let ((identifier (apply + (map (cut hash-table-ref freqs <>) segment))))
+          (hash-table-set! mem segment identifier)))
+      lst)
+    mem))
 
-(define (generate-list permutation lst)
-  ;; generate a list based on a permutation
-  (sort (map cdr (map (cut assoc <> permutation) lst)) string<?))
+(define segments-identifiers
+  (let ((ids (segments->identifiers segments)) (mem (make-hash-table)))
+    (for-each
+      (lambda (segment identifier)
+        (hash-table-set! mem (hash-table-ref ids segment) identifier))
+      segments (iota (length segments)))
+    mem))
 
-(define (find-permutation permutations valids patterns)
-  (find
-    (lambda (permutation)
-      (every
-        (lambda (lst)
-          (assoc (generate-list permutation lst) valids))
-        patterns))
-    permutations))
-
-(define (translate-entry permutations valids entry)
+(define (translate entry)
   (receive (patterns output) (apply values entry)
-    (let ((permutation (find-permutation permutations valids patterns)))
-      ;; generate output based on valid permutation
-      (map cdr (map (cut assoc <> valids) (map (cut generate-list permutation <>) output))))))
+    (let ((ids (segments->identifiers patterns)))
+      (map
+        (lambda (segment)
+          (hash-table-ref segments-identifiers
+            (hash-table-ref ids segment)))
+        output))))
 
-(define (translate-all lst)
-  (let ((valids (generate-valids)) (permutations (generate-permutations)))
-    (map (cut translate-entry permutations valids <>) lst)))
+(define (parse-segments str)
+  (map (cut sort <> string<?)
+    (map (cut string-chop <> 1) (string-split str " "))))
 
 (define (parse-entry str)
-  (map
-    (lambda (lst)
-      (map (cut string-chop <> 1) lst))
-    (map (cut string-split <> " ") (string-split str "|"))))
+  (map parse-segments (string-split str "|")))
 
 (define (import-input)
-  (translate-all (map parse-entry (read-lines))))
+  (map translate (map parse-entry (read-lines))))
 
 (define (solve/1 input)
   (count
