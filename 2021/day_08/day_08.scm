@@ -6,6 +6,8 @@
   (srfi 1)
   (srfi 69))
 
+(define signals '("abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"))
+
 (define (signals->frequencies lst)
   (let ((mem (make-hash-table)))
     (for-each
@@ -18,12 +20,13 @@
   (let ((freqs (signals->frequencies lst)) (mem (make-hash-table)))
     (for-each
       (lambda (signal)
-        (hash-table-set! mem signal (foldl + 0 (map (cut hash-table-ref freqs <>) signal))))
+        (hash-table-set! mem signal
+          (foldl + 0 (map (cut hash-table-ref freqs <>) signal))))
       lst)
     mem))
 
 (define signals-identifiers
-  (let ((signals (map (cut string-chop <> 1) (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"))))
+  (let ((signals (map (cut string-chop <> 1) signals))) 
     (let ((ids (signals->identifiers signals)) (mem (make-hash-table)))
       (for-each
         (lambda (signal identifier)
