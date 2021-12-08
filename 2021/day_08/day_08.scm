@@ -6,11 +6,11 @@
   (srfi 1)
   (srfi 69))
 
-(define segments
+(define signals
   (map (cut string-chop <> 1)
     (list "abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg"))) 
 
-(define (segments->frequencies lst)
+(define (signals->frequencies lst)
   (let ((mem (make-hash-table)))
     (for-each
       (lambda (char)
@@ -18,38 +18,38 @@
       (flatten lst))
     mem))
 
-(define (segments->identifiers lst)
-  (let ((freqs (segments->frequencies lst)) (mem (make-hash-table)))
+(define (signals->identifiers lst)
+  (let ((freqs (signals->frequencies lst)) (mem (make-hash-table)))
     (for-each
-      (lambda (segment)
-        (let ((identifier (apply + (map (cut hash-table-ref freqs <>) segment))))
-          (hash-table-set! mem segment identifier)))
+      (lambda (signal)
+        (let ((identifier (apply + (map (cut hash-table-ref freqs <>) signal))))
+          (hash-table-set! mem signal identifier)))
       lst)
     mem))
 
-(define segments-identifiers
-  (let ((ids (segments->identifiers segments)) (mem (make-hash-table)))
+(define signals-identifiers
+  (let ((ids (signals->identifiers signals)) (mem (make-hash-table)))
     (for-each
-      (lambda (segment identifier)
-        (hash-table-set! mem (hash-table-ref ids segment) identifier))
-      segments (iota (length segments)))
+      (lambda (signal identifier)
+        (hash-table-set! mem (hash-table-ref ids signal) identifier))
+      signals (iota (length signals)))
     mem))
 
 (define (translate entry)
   (receive (patterns output) (apply values entry)
-    (let ((ids (segments->identifiers patterns)))
+    (let ((ids (signals->identifiers patterns)))
       (map
-        (lambda (segment)
-          (hash-table-ref segments-identifiers
-            (hash-table-ref ids segment)))
+        (lambda (signal)
+          (hash-table-ref signals-identifiers
+            (hash-table-ref ids signal)))
         output))))
 
-(define (parse-segments str)
+(define (parse-signals str)
   (map (cut sort <> string<?)
     (map (cut string-chop <> 1) (string-split str " "))))
 
 (define (parse-entry str)
-  (map parse-segments (string-split str "|")))
+  (map parse-signals (string-split str "|")))
 
 (define (import-input)
   (map translate (map parse-entry (read-lines))))
