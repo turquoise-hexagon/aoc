@@ -16,7 +16,7 @@
 
 (define (find-number lst n)
   (let ((acc (generate-preamble (take lst n))))
-    (let find-number/h ((lst lst))
+    (let loop ((lst lst))
       (receive (head tail) (split-at lst n)
         (if (bag-contains? acc (car tail))
           (begin
@@ -25,7 +25,7 @@
                 (bag-delete! acc (+ i (car head)))
                 (bag-adjoin! acc (+ i (car tail))))
               (cdr head))
-            (find-number/h (cdr lst)))
+            (loop (cdr lst)))
           (car tail))))))
 
 (define (pair-find pred lst)
@@ -34,13 +34,13 @@
     (pair-find pred (cdr lst))))
 
 (define (solve input n)
-  (let solve/h ((lst input))
+  (let loop ((lst input))
     (let ((res (pair-find
                  (lambda (lst)
                    (= (apply + lst) n))
                  (reverse lst))))
       (if (null? res)
-        (solve/h (cdr lst))
+        (loop (cdr lst))
         (+ (apply max res)
            (apply min res))))))
 

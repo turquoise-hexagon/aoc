@@ -14,22 +14,22 @@
 
 (define (run-instructions vec)
   (let ((mem (make-hash-table)) (len (vector-length vec)))
-    (let run-instructions/h ((ptr 0) (acc 0))
+    (let loop ((ptr 0) (acc 0))
       (if (or (hash-table-exists? mem ptr) (= ptr len))
         (values ptr acc)
         (begin
           (hash-table-set! mem ptr #t)
           (match (vector-ref vec ptr)
-            (`(acc ,n) (run-instructions/h (+ ptr 1) (+ acc n)))
-            (`(jmp ,n) (run-instructions/h (+ ptr n) acc))
-            (`(nop ,n) (run-instructions/h (+ ptr 1) acc))))))))
+            (`(acc ,n) (loop (+ ptr 1) (+ acc n)))
+            (`(jmp ,n) (loop (+ ptr n) acc))
+            (`(nop ,n) (loop (+ ptr 1) acc))))))))
 
 (define (solve/1 input)
   (nth-value 1 (run-instructions input)))
 
 (define (solve/2 input)
   (let ((len (vector-length input)))
-    (let solve/2/h ((ptr 0))
+    (let loop ((ptr 0))
       (let ((copy (vector-copy input)))
         (match (vector-ref copy ptr)
           (`(jmp ,n) (vector-set! copy ptr `(nop ,n)))
@@ -38,7 +38,7 @@
         (receive (stop acc) (run-instructions copy)
           (if (= stop len)
             acc
-            (solve/2/h (+ ptr 1))))))))
+            (loop (+ ptr 1))))))))
 
 (let ((input (import-input)))
   (print (solve/1 input))
