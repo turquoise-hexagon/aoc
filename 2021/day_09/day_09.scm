@@ -25,8 +25,8 @@
     (map (cut map + coord <>) '((1 0) (0 1) (-1 0) (0 -1)))))
 
 (define (low-point? mem coord)
-  (let ((current (hash-table-ref mem coord)))
-    (> (apply min (map (cut hash-table-ref mem <>) (neighbors mem coord))) current)))
+  (> (apply min (map (cut hash-table-ref mem <>) (neighbors mem coord)))
+     (hash-table-ref mem coord)))
 
 (define (extend-bassin mem mem/bassin mem/added)
   (let ((mem/acc (make-hash-table)))
