@@ -37,18 +37,18 @@
                         (cons char acc))
                        ((char=? (cdr (assoc char matched)) (car acc))
                         (cdr acc))
-                       (else (_ (score/1 char)))))
+                       (else (_ char))))
                '() lst))))
 
 (define (import-input)
-  (partition number? (map run (map string->list (read-lines)))))
+  (partition list? (map run (map string->list (read-lines)))))
 
 (define (solve/1 input)
-  (apply + input))
+  (apply + (map score/1 input)))
 
 (define (solve/2 input)
   (list-ref (sort (map score/2 input) <) (quotient (length input) 2)))
 
-(receive (nums lsts) (import-input)
-  (print (solve/1 nums))
-  (print (solve/2 lsts)))
+(receive (lists chars) (import-input)
+  (print (solve/1 chars))
+  (print (solve/2 lists)))
