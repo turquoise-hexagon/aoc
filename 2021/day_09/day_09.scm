@@ -28,31 +28,14 @@
   (> (apply min (map (cut hash-table-ref mem <>) (neighbors mem coord)))
      (hash-table-ref mem coord)))
 
-(define (extend-bassin mem mem/bassin mem/added)
-  (let ((mem/acc (make-hash-table)))
-    (for-each
-      (lambda (coord)
-        (let ((current (hash-table-ref mem coord)))
-          (for-each
-            (lambda (coord)
-              (let ((tmp (hash-table-ref mem coord)))
-                ;; do not take into account invalid values & coordinates already in the bassin
-                (when (and (> 9 tmp current) (not (hash-table-exists? mem/bassin coord)))
-                  (hash-table-set! mem/acc coord #t))))
-            (neighbors mem coord))))
-      (hash-table-keys mem/added))
-    mem/acc))
-
 (define (bassin mem coord)
-  (let ((mem/acc (alist->hash-table `((,coord . #t)))))
-    (let loop ((mem/added mem/acc))
-      ;; considere only the coordinates that were just added
-      (let ((mem/tmp (extend-bassin mem mem/acc mem/added)))
-        (if (= (hash-table-size mem/tmp) 0)
-          mem/acc
-          (begin
-            (for-each (cut hash-table-set! mem/acc <> #t) (hash-table-keys mem/tmp))
-            (loop mem/tmp)))))))
+  (let ((acc (make-hash-table)))
+    (let loop ((coord coord))
+      (unless (or (hash-table-exists? acc coord)
+                  (= (hash-table-ref mem coord) 9))
+        (hash-table-set! acc coord #t)
+        (for-each loop (neighbors mem coord))))
+    acc))
 
 (define (solve/1 input low-points)
   (apply + (map (cut + <> 1) (map (cut hash-table-ref input <>) low-points))))
