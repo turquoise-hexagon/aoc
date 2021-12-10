@@ -3,53 +3,52 @@
   (chicken sort)
   (srfi 1))
 
+(define openings '(#\( #\[ #\{ #\<))
+(define closings '(#\) #\] #\} #\>))
+
 (define matched
-  '((#\> . #\<)
-    (#\} . #\{)
-    (#\) . #\()
-    (#\] . #\[)))
+  (append
+    (map cons openings closings)
+    (map cons closings openings)))
 
-(define scores/1
-  '((#\) . 3)
-    (#\] . 57)
-    (#\} . 1197)
-    (#\> . 25137)))
+(define (score/1 char)
+  (case char
+    ((#\)) 3)
+    ((#\]) 57)
+    ((#\}) 1197)
+    ((#\>) 25137)))
 
-(define scores/2
-  '((#\{ . 3)
-    (#\( . 1)
-    (#\[ . 2)
-    (#\< . 4)))
+(define (score/2 lst)
+  (foldl
+    (lambda (acc char)
+      (+ (* acc 5)
+         (case char
+           ((#\() 1)
+           ((#\[) 2)
+           ((#\{) 3)
+           ((#\<) 4))))
+    0 lst))
 
-(define (score lst)
-  (let loop ((lst lst) (acc '()))
-    (if (null? lst)
-      acc
-      (if (member (car lst) (map cdr matched))
-        (loop (cdr lst) (cons (car lst) acc))
-        (if (char=? (car acc) (cdr (assoc (car lst) matched)))
-          (loop (cdr lst) (cdr acc))
-          (cdr (assoc (car lst) scores/1)))))))
+(define (run lst)
+  (call/cc (lambda (_)
+             (foldl
+               (lambda (acc char)
+                 (cond ((member char openings)
+                        (cons char acc))
+                       ((char=? (cdr (assoc char matched)) (car acc))
+                        (cdr acc))
+                       (else (_ (score/1 char)))))
+               '() lst))))
 
 (define (import-input)
-  (let ((lst (map score (map string->list (read-lines)))))
-    (partition list? lst)))
-
-(define (median lst)
-  (list-ref (sort lst <) (quotient (length lst) 2)))
+  (partition number? (map run (map string->list (read-lines)))))
 
 (define (solve/1 input)
   (apply + input))
 
 (define (solve/2 input)
-  (median (map
-            (lambda (lst)
-              (foldl
-                (lambda (acc char)
-                  (+ (* acc 5) (cdr (assoc char scores/2))))
-                0 lst))
-            input)))
+  (list-ref (sort (map score/2 input) <) (quotient (length input) 2)))
 
-(receive (lsts nums) (import-input)
+(receive (nums lsts) (import-input)
   (print (solve/1 nums))
   (print (solve/2 lsts)))
