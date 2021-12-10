@@ -11,6 +11,20 @@
     (map cons openings closings)
     (map cons closings openings)))
 
+(define (run lst)
+  (call/cc (lambda (_)
+             (foldl
+               (lambda (acc char)
+                 (cond ((member char openings)
+                        (cons char acc))
+                       ((char=? (cdr (assoc char matched)) (car acc))
+                        (cdr acc))
+                       (else (_ char))))
+               '() lst))))
+
+(define (import-input)
+  (partition list? (map run (map string->list (read-lines)))))
+
 (define (score/1 char)
   (case char
     ((#\)) 3)
@@ -28,20 +42,6 @@
            ((#\{) 3)
            ((#\<) 4))))
     0 lst))
-
-(define (run lst)
-  (call/cc (lambda (_)
-             (foldl
-               (lambda (acc char)
-                 (cond ((member char openings)
-                        (cons char acc))
-                       ((char=? (cdr (assoc char matched)) (car acc))
-                        (cdr acc))
-                       (else (_ char))))
-               '() lst))))
-
-(define (import-input)
-  (partition list? (map run (map string->list (read-lines)))))
 
 (define (solve/1 input)
   (apply + (map score/1 input)))
