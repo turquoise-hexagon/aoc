@@ -22,19 +22,21 @@
 (define (string-lower-case? str)
   (every char-lower-case? (string->list str)))
 
-(define (solve graph from to flag)
-  (let loop ((from from) (to to) (flag flag) (acc '()))
-    (define (next from to flag acc)
-      (let ((acc (if (string-lower-case? from) (cons from acc) acc)))
-        (apply + (map (cut loop <> to flag acc) (hash-table-keys (hash-table-ref graph from))))))
-    (if (string=? from to)
+(define (solve graph source target flag)
+  (let loop ((current source) (flag flag) (acc '()))
+    (define (next current flag acc)
+      (let ((acc (if (string-lower-case? current) (cons current acc) acc)))
+        (apply + (map (cut loop <> flag acc) (hash-table-keys (hash-table-ref graph current))))))
+    (if (string=? current target)
       1
-      (if (member from acc)
-        (if (or flag (string=? from "start"))
+      (if (member current acc)
+        (if (or (string=? current source)
+                (string=? current target)
+                flag)
           0
-          (next from to #t acc))
-        (next from to flag acc)))))
-
+          (next current #t acc))
+        (next current flag acc)))))
+        
 (let ((input (import-input)))
   (print (solve input "start" "end" #t))
   (print (solve input "start" "end" #f)))
