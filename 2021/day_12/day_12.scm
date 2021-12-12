@@ -24,7 +24,7 @@
   (let loop ((current source) (flag flag) (acc '()))
     (define (next current flag acc)
       (let ((acc (if (string-lower-case? current) (cons current acc) acc)))
-        (apply + (map (cut loop <> flag acc) (hash-table-ref graph current)))))
+        (foldl + 0 (map (cut loop <> flag acc) (hash-table-ref graph current)))))
     (if (string=? current target)
       1
       (if (member current acc)
