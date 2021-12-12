@@ -30,9 +30,7 @@
     (if (string=? current target)
       1
       (if (member current acc)
-        (if (or (string=? current source)
-                (string=? current target)
-                flag)
+        (if (or flag (string=? current source))
           0
           (next current #t acc))
         (next current flag acc)))))
