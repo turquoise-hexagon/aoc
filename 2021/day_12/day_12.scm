@@ -1,8 +1,8 @@
 (import
   (chicken io)
   (chicken string)
-  (srfi 69)
-  (srfi 1))
+  (srfi 1)
+  (srfi 69))
 
 (define (add-connection! graph a b)
   (hash-table-set! graph a (cons b (hash-table-ref/default graph a '()))))
