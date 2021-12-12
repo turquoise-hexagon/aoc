@@ -5,9 +5,7 @@
   (srfi 1))
 
 (define (add-connection! graph a b)
-  (unless (hash-table-exists? graph a)
-    (hash-table-set! graph a (make-hash-table)))
-  (hash-table-set! (hash-table-ref graph a) b #t))
+  (hash-table-set! graph a (cons b (hash-table-ref/default graph a '()))))
 
 (define (import-input)
   (let ((graph (make-hash-table)))
@@ -26,7 +24,7 @@
   (let loop ((current source) (flag flag) (acc '()))
     (define (next current flag acc)
       (let ((acc (if (string-lower-case? current) (cons current acc) acc)))
-        (apply + (map (cut loop <> flag acc) (hash-table-keys (hash-table-ref graph current))))))
+        (apply + (map (cut loop <> flag acc) (hash-table-ref graph current)))))
     (if (string=? current target)
       1
       (if (member current acc)
