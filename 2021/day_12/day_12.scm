@@ -1,8 +1,8 @@
 (import
   (chicken io)
   (chicken string)
-  (srfi 1)
-  (srfi 69))
+  (srfi 69)
+  (srfi 152))
 
 (define (add-connection! graph a b)
   (hash-table-set! graph a (cons b (hash-table-ref/default graph a '()))))
@@ -18,7 +18,7 @@
     graph))
 
 (define (string-lower-case? str)
-  (every char-lower-case? (string->list str)))
+  (string-every char-lower-case? str))
 
 (define (solve graph source target flag)
   (let loop ((current source) (flag flag) (acc '()))
