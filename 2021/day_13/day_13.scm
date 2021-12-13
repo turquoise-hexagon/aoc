@@ -2,7 +2,8 @@
   (chicken io)
   (chicken irregex)
   (srfi 1)
-  (srfi 69))
+  (srfi 113)
+  (srfi 128))
 
 (define (parse-dot str)
   (map string->number (irregex-split "," str)))
@@ -29,23 +30,23 @@
     dots folds))
 
 (define (place-dots dots)
-  (alist->hash-table (map list dots)))
+  (list->set (make-default-comparator) dots))
 
 (define (output grid)
-  (receive (x y) (unzip2 (hash-table-keys grid))
+  (receive (x y) (unzip2 (set->list grid))
     (let ((h (+ (apply max x) 1))
           (w (+ (apply max y) 1)))
       (for-each
         (lambda (i)
           (for-each
             (lambda (j)
-              (display (if (hash-table-exists? grid (list j i)) "▊" " ")))
+              (display (if (set-contains? grid (list j i)) "▊" " ")))
             (iota h))
           (newline))
         (iota w)))))
 
 (define (solve/1 dots folds)
-  (hash-table-size (place-dots (fold-dots dots (list (first folds))))))
+  (set-size (place-dots (fold-dots dots (list (first folds))))))
 
 (define (solve/2 dots folds)
   (output (place-dots (fold-dots dots folds))))
