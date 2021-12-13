@@ -1,49 +1,45 @@
-(import (chicken io)
-        (chicken process-context)
-        (chicken string)
-        (matchable)
-        (srfi 1))
+(import
+  (chicken io)
+  (chicken string)
+  (srfi 1))
 
-(define (import-input path)
-  (match (read-lines (open-input-file path))
-    ((earliest schedule)
-     (list (string->number earliest)
-           (map string->number (string-split schedule ","))))))
+(define (import-input)
+  (let ((earliest (read-line))
+        (schedule (read-line)))
+    (list (string->number earliest)
+      (let ((lst (string-split schedule ",")))
+        (map string->number lst)))))
+
+(define (solve-chinese offsets)
+  (let loop ((acc 0))
+    (let ((lst (filter
+                 (lambda (lst)
+                   (receive (id offset) (apply values lst)
+                     (= (modulo (+ acc offset) id) 0)))
+                 offsets)))
+      (if (equal? lst offsets) acc
+        (loop (+ acc (apply * (unzip1 lst))))))))
 
 (define (solve/1 input)
-  (match input
-    ((earliest schedule)
-     (let ((lst (map
-                  (lambda (n)
-                    (let solve/1/h ((current 0))
-                      (if (> current earliest)
-                          (cons (- current earliest) n)
-                          (solve/1/h (+ current n)))))
-                  (filter (cut number? <>) schedule))))
-       (let ((lst (assoc (apply min (map car lst)) lst)))
-         (print (* (car lst)
-                   (cdr lst))))))))
+  (receive (earliest schedule) (apply values input)
+    (let ((lst (map
+                 (lambda (id)
+                   (let loop ((acc 0))
+                     (let ((diff (- acc earliest)))
+                       (if (> diff 0) (list diff id)
+                         (loop (+ acc id))))))
+                 (filter number? schedule))))
+      (apply * (assoc (apply min (unzip1 lst)) lst)))))
 
 (define (solve/2 input)
-  (match input
-   ((earliest schedule)
-    (let ((offsets (fold
+  (receive (earliest schedule) (apply values input)
+    (solve-chinese (fold
                      (lambda (a b acc)
                        (if (number? a)
-                           (cons (cons a b) acc)
-                           acc))
-                     (list) schedule (iota (length schedule)))))
-      (print (let solve/2/h ((current 0))
-               (let ((lst (filter
-                            (match-lambda
-                              ((id . offsets)
-                               (= (modulo (+ current offsets) id) 0)))
-                            offsets)))
-                 (if (equal? lst offsets)
-                     current
-                     (solve/2/h (+ current (apply * (map car lst))))))))))))
+                         (cons (list a b) acc)
+                         acc))
+                     '() schedule (iota (length schedule))))))
 
-(let ((path (car (command-line-arguments))))
-  (let ((input (import-input path)))
-    (solve/1 input)
-    (solve/2 input)))
+(let ((input (import-input)))
+  (print (solve/1 input))
+  (print (solve/2 input)))
