@@ -37,18 +37,18 @@
 
 (define (output mem)
   (receive (x y) (unzip2 (hash-table-keys mem))
-    (let* ((x-min (apply min x))
-           (y-min (apply min y))
-           (h (- (apply max x) x-min -1))
-           (w (- (apply max y) y-min -1)))
-      (for-each
-        (lambda (y)
-          (for-each
-            (lambda (x)
-              (display (if (hash-table-exists? mem (list x y)) "#" " ")))
-            (iota h x-min))
-          (newline))
-        (iota w y-min)))))
+    (let ((x-min (apply min x))
+          (y-min (apply min y)))
+      (let ((h (- (apply max x) x-min -1))
+            (w (- (apply max y) y-min -1)))
+        (for-each
+          (lambda (y)
+            (for-each
+              (lambda (x)
+                (display (if (hash-table-exists? mem (list x y)) "#" " ")))
+              (iota h x-min))
+            (newline))
+          (iota w y-min))))))
 
 (define (solve/1 dots folds)
   (hash-table-size (place-dots (fold-dots dots `(,(car folds))))))
