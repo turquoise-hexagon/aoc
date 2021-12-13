@@ -15,5 +15,7 @@ depends on
     * srfi-69
     * srfi-113
     * srfi-128
+    * srfi-133
+    * srfi-152
     * euler
     * matchable
