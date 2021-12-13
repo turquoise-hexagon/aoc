@@ -41,7 +41,7 @@
         (lambda (i)
           (for-each
             (lambda (j)
-              (display (if (hash-table-exists? grid (list j i)) "#" " ")))
+              (display (if (hash-table-exists? grid (list j i)) "▊" " ")))
             (iota h))
           (newline))
         (iota w)))))
