@@ -29,9 +29,7 @@
     dots folds))
 
 (define (place-dots dots)
-  (let ((grid (make-hash-table)))
-    (for-each (cut hash-table-set! grid <> #t) dots)
-    grid))
+  (alist->hash-table (map (cut cons <> #t) dots)))
 
 (define (output grid)
   (receive (x y) (unzip2 (hash-table-keys grid))
