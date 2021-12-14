@@ -1,63 +1,62 @@
-(import (chicken io)
-        (chicken bitwise)
-        (chicken process-context)
-        (chicken irregex)
-        (chicken string)
-        (matchable)
-        (srfi 69))
+(import
+  (chicken bitwise)
+  (chicken io)
+  (chicken irregex)
+  (srfi 1)
+  (srfi 69))
 
-(define (import-input path)
-  (map
-    (match-lambda
-      ((mask . instructions)
-       (list mask (map
-                    (lambda (instructions)
-                      (map string->number (cdr (string-split instructions "[]= "))))
-                    instructions))))
-    (map (cut string-split <> "\n") (irregex-split "mask = " (read-string #f (open-input-file path))))))
+(define (parse-instruction str)
+  (let ((lst (irregex-extract "[0-9]+" str)))
+    (map string->number lst)))
 
-(define (pad address mask)
-  (do ((acc (number->string address 2) (string-append "0" acc)))
-    ((= (string-length  acc)
-        (string-length mask))
-     acc)))
+(define (parse-chunk str)
+  (let ((lst (irregex-split "\n" str)))
+    (receive (mask . instructions) (apply values lst)
+      `(,mask ,(map parse-instruction instructions)))))
 
-(define (combinations address mask)
-  (let combinations/h ((address (string->list address)) (mask (string->list mask)) (acc (string)))
-    (if (null? mask)
-        (list (string->number acc 2))
-        (let ((proc (lambda (char) (combinations/h (cdr address) (cdr mask) (string-append acc char)))))
+(define (import-input)
+  (map parse-chunk (irregex-split "mask = " (read-string #f))))
+
+(define (add-padding mask address)
+  (let ((address (number->string address 2)))
+    (let ((n (apply - (map string-length `(,mask ,address)))))
+      (foldr string-append address (make-list n "0")))))
+
+(define (generate mask address)
+  (let ((address (add-padding mask address)))
+    (let loop ((mask (string->list mask)) (address (string->list address)) (acc '()))
+      (if (null? mask) `(,(string->number (list->string (reverse acc)) 2))
+        (append-map
+          (lambda (char)
+            (loop (cdr mask) (cdr address) (cons char acc)))
           (case (car mask)
-            ((#\0) (proc (string (car address))))
-            ((#\1) (proc                    "1"))
-            ((#\X) (append (proc "0")
-                           (proc "1"))))))))
-
+            ((#\0) `(,(car address)))
+            ((#\1) `(#\1))
+            ((#\X) `(#\1 #\0))))))))
+ 
 (define (proc/1 memory mask address value)
-  (let ((mask1 (string->number (irregex-replace/all "X" mask "1") 2))
-        (mask2 (string->number (irregex-replace/all "X" mask "0") 2)))
-    (hash-table-set! memory address (bitwise-ior (bitwise-and value mask1) mask2))))
+  (let ((mask/1 (string->number (irregex-replace/all "X" mask "1") 2))
+        (mask/2 (string->number (irregex-replace/all "X" mask "0") 2)))
+    (let* ((value (bitwise-and value mask/1))
+           (value (bitwise-ior value mask/2)))
+      (hash-table-set! memory address value))))
 
 (define (proc/2 memory mask address value)
-  (for-each
-    (lambda (address)
-      (hash-table-set! memory address value))
-    (combinations (pad address mask) mask)))
+  (for-each (cut hash-table-set! memory <> value)
+    (generate mask address)))
 
-(define (solve proc input)
+(define (solve input proc)
   (let ((memory (make-hash-table)))
     (for-each
-      (match-lambda
-        ((mask . (instructions))
-         (for-each
-           (match-lambda
-             ((address value)
-              (proc memory mask address value)))
-           instructions)))
+      (lambda (lst)
+        (receive (mask instructions) (apply values lst)
+          (for-each
+            (lambda (instruction)
+              (apply (cut proc memory mask <> <>) instruction))
+            instructions)))
       input)
-    (print (apply + (hash-table-values memory)))))
+    (apply + (hash-table-values memory))))
 
-(let ((path (car (command-line-arguments))))
-  (let ((input (import-input path)))
-    (solve proc/1 input)
-    (solve proc/2 input)))
+(let ((input (import-input)))
+  (print (solve input proc/1))
+  (print (solve input proc/2)))
