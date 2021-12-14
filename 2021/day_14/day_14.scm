@@ -1,6 +1,5 @@
 (import
   (chicken io)
-  (chicken irregex)
   (chicken string)
   (srfi 1)
   (srfi 69))
@@ -11,7 +10,7 @@
       (lambda (rule)
         (receive (a b) (apply values rule)
           (hash-table-set! acc (string-chop a 1) b)))
-      (map (cut irregex-split " -> " <>) lst))
+      (map (cut string-split <> "-> ") lst))
     acc))
 
 (define (parse-template str)
