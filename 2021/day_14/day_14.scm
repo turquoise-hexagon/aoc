@@ -7,52 +7,41 @@
 (define (parse-rules lst)
   (let ((acc (make-hash-table)))
     (for-each
-      (lambda (rule)
-        (receive (a b) (apply values rule)
+      (lambda (lst)
+        (receive (a b) (apply values lst)
           (hash-table-set! acc (string-chop a 1) b)))
-      (map (cut string-split <> "-> ") lst))
+     (map (cut string-split <> "-> ") lst))
     acc))
-
-(define (parse-template str)
-  (let ((lst (string-chop str 1)))
-    (append (zip lst (cdr lst))
-      `((,(last lst))))))
 
 (define (import-input)
   (receive (template _ . rules) (apply values (read-lines))
-    (values (parse-template template) (parse-rules rules))))
+    (values (string-chop template 1) (parse-rules rules))))
 
 (define (increment! mem key #!optional (step 1))
   (hash-table-set! mem key (+ (hash-table-ref/default mem key 0) step)))
 
-(define (iterate/h mem rules)
+(define (iterate/h chars pairs rules)
   (let ((acc (make-hash-table)))
-    (hash-table-for-each mem
+    (hash-table-for-each pairs
       (lambda (pair cnt)
-        (if (hash-table-exists? rules pair)
-          (let ((char (hash-table-ref rules pair)))
-            (increment! acc (list (car  pair) char) cnt)
-            (increment! acc (list char (cadr pair)) cnt))
-          (increment! acc pair cnt))))
+        (let ((char (hash-table-ref rules pair)))
+          (increment! chars char cnt)
+          (increment! acc `(,(car  pair) ,char) cnt)
+          (increment! acc `(,char ,(cadr pair)) cnt))))
     acc))
 
-(define (iterate mem rules n)
+(define (iterate chars pairs rules n)
   (foldl
     (lambda (acc _)
-      (iterate/h acc rules))
-    mem (iota n)))
-
-(define (frequencies mem)
-  (let ((acc (make-hash-table)))
-    (hash-table-for-each mem
-      (lambda (pair cnt)
-        (increment! acc (car pair) cnt)))
-    (hash-table-values acc)))
+      (iterate/h chars acc rules))
+    pairs (iota n)))
 
 (define (solve template rules n)
-  (let ((acc (make-hash-table)))
-    (for-each (cut increment! acc <>) template)
-    (let ((frequencies (frequencies (iterate acc rules n))))
+  (let ((chars (make-hash-table)) (pairs (make-hash-table)))
+    (for-each (cut increment! chars <>) template)
+    (for-each (cut increment! pairs <>) (zip template (cdr template)))
+    (iterate chars pairs rules n)
+    (let ((frequencies (hash-table-values chars)))
       (- (apply max frequencies)
          (apply min frequencies)))))
 
