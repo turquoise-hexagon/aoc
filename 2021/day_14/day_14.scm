@@ -6,59 +6,56 @@
   (srfi 69))
 
 (define (parse-rules lst)
-  (let ((mem (make-hash-table)))
+  (let ((acc (make-hash-table)))
     (for-each
       (lambda (rule)
-        (apply (cut hash-table-set! mem <> <>) rule))
+        (receive (a b) (apply values rule)
+          (hash-table-set! acc (string-chop a 1) b)))
       (map (cut irregex-split " -> " <>) lst))
-    mem))
+    acc))
 
 (define (parse-template str)
   (let ((lst (string-chop str 1)))
-    (append (map (cut apply string-append <>)
-             (zip lst (cdr lst)))
-      `(,(last lst)))))
-      
+    (append (zip lst (cdr lst))
+      `((,(last lst))))))
+
 (define (import-input)
   (receive (template _ . rules) (apply values (read-lines))
     (values (parse-template template) (parse-rules rules))))
 
-(define (increment! mem key #!optional (n 1))
-  (hash-table-set! mem key (+ (hash-table-ref/default mem key 0) n)))
-
-(define (string-ref/h str index)
-  (string (string-ref str index)))
+(define (increment! mem key #!optional (step 1))
+  (hash-table-set! mem key (+ (hash-table-ref/default mem key 0) step)))
 
 (define (iterate/h mem rules)
   (let ((acc (make-hash-table)))
     (hash-table-for-each mem
-      (lambda (str cnt)
-        (if (hash-table-exists? rules str)
-          (let ((res (hash-table-ref rules str)))
-            (increment! acc (string-append (string-ref/h str 0) res) cnt)
-            (increment! acc (string-append res (string-ref/h str 1)) cnt))
-          (increment! acc str cnt))))
+      (lambda (pair cnt)
+        (if (hash-table-exists? rules pair)
+          (let ((char (hash-table-ref rules pair)))
+            (increment! acc (list (car  pair) char) cnt)
+            (increment! acc (list char (cadr pair)) cnt))
+          (increment! acc pair cnt))))
     acc))
 
-(define (iterate template rules n)
-  (let ((mem (make-hash-table)))
-    (for-each (cut increment! mem <>) template)
-    (foldl
-      (lambda (mem _)
-        (iterate/h mem rules))
-      mem (iota n))))
+(define (iterate mem rules n)
+  (foldl
+    (lambda (acc _)
+      (iterate/h acc rules))
+    mem (iota n)))
 
-(define (freq mem)
+(define (frequencies mem)
   (let ((acc (make-hash-table)))
     (hash-table-for-each mem
-      (lambda (str cnt)
-        (increment! acc (string-ref/h str 0) cnt)))
+      (lambda (pair cnt)
+        (increment! acc (car pair) cnt)))
     (hash-table-values acc)))
 
 (define (solve template rules n)
-  (let ((lst (freq (iterate template rules n))))
-    (- (apply max lst)
-       (apply min lst))))
+  (let ((acc (make-hash-table)))
+    (for-each (cut increment! acc <>) template)
+    (let ((frequencies (frequencies (iterate acc rules n))))
+      (- (apply max frequencies)
+         (apply min frequencies)))))
 
 (receive (template rules) (import-input)
   (print (solve template rules 10))
