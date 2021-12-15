@@ -1,64 +1,58 @@
 (import
   (chicken io)
   (chicken string)
-  (euler)
   (srfi 1)
   (srfi 69))
 
+(include-relative "grid")
 (include-relative "queue")
 
-(define (pack-input lst)
-  (let ((acc (make-hash-table)))
-    (for-each
-      (lambda (coord)
-        (receive (x y) (apply values coord)
-          (hash-table-set! acc coord
-            (list-ref (list-ref lst x) y))))
-      (product (iota (length lst)) (iota (length (car lst)))))
-    acc))
-
 (define (import-input)
-  (pack-input
+  (list->grid
     (map (cut map string->number <>)
       (map (cut string-chop <> 1)
         (read-lines)))))
 
-(define (extend mem n)
-  (receive (x y) (unzip2 (hash-table-keys mem))
-    (let ((h (+ (apply max x) 1))
-          (w (+ (apply max y) 1))
-          (multipliers (delete '(0 0) (combinations (iota n) 2))))
-      (hash-table-for-each mem
-        (lambda (coord value)
-          (for-each
-            (lambda (multiplier)
-              (hash-table-set! mem (map + coord (map * multiplier (list h w)))
-                (+ (modulo (+ value (apply + multiplier) -1) 9) 1)))
-            multipliers))))))
+(define (transform/h lst i)
+  (map
+    (lambda (n)
+      (+ (modulo (+ n i -1) 9) 1))
+    lst))
 
-(define (neighbors mem coord)
-  (filter (cut hash-table-exists? mem <>)
+(define (transform grid n)
+  (let* ((lst (grid->list grid))
+         (lst (join (map
+                      (lambda (i)
+                        (map (cut transform/h <> i) lst))
+                      (iota n))))
+         (lst (map
+                (lambda (lst)
+                  (join (map (cut transform/h lst <>) (iota n))))
+                lst)))
+    (list->grid lst)))
+
+(define (neighbors grid coord)
+  (filter (cut grid-exists? grid <>)
     (map (cut map + <> coord) '((1 0) (0 1) (-1 0) (0 -1)))))
 
-(define (solve mem from to)
-  (let ((acc (make-hash-table)) (queue (queue-init 10000)))
+(define (solve grid from to)
+  (let ((acc (make-hash-table)) (queue (queue 10000)))
     (queue-push! queue 0 from)
     (let loop ((current (queue-pop! queue)))
       (if (null? current) (hash-table-ref acc to)
         (receive (distance coord) (apply values current)
           (for-each
             (lambda (neighbor)
-              (let ((distance (+ (hash-table-ref mem neighbor) distance)))
+              (let ((distance (+ distance (grid-ref grid neighbor))))
                 (if (hash-table-exists? acc neighbor)
                   (when (> (hash-table-ref acc neighbor) distance)
                     (hash-table-set! acc neighbor distance))
                   (begin
-                    (queue-push! queue distance neighbor)
-                    (hash-table-set! acc neighbor distance)))))
-            (neighbors mem coord))
+                    (hash-table-set! acc neighbor distance)
+                    (queue-push! queue distance neighbor)))))
+            (neighbors grid coord))
           (loop (queue-pop! queue)))))))
 
-(let ((input (import-input)))
-  (print (solve input '(0 0) '(99 99)))
-  (extend input 5)
-  (print (solve input '(0 0) '(499 499))))
+(let* ((input/1 (import-input)) (input/2 (transform input/1 5)))
+  (print (solve input/1 '(0 0) (grid-end input/1)))
+  (print (solve input/2 '(0 0) (grid-end input/2))))
