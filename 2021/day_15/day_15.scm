@@ -5,7 +5,7 @@
   (srfi 1)
   (srfi 69))
 
-(include-relative "bucket")
+(include-relative "queue")
 
 (define (pack-input lst)
   (let ((acc (make-hash-table)))
@@ -41,24 +41,22 @@
     (map (cut map + <> coord) '((1 0) (0 1) (-1 0) (0 -1)))))
 
 (define (solve mem from to)
-  (let ((acc (alist->hash-table `((,from . 0)))) (bucket (make-bucket 10000)))
-    (bucket-add! bucket 0 from)
-    (let loop ()
-      (let ((result (bucket-pop! bucket)))
-        (if result
-          (receive (distance coord) (apply values result)
-            (for-each
-              (lambda (neigh)
-                (let ((value (+ (hash-table-ref mem neigh) distance)))
-                  (if (hash-table-exists? acc neigh)
-                    (when (> (hash-table-ref acc neigh) value)
-                      (hash-table-set! acc neigh value))
-                    (begin
-                      (bucket-add! bucket value neigh)
-                      (hash-table-set! acc neigh value)))))
-              (neighbors mem coord))
-            (loop))
-          (hash-table-ref acc to))))))
+  (let ((acc (make-hash-table)) (queue (queue-init 10000)))
+    (queue-push! queue 0 from)
+    (let loop ((current (queue-pop! queue)))
+      (if (null? current) (hash-table-ref acc to)
+        (receive (distance coord) (apply values current)
+          (for-each
+            (lambda (neighbor)
+              (let ((distance (+ (hash-table-ref mem neighbor) distance)))
+                (if (hash-table-exists? acc neighbor)
+                  (when (> (hash-table-ref acc neighbor) distance)
+                    (hash-table-set! acc neighbor distance))
+                  (begin
+                    (queue-push! queue distance neighbor)
+                    (hash-table-set! acc neighbor distance)))))
+            (neighbors mem coord))
+          (loop (queue-pop! queue)))))))
 
 (let ((input (import-input)))
   (print (solve input '(0 0) '(99 99)))
