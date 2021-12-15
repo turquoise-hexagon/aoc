@@ -35,22 +35,26 @@
   (filter (cut grid-exists? grid <>)
     (map (cut map + <> coord) '((1 0) (0 1) (-1 0) (0 -1)))))
 
+(define (solve/h grid distances queue current)
+  (receive (distance coord) (apply values current)
+    (for-each
+      (lambda (neighbor)
+        (let ((distance (+ (grid-ref grid neighbor) distance)))
+          (if (hash-table-exists? distances neighbor)
+            (when (> (hash-table-ref distances neighbor) distance)
+              (hash-table-set! distances neighbor distance))
+            (begin
+              (hash-table-set! distances neighbor distance)
+              (queue-push! queue distance neighbor)))))
+      (neighbors grid coord))))
+
 (define (solve grid from to)
   (let ((acc (make-hash-table)) (queue (queue 10000)))
-    (queue-push! queue 0 from)
-    (let loop ((current (queue-pop! queue)))
-      (if (null? current) (hash-table-ref acc to)
-        (receive (distance coord) (apply values current)
-          (for-each
-            (lambda (neighbor)
-              (let ((distance (+ distance (grid-ref grid neighbor))))
-                (if (hash-table-exists? acc neighbor)
-                  (when (> (hash-table-ref acc neighbor) distance)
-                    (hash-table-set! acc neighbor distance))
-                  (begin
-                    (hash-table-set! acc neighbor distance)
-                    (queue-push! queue distance neighbor)))))
-            (neighbors grid coord))
+    (let loop ((current `(0 ,from)))
+      (if (null? current)
+        (hash-table-ref acc to)
+        (begin
+          (solve/h grid acc queue current)
           (loop (queue-pop! queue)))))))
 
 (let* ((input/1 (import-input)) (input/2 (transform input/1 5)))
