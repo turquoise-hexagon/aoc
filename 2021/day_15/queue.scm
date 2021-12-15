@@ -40,5 +40,3 @@
       (let ((data (car (vector-ref buckets minimum))))
         (queue-remove! queue minimum data)
         (list minimum data)))))
-
-; vim: ft=scheme

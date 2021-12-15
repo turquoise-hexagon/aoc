@@ -32,5 +32,3 @@
         (and (< -1 x h)
              (< -1 y w)))
       coord)))
-
-; vim: ft=scheme
