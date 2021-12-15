@@ -19,16 +19,12 @@
 
 (define (grid-ref grid coord)
   (let ((content (grid-content grid)))
-    (apply
-      (lambda (x y)
-        (vector-ref (vector-ref content x) y))
-      coord)))
+    (receive (x y) (apply values coord)
+      (vector-ref (vector-ref content x) y))))
 
 (define (grid-exists? grid coord)
   (let ((h (grid-h grid))
         (w (grid-w grid)))
-    (apply
-      (lambda (x y)
-        (and (< -1 x h)
-             (< -1 y w)))
-      coord)))
+    (receive (x y) (apply values coord)
+      (and (< -1 x h)
+           (< -1 y w)))))
