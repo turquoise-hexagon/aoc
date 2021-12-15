@@ -20,16 +20,10 @@
     lst))
 
 (define (transform grid n)
-  (let* ((lst (grid->list grid))
-         (lst (join (map
-                      (lambda (i)
-                        (map (cut transform/h <> i) lst))
-                      (iota n))))
-         (lst (map
-                (lambda (lst)
-                  (join (map (cut transform/h lst <>) (iota n))))
-                lst)))
-    (list->grid lst)))
+  (let ((lst (grid->list grid)))
+    (let* ((lst (join (map (lambda (i) (map (cut transform/h <> i) lst)) (iota n))))
+           (lst (map (lambda (i) (join (map (cut transform/h i <>) (iota n)))) lst)))
+      (list->grid lst))))
 
 (define (neighbors grid coord)
   (filter (cut grid-exists? grid <>)
