@@ -2,8 +2,7 @@
   (chicken io)
   (chicken string)
   (srfi 1)
-  (srfi 69)
-  (srfi 133))
+  (srfi 69))
 
 (include-relative "grid.scm")
 (include-relative "queue.scm")

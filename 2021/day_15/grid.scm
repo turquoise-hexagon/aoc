@@ -18,9 +18,8 @@
         (- (grid-w grid) 1)))
 
 (define (grid-ref grid coord)
-  (let ((content (grid-content grid)))
-    (receive (x y) (apply values coord)
-      (vector-ref (vector-ref content x) y))))
+  (receive (x y) (apply values coord)
+    (vector-ref (vector-ref (grid-content grid) x) y)))
 
 (define (grid-exists? grid coord)
   (receive (x y) (apply values coord)
