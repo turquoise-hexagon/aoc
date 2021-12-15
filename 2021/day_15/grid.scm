@@ -4,18 +4,18 @@
   w)
 
 (define (list->grid lst)
-  (make-grid
-    (list->vector (map list->vector lst))
-    (length lst)
-    (length (car lst))))
+  (let ((h (length lst)) (w (length (car lst))))
+    (make-grid
+      (list->vector (map list->vector lst))
+      h
+      w)))
 
 (define (grid->list grid)
   (map vector->list (vector->list (grid-content grid))))
 
 (define (grid-end grid)
-  (map (cut - <> 1)
-    (list (grid-h grid)
-          (grid-w grid))))
+  (list (- (grid-h grid) 1)
+        (- (grid-w grid) 1)))
 
 (define (grid-ref grid coord)
   (let ((content (grid-content grid)))
@@ -23,8 +23,6 @@
       (vector-ref (vector-ref content x) y))))
 
 (define (grid-exists? grid coord)
-  (let ((h (grid-h grid))
-        (w (grid-w grid)))
-    (receive (x y) (apply values coord)
-      (and (< -1 x h)
-           (< -1 y w)))))
+  (receive (x y) (apply values coord)
+    (and (< -1 x (grid-h grid))
+         (< -1 y (grid-w grid)))))
