@@ -1,0 +1,23 @@
+(define (make-bucket size)
+  (make-vector size '()))
+
+(define (bucket/h! bucket priority data proc)
+  (vector-set! bucket priority (proc data (vector-ref bucket priority))))
+
+(define (bucket-add! bucket priority data)
+  (bucket/h! bucket priority data cons))
+
+(define (bucket-remove! bucket priority data)
+  (bucket/h! bucket priority data delete))
+
+(define (bucket-pop! bucket)
+  (let ((len (vector-length bucket)))
+    (let loop ((index 0))
+      (if (= index len) #f
+        (let ((res (vector-ref bucket index)))
+          (if (null? res) (loop (+ index 1))
+            (begin
+              (bucket-remove! bucket index (car res))
+              (list index (car res)))))))))
+
+; vim: ft=scheme
