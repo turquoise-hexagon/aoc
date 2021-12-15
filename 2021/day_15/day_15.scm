@@ -2,7 +2,8 @@
   (chicken io)
   (chicken string)
   (srfi 1)
-  (srfi 69))
+  (srfi 69)
+  (srfi 133))
 
 (include-relative "grid.scm")
 (include-relative "queue.scm")
@@ -49,7 +50,7 @@
       (neighbors grid coord))))
 
 (define (solve grid from to)
-  (let ((acc (make-hash-table)) (queue (queue 10000)))
+  (let ((acc (make-hash-table)) (queue (queue)))
     (let loop ((current `(0 ,from)))
       (if (null? current)
         (hash-table-ref acc to)
