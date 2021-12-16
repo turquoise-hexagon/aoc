@@ -4,8 +4,8 @@
   (srfi 1)
   (srfi 69))
 
-(include-relative "grid.scm")
-(include-relative "queue.scm")
+(include-relative "utils/grid.scm")
+(include-relative "utils/queue.scm")
 
 (define (import-input)
   (list->grid
