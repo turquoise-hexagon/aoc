@@ -27,7 +27,8 @@
         (begin
           (hash-table-delete! buckets priority)
           ;; set minimum when necessary
-          (queue-minimum-set! queue (queue-find-minimum queue)))
+          (when (= (queue-minimum queue) priority)
+            (queue-minimum-set! queue (queue-find-minimum queue))))
         (hash-table-set! buckets priority datas)))))
 
 (define (queue-pop! queue)
