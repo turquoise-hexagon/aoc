@@ -1,7 +1,4 @@
-(define-record grid
-  content
-  h
-  w)
+(define-record grid content h w)
 
 (define (list->grid lst)
   (let ((h (length lst)) (w (length (car lst))))

@@ -1,6 +1,4 @@
-(define-record queue
-  buckets
-  minimum)
+(define-record queue buckets minimum)
 
 (define (queue)
   (make-queue (make-hash-table) -1))
