@@ -32,7 +32,7 @@
           0
           (next current #t acc))
         (next current flag acc)))))
-        
+
 (let ((input (import-input)))
   (print (solve input "start" "end" #t))
   (print (solve input "start" "end" #f)))

@@ -13,7 +13,7 @@
     (5 . ,(lambda (_) (if (apply   > _) 1 0)))
     (6 . ,(lambda (_) (if (apply   < _) 1 0)))
     (7 . ,(lambda (_) (if (apply   = _) 1 0)))))
-     
+
 (define (hexadecimal->binary str)
   (let ((str (number->string (string->number str 16) 2)))
     (string-pad str 4 #\0)))
