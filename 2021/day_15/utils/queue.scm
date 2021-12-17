@@ -13,10 +13,13 @@
       (queue-minimum-set! queue priority))))
 
 (define (queue-find-minimum queue)
-  (let ((priorities (hash-table-keys (queue-buckets queue))))
-    (if (null? priorities)
+  (let ((buckets (queue-buckets queue)))
+    (if (= (hash-table-size buckets) 0)
       -1
-      (foldl min (car priorities) (cdr priorities)))))
+      (let loop ((i (queue-minimum queue)))
+        (if (hash-table-exists? buckets i)
+          i
+          (loop (+ i 1)))))))
 
 (define (queue-remove! queue priority data)
   (let ((buckets (queue-buckets queue)))
