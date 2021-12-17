@@ -7,7 +7,7 @@
 (define (parse-segment str)
   (map (cut map string->number <>)
     (map (cut irregex-split "," <>)
-       (irregex-split " -> " str))))
+      (irregex-split " -> " str))))
 
 (define (import-input)
   (let ((lst (map parse-segment (read-lines))))
