@@ -52,10 +52,10 @@
       (let ((q (quotient arg 2)))
         (list q (+ q (if (odd? arg) 1 0))))
       arg)
-    (let ((l (split (1st arg)))
-          (r (split (2nd arg))))
+    (let ((l (split (1st arg))))
       (if (equal? l (1st arg))
-        (list (1st arg) r)
+        (let ((r (split (2nd arg))))
+          (list (1st arg) r))
         (list l (2nd arg))))))
 
 (define (reduce arg)
