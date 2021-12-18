@@ -4,13 +4,13 @@
   (chicken port)
   (euler))
 
-(define (parse str)
-  ;; "[[1,2],3]" => "'((1 2) 3)" => '((1 2) 3)
+(define (internalize str)
+  ;; "[[1,2],3]" => "'[[1 2] 3]" => '((1 2) 3)
   (let ((str (string-append "'" (string-translate str "," " "))))
     (eval (call-with-input-string str read))))
 
 (define (import-input)
-  (map parse (read-lines)))
+  (map internalize (read-lines)))
 
 (define (1st lst) (car  lst))
 (define (2nd lst) (cadr lst))
