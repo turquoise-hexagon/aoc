@@ -63,7 +63,7 @@
 (define (parse-literal lst)
   (let loop ((lst lst) (acc '()))
     (receive (temp lst) (split-at lst 5)
-      (receive (id . group) (apply values temp)
+      (receive (id group) (car+cdr temp)
         (let ((acc (cons group acc)))
           (if (string=? id "1")
             (loop lst acc)
@@ -71,7 +71,7 @@
               (list value lst))))))))
 
 (define (parse-operator lst type-id)
-  (receive (len-id . lst) (apply values lst)
+  (receive (len-id lst) (car+cdr lst)
     (receive (value lst)
       ((if (string=? len-id "0")
          parse-by-length
