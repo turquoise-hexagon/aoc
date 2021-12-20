@@ -7,7 +7,7 @@
   (srfi 69))
 
 (define (parse-scanner lst)
-  (receive (_ . points) (apply values lst)
+  (receive (_ points) (car+cdr lst)
     (map (cut map string->number <>)
       (map (cut string-split <> ",") points))))
 
@@ -61,7 +61,7 @@
     (let loop ((lst scanners) (scanners scanners) (translations translations))
       (if (null? lst)
         (values (hash-table-keys acc) scanners translations)
-        (receive (current . lst) (apply values lst)
+        (receive (current lst) (car+cdr lst)
           (let ((result (match? center current n)))
             (if result
               (receive (translation translated) (apply values result)
@@ -71,7 +71,7 @@
               (loop lst scanners translations))))))))
 
 (define (connect scanners n)
-  (receive (center . scanners) (apply values scanners)
+  (receive (center scanners) (car+cdr scanners)
     (let loop ((center center) (scanners scanners) (translations '()))
       (if (null? scanners)
         (values center translations)
