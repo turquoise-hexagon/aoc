@@ -12,7 +12,7 @@
 
 (define (parse-rule str)
   (let ((lst (irregex-split " ?(contains?|bags?[,.]?) ?" str)))
-    (receive (color . content) (apply values lst)
+    (receive (color content) (car+cdr lst)
       `(,color . ,(alist->hash-table (map parse-bag content))))))
 
 (define (import-input)
