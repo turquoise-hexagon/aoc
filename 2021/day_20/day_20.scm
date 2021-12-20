@@ -9,44 +9,46 @@
     ( 0 -1) ( 0  0) ( 0  1)
     ( 1 -1) ( 1  0) ( 1  1)))
 
+(define (convert str)
+  (map
+    (lambda (char)
+      (case char
+        ((#\.) 0)
+        ((#\#) 1)))
+    (string->list str)))
+
 (define (pack-image lst)
-  (let ((acc (make-hash-table)))
-    (for-each
-      (lambda (coord)
-        (receive (x y) (apply values coord)
-          (hash-table-set! acc coord
-            (list-ref (list-ref lst x) y))))
-      (product (range 0 (- (length lst) 1))
-               (range 0 (- (length (car lst)) 1))))
-    acc))
+  (let ((h (length lst)) (w (length (car lst))))
+    (let ((acc (make-hash-table)))
+      (for-each
+        (lambda (coord)
+          (receive (x y) (apply values coord)
+            (hash-table-set! acc coord
+              (list-ref (list-ref lst x) y))))
+        (product (range 0 (- h 1)) (range 0 (- w 1))))
+      acc)))
 
 (define (import-input)
-  (receive (data _ . image) (apply values (read-lines))
-    (values data (pack-image (map string->list image)))))
+  (receive (data _ . image) (apply values (map convert (read-lines)))
+    (values data (pack-image image))))
 
-(define (min/max lst proc)
-  ;; applying would be inefficient
+(define (minimum/maximum lst proc)
+  ;; applying proc would be inefficient
   (foldl proc (car lst) (cdr lst)))
 
-(define (minimum lst) (min/max lst min))
-(define (maximum lst) (min/max lst max))
+(define (minimum lst) (minimum/maximum lst min))
+(define (maximum lst) (minimum/maximum lst max))
 
-(define (outside data n)
-  ;; take into account blinking borders
-  (if (odd? n)
-    (string-ref data 0)
-    #\.))
+(define (default data n)
+  ;; take into account blinking edges
+  (if (odd? n) (car data)
+    0))
 
-(define (neighbors data image coord outside)
-  (string-ref data
+(define (neighbors data image coord default)
+  (list-ref data
     (list->number
-      (map
-        (lambda (char)
-          (case char
-            ((#\.) 0)
-            ((#\#) 1)))
-        (map (cut hash-table-ref/default image <> outside)
-          (map (cut map + coord <>) offsets)))
+      (map (cut hash-table-ref/default image <> default)
+        (map (cut map + coord <>) offsets))
       2)))
 
 (define (bounds image)
@@ -56,17 +58,18 @@
 
 (define (iterate data image n)
   (receive (x-min x-max y-min y-max) (bounds image)
-    (let ((acc (make-hash-table)) (outside (outside data n)))
+    (let ((acc (make-hash-table)) (default (default data n)))
       (for-each
         (lambda (coord)
           (hash-table-set! acc coord
-            (neighbors data image coord outside)))
+            (neighbors data image coord default)))
+        ;; extend
         (product (range (- x-min 1) (+ x-max 1))
                  (range (- y-min 1) (+ y-max 1))))
       acc)))
 
 (define (solve data image n)
-  (count (cut char=? <> #\#)
+  (foldl + 0
     (hash-table-values
       (foldl
         (lambda (acc n)
