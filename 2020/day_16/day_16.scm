@@ -11,7 +11,7 @@
     lst))
 
 (define (parse-tickets lst)
-  (receive (_ . tickets) (apply values lst)
+  (receive (_ tickets) (car+cdr lst)
     (map (cut map string->number <>)
       (map (cut irregex-split "," <>) tickets))))
 
@@ -43,7 +43,7 @@
 
 (define (find-matched-field fields lst)
   (let loop ((lst lst))
-    (receive (vals . lst) (apply values lst)
+    (receive (vals lst) (car+cdr lst)
       (let ((result (find-matching-fields fields vals)))
         (if (= (length result) 1)
           (values (first result) vals)
@@ -63,7 +63,7 @@
   (let loop ((lst tickets) (error-rate 0) (acc '()))
     (if (null? lst)
       (values error-rate acc)
-      (receive (ticket . lst) (apply values lst)
+      (receive (ticket lst) (car+cdr lst)
         (let ((result (find-invalid-values fields ticket)))
           (if (null? result)
             (loop lst error-rate (cons ticket acc))
