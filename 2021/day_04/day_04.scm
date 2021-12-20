@@ -12,7 +12,7 @@
 
 (define (import-input)
   (let ((lst (irregex-split "\n{2}" (read-string #f))))
-    (receive (numbers . boards) (apply values lst)
+    (receive (numbers boards) (car+cdr lst)
       (values (parse-numbers numbers) (map parse-board boards)))))
 
 (define (has numbers board)
