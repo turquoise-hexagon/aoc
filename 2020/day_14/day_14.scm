@@ -11,7 +11,7 @@
 
 (define (parse-chunk str)
   (let ((lst (irregex-split "\n" str)))
-    (receive (mask . instructions) (apply values lst)
+    (receive (mask instructions) (car+cdr lst)
       `(,mask ,(map parse-instruction instructions)))))
 
 (define (import-input)
