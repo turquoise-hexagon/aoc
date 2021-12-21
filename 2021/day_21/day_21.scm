@@ -54,13 +54,13 @@
             (else
               (let ((res
                       (reverse
-                        (fold
-                          (lambda (roll count acc)
-                            (map + acc
+                        (apply (cut map + <...>)
+                          (map
+                            (lambda (roll count)
                               (map * `(,count ,count)
                                 (let ((a (+ (modulo (+ a -1 roll) 10) 1)))
-                                  (loop b a score/b (+ score/a a))))))
-                          '(0 0) rolls counts))))
+                                  (loop b a score/b (+ score/a a)))))
+                            rolls counts)))))
                 (hash-table-set! acc key res)
                 res)))))
       (apply max (loop a b 0 0)))))
