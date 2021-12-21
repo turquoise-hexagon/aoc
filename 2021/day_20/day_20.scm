@@ -48,8 +48,7 @@
   (list-ref data
     (list->number
       (map (cut hash-table-ref/default image <> default)
-        (map (cut map + coord <>) offsets))
-      2)))
+        (map (cut map + coord <>) offsets)) 2)))
 
 (define (bounds image)
   (receive (x y) (unzip2 (hash-table-keys image))
