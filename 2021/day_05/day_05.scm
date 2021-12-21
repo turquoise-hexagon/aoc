@@ -14,14 +14,9 @@
     ;; split lst in lines and diagonals
     (partition (cut apply any = <>) lst)))
 
-(define (offset a b)
-  (cond ((> a b) -1)
-        ((< a b)  1)
-        (else 0)))
-
 (define (segment->points lst)
   (receive (a b) (apply values lst)
-    (let ((offsets (map (cut offset <> <>) a b)))
+    (let ((offsets (map signum (map - b a))))
       (let loop ((t a) (acc '()))
         (let ((acc (cons t acc)))
           (if (equal? t b)
