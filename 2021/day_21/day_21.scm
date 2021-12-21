@@ -15,7 +15,7 @@
 ;; part 1 rolls
 (define DIE-STATE 0)
 
-(define (die)
+(define (rolls)
   (define (roll)
     (set! DIE-STATE (modulo (+ DIE-STATE 1) 100))
     DIE-STATE)
@@ -38,7 +38,7 @@
     (if (or (>= score/a 1000)
             (>= score/b 1000))
       (* (min score/a score/b) count)
-      (let ((a (+ (modulo (+ a -1 (die)) 10) 1)))
+      (let ((a (+ (modulo (+ a -1 (rolls)) 10) 1)))
         (loop b a score/b (+ score/a a) (+ count 3)))))
   (loop a b 0 0 0))
 
