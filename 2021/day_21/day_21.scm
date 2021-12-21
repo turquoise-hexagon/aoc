@@ -22,20 +22,16 @@
   (+ (roll) (roll) (roll)))
 
 ;; part 2 rolls
-(define (counts lst)
+(define (dirac)
   (let ((acc (make-hash-table)))
     (for-each
-      (lambda (item)
-        (hash-table-set! acc item
-          (+ (hash-table-ref/default acc item 0) 1)))
-      lst)
-    (hash-table-fold acc
-      (lambda (item count acc)
-        (cons (list item count) acc))
-      '())))
-
-(define dirac
-  (counts (map (cut apply + <>) (product '(1 2 3) '(1 2 3) '(1 2 3)))))
+      (lambda (roll)
+        (hash-table-set! acc roll
+          (+ (hash-table-ref/default acc roll 0) 1)))
+      (map (cut apply + <>) (product '(1 2 3) '(1 2 3) '(1 2 3))))
+    (let ((result (hash-table->alist acc)))
+      (values (map car result)
+              (map cdr result)))))
 
 (define (game/1 a b)
   (define (loop a b score/a score/b count)
@@ -47,7 +43,7 @@
   (loop a b 0 0 0))
 
 (define (game/2 a b)
-  (receive (rolls counts) (unzip2 dirac)
+  (receive (rolls counts) (dirac)
     (let ((acc (make-hash-table)))
       (define (loop a b score/a score/b turn)
         (let ((key (list a b score/a score/b turn)))
