@@ -4,13 +4,13 @@
   (srfi 1)
   (srfi 69))
 
-(define (parse-cube str)
+(define (parse-cuboid str)
   (receive (sign coordinates) (car+cdr (string-split str ".,= "))
     (list (if (string=? sign "on") 1 -1)
       (chop (filter-map string->number coordinates) 2))))
 
 (define (import-input)
-  (map parse-cube (read-lines)))
+  (map parse-cuboid (read-lines)))
 
 (define (increment! mem key step)
   (hash-table-update!/default mem key (cut + <> step) 0))
