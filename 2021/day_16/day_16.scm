@@ -28,13 +28,12 @@
         (map hexadecimal->binary
           (string-segment
             (read-line)
-            1)))
-      1)))
+            1))) 1)))
 
 (define (parse-header lst)
-  (receive (version lst) (split-at lst 3)
-    (receive (type-id lst) (split-at lst 3)
-      (values version type-id lst))))
+  (let*-values (((version lst) (split-at lst 3))
+                ((type-id lst) (split-at lst 3)))
+    (values version type-id lst)))
 
 (define (parse-length lst len)
   (receive (value lst) (split-at lst len)
@@ -42,15 +41,14 @@
       (values value lst))))
 
 (define (parse-by-length lst)
-  (receive (len lst) (parse-length lst 15)
-    (receive (packets lst) (split-at lst len)
-      (values
-        (let loop ((lst packets) (acc '()))
-          (if (null? lst)
-            (flatten (reverse acc))
-            (receive (value lst) (apply values (parse lst))
-              (loop lst (cons value acc)))))
-        lst))))
+  (let*-values (((len lst) (parse-length lst 15)) ((packets lst) (split-at lst len)))
+    (values
+      (let loop ((lst packets) (acc '()))
+        (if (null? lst)
+          (flatten (reverse acc))
+          (receive (value lst) (apply values (parse lst))
+            (loop lst (cons value acc)))))
+      lst)))
 
 (define (parse-by-count lst)
   (receive (len lst) (parse-length lst 11)
@@ -62,13 +60,12 @@
 
 (define (parse-literal lst)
   (let loop ((lst lst) (acc '()))
-    (receive (temp lst) (split-at lst 5)
-      (receive (id group) (car+cdr temp)
-        (let ((acc (cons group acc)))
-          (if (string=? id "1")
-            (loop lst acc)
-            (let ((value (binary-list->decimal (flatten (reverse acc)))))
-              (list value lst))))))))
+    (let*-values (((temp lst) (split-at lst 5)) ((id group) (car+cdr temp)))
+      (let ((acc (cons group acc)))
+        (if (string=? id "1")
+          (loop lst acc)
+          (let ((value (binary-list->decimal (flatten (reverse acc)))))
+            (list value lst)))))))
 
 (define (parse-operator lst type-id)
   (receive (len-id lst) (car+cdr lst)
