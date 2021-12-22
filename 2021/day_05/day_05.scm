@@ -28,7 +28,7 @@
     (lambda (segment)
       (for-each
         (lambda (point)
-          (hash-table-set! mem point (+ (hash-table-ref/default mem point 0) 1)))
+          (hash-table-update!/default mem point (cut + <> 1) 0))
         (segment->points segment)))
     lst)
   (count (cut > <> 1) (hash-table-values mem)))

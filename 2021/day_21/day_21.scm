@@ -26,8 +26,7 @@
   (let ((acc (make-hash-table)))
     (for-each
       (lambda (roll)
-        (hash-table-set! acc roll
-          (+ (hash-table-ref/default acc roll 0) 1)))
+        (hash-table-update!/default acc roll (cut + <> 1) 0))
       (map (cut apply + <>) (product '(1 2 3) '(1 2 3) '(1 2 3))))
     (let ((result (hash-table->alist acc)))
       (values (map car result)

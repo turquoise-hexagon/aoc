@@ -13,7 +13,7 @@
   (let ((mem (make-hash-table)))
     (for-each
       (lambda (char)
-        (hash-table-set! mem char (+ (hash-table-ref/default mem char 0) 1)))
+        (hash-table-update!/default mem char (cut + <> 1) 0))
       (flatten lst))
     mem))
 

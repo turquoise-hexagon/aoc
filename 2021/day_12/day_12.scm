@@ -5,7 +5,7 @@
   (srfi 152))
 
 (define (add-connection! graph a b)
-  (hash-table-set! graph a (cons b (hash-table-ref/default graph a '()))))
+  (hash-table-update!/default graph a (cut cons b <>) '()))
 
 (define (import-input)
   (let ((graph (make-hash-table)))

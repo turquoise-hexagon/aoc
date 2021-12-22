@@ -5,8 +5,7 @@
   (srfi 69))
 
 (define (increment! table key increment)
-  (hash-table-set! table key
-    (+ (hash-table-ref/default table key 0) increment)))
+  (hash-table-update!/default table key (cut + <> increment) 0))
 
 (define (import-input)
   (let ((mem (make-hash-table)))

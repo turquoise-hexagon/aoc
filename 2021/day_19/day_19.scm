@@ -35,8 +35,7 @@
   (let ((acc (make-hash-table)))
     (for-each
       (lambda (item)
-        (hash-table-set! acc item
-          (+ 1 (hash-table-ref/default acc item 0))))
+        (hash-table-update!/default acc item (cut + <> 1) 0))
       lst)
     acc))
 

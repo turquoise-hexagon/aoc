@@ -18,7 +18,7 @@
     (values (string-chop template 1) (parse-rules rules))))
 
 (define (increment! mem key #!optional (step 1))
-  (hash-table-set! mem key (+ (hash-table-ref/default mem key 0) step)))
+  (hash-table-update!/default mem key (cut + <> step) 0))
 
 (define (iterate/h chars pairs rules)
   (let ((acc (make-hash-table)))

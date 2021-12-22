@@ -5,8 +5,7 @@
 
 (define (queue-push! queue priority data)
   (let ((buckets (queue-buckets queue)))
-    (hash-table-set! buckets priority
-      (cons data (hash-table-ref/default buckets priority '()))))
+    (hash-table-update!/default buckets priority (cut cons data <>) '()))
   (let ((minimum (queue-minimum queue)))
     ;; set minimum when necessary
     (when (or (= minimum -1) (> minimum priority))
