@@ -1,60 +1,54 @@
 (import
   (chicken io)
   (euler)
-  (srfi 1)
-  (srfi 69))
+  (srfi 1))
 
 (define offsets
   (delete '(0 0) (combinations '(-1 0 1) 2)))
 
-(define (pack-input lst)
-  (let ((table (make-hash-table)))
-    (for-each
-      (lambda (coord)
-        (receive (x y) (apply values coord)
-          (hash-table-set! table coord
-            (list-ref (list-ref lst x) y))))
-      (product (iota (length lst))
-               (iota (length (car lst)))))
-    table))
-
 (define (import-input)
-  (pack-input (map string->list (read-lines))))
+  (list->array (map string->list (read-lines))))
 
-(define (count-neighbors/1 table coord)
+(define (count-neighbors/1 array coord)
   (count (cut char=? <> #\#)
-    (map (cut hash-table-ref/default table <> #\.)
-      (map (cut map + coord <>) offsets))))
+    (map (cut array-ref array <>)
+      (filter (cut array-exists? array <>)
+        (map (cut map + <> coord) offsets)))))
 
-(define (count-neighbors/h table coord offset)
+(define (count-neighbors/h array coord offset)
   (let ((coord (map + coord offset)))
-    (if (hash-table-exists? table coord)
-      (case (hash-table-ref table coord)
+    (if (array-exists? array coord)
+      (case (array-ref array coord)
         ((#\#) 1)
         ((#\L) 0)
-        ((#\.) (count-neighbors/h table coord offset)))
+        ((#\.) (count-neighbors/h array coord offset)))
       0)))
 
-(define (count-neighbors/2 table coord)
-  (apply + (map (cut count-neighbors/h table coord <>) offsets)))
+(define (count-neighbors/2 array coord)
+  (apply + (map (cut count-neighbors/h array coord <>) offsets)))
 
-(define (iterate table proc n)
-  (let ((copy (hash-table-copy table)))
-    (hash-table-for-each table
-      (lambda (coord value)
-        (unless (char=? value #\.)
-          (let ((cnt (proc table coord)))
-            (case value
-              ((#\L) (when (=  cnt 0) (hash-table-set! copy coord #\#)))
-              ((#\#) (when (>= cnt n) (hash-table-set! copy coord #\L))))))))
-    (if (equal? copy table) #f
-      copy)))
+(define (iterate array proc n)
+  (let ((acc (array-copy array)))
+    (for-each
+      (lambda (coord)
+        (let ((value (array-ref array coord)))
+          (unless (char=? value #\.)
+            (let ((cnt (proc array coord)))
+              (case value
+                ((#\L) (when (=  cnt 0) (array-set! acc coord #\#)))
+                ((#\#) (when (>= cnt n) (array-set! acc coord #\L))))))))
+      (array-indexes array))
+    (if (equal? array acc)
+      #f
+      acc)))
 
 (define (solve input proc n)
-  (let loop ((table input))
-    (let ((next (iterate table proc n)))
+  (let loop ((acc input))
+    (let ((next (iterate acc proc n)))
       (if next (loop next)
-        (count (cut char=? <> #\#) (hash-table-values table))))))
+        (count (cut char=? <> #\#)
+          (map (cut array-ref acc <>)
+            (array-indexes acc)))))))
 
 (let ((input (import-input)))
   (print (solve input count-neighbors/1 4))
