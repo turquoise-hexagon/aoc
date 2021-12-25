@@ -23,7 +23,7 @@
   (let ((acc (list->grid (grid->list grid))))
     (for-each
       (lambda (coord)
-        (if (char=? (grid-ref grid coord) type)
+        (when (char=? (grid-ref grid coord) type)
           (let ((next (neighbor grid coord type)))
             (when next
               (grid-set! acc next type)
