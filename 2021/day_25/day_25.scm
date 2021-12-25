@@ -26,8 +26,7 @@
               (when next
                 (array-set! acc coord #\.)
                 (array-set! acc next type)))))
-        (product (range 0 (- h 1))
-                 (range 0 (- w 1))))
+        (array-indexes array))
       acc)))
 
 (define (solve input)
