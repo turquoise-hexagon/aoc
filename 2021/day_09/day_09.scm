@@ -23,13 +23,6 @@
          (neighbors array coord)))
      (array-ref array coord)))
 
-(define (low-points array)
-  (receive (h w) (apply values (array-dimensions array))
-    (filter (cut low-point? array <>)
-      (product
-        (range 0 (- h 1))
-        (range 0 (- w 1))))))
-
 (define (bassin array coord)
   (let ((acc (make-hash-table)))
     (let loop ((coord coord))
@@ -50,6 +43,6 @@
     (apply * (take (sort lens >) 3))))
 
 (let ((input (import-input)))
-  (let ((low-points (low-points input)))
+  (let ((low-points (filter (cut low-point? input <>) (array-indexes input))))
     (print (solve/1 input low-points))
     (print (solve/2 input low-points))))
