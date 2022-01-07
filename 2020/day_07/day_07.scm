@@ -24,18 +24,15 @@
           (parse-rule str)))
       (read-lines))))
 
-(define (true? bool)
-  (equal? bool #t))
-
 (define (solve/1 input main)
   (define (helper color)
     (if (string=? color main)
       #t
       (if (hash-table-exists? input color)
         (let ((content (hash-table-ref input color)))
-          (any true? (map helper (hash-table-keys content))))
+          (any identity (map helper (hash-table-keys content))))
         #f)))
-  (- (count true? (map helper (hash-table-keys input))) 1))
+  (- (count identity (map helper (hash-table-keys input))) 1))
 
 (define (solve/2 input main)
   (define (helper color)
