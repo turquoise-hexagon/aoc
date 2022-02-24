@@ -34,12 +34,9 @@
     (for-each
       (lambda (neighbor)
         (let ((distance (+ (array-ref array neighbor) distance)))
-          (if (hash-table-exists? distances neighbor)
-            (when (> (hash-table-ref distances neighbor) distance)
-              (hash-table-set! distances neighbor distance))
-            (begin
-              (hash-table-set! distances neighbor distance)
-              (queue-push! queue distance neighbor)))))
+          (when (> (hash-table-ref/default distances neighbor +inf.0) distance)
+            (hash-table-set! distances neighbor distance)
+            (queue-push! queue distance neighbor))))
       (neighbors array coord))))
 
 (define (solve array from to)
