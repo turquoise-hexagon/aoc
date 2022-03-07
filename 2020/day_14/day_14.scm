@@ -3,7 +3,8 @@
   (chicken io)
   (chicken irregex)
   (srfi 1)
-  (srfi 69))
+  (srfi 69)
+  (srfi 152))
 
 (define (parse-instruction str)
   (let ((lst (irregex-extract "[0-9]+" str)))
@@ -18,9 +19,8 @@
   (map parse-chunk (irregex-split "mask = " (read-string #f))))
 
 (define (add-padding mask address)
-  (let ((address (number->string address 2)))
-    (let ((n (apply - (map string-length `(,mask ,address)))))
-      (foldr string-append address (make-list n "0")))))
+  (string-pad (number->string address 2)
+    (string-length mask) #\0))
 
 (define (generate mask address)
   (let ((address (add-padding mask address)))
