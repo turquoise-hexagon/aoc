@@ -2,8 +2,7 @@
   (chicken io)
   (chicken string)
   (euler)
-  (srfi 1)
-  (srfi 69))
+  (srfi 1))
 
 (define offsets
   (delete '(0 0) (combinations '(-1 0 1) 2)))
@@ -25,19 +24,19 @@
       offsets)))
 
 (define (iterate! array)
-  (let ((acc (make-hash-table)))
-    (define (helper! coord)
-      (unless (hash-table-exists? acc coord)
-        (let ((tmp (array-ref array coord)))
-          (if (= tmp 9)
-            (begin
-              (hash-table-set! acc coord #t)
-              (array-set! array coord 0)
-              (for-each helper!
-                (neighbors array coord)))
-            (array-set! array coord (+ tmp 1))))))
-    (for-each helper! (array-indexes array))
-    (hash-table-size acc)))
+  (set! acc '())
+  (define (helper! coord)
+    (let ((tmp (array-ref array coord)))
+      (unless (member coord acc)
+        (if (= tmp 9)
+          (begin
+            (array-set! array coord 0)
+            (set! acc (cons coord acc))
+            (for-each helper!
+              (neighbors array coord)))
+          (array-set! array coord (+ tmp 1))))))
+  (for-each helper! (array-indexes array))
+  (length acc))
 
 (define (valid? array)
   (every
