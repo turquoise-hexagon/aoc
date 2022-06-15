@@ -5,50 +5,61 @@
   (srfi 1)
   (srfi 69))
 
-(define offsets (delete '(0 0) (combinations '(1 0 -1) 2)))
-
-(define (pack-input lst)
-  (let ((mem (make-hash-table)))
-    (for-each
-      (lambda (coord)
-        (receive (x y) (apply values coord)
-          (hash-table-set! mem coord
-            (list-ref (list-ref lst x) y))))
-      (product (iota (length lst)) (iota (length (car lst)))))
-    mem))
+(define offsets
+  (delete '(0 0) (combinations '(-1 0 1) 2)))
 
 (define (import-input)
-  (pack-input
-    (map (cut map string->number <>)
-      (map (cut string-chop <> 1) (read-lines)))))
+  (list->array
+    (map
+      (lambda (str)
+        (map string->number (string-chop str 1)))
+      (read-lines))))
 
-(define (neighbors mem coord)
-  (filter (cut hash-table-exists? mem <>) (map (cut map + <> coord) offsets)))
+(define (neighbors array coord)
+  (filter
+    (lambda (neighbor)
+      (array-exists? array neighbor))
+    (map
+      (lambda (offset)
+        (map + offset coord))
+      offsets)))
 
-(define (iterate mem)
+(define (iterate! array)
   (let ((acc (make-hash-table)))
-    (define (loop coord)
+    (define (helper! coord)
       (unless (hash-table-exists? acc coord)
-        (hash-table-set! mem coord (+ (hash-table-ref mem coord) 1))
-        (when (> (hash-table-ref mem coord) 9)
-          (hash-table-set! mem coord  0)
-          (hash-table-set! acc coord #t)
-          (for-each loop (neighbors mem coord)))))
-    (for-each loop (hash-table-keys mem))
+        (let ((tmp (array-ref array coord)))
+          (if (= tmp 9)
+            (begin
+              (hash-table-set! acc coord #t)
+              (array-set! array coord 0)
+              (for-each helper!
+                (neighbors array coord)))
+            (array-set! array coord (+ tmp 1))))))
+    (for-each helper! (array-indexes array))
     (hash-table-size acc)))
 
+(define (valid? array)
+  (every
+    (lambda (coord)
+      (= (array-ref array coord) 0))
+    (array-indexes array)))
+
 (define (solve/1 input)
-  (foldl
-    (lambda (acc _)
-      (+ acc (iterate input)))
-    0 (iota 100)))
+  (apply +
+    (map
+      (lambda (_)
+        (iterate! input))
+      (range 1 100))))
 
 (define (solve/2 input)
-  (let loop ((acc 1))
-    (if (= (iterate input) (hash-table-size input))
-      acc
-      (loop (+ acc 1)))))
+  (let loop ((i 0))
+    (if (valid? input)
+      i
+      (begin
+        (iterate! input)
+        (loop (+ i 1))))))
 
 (let ((input (import-input)))
-  (print (solve/1 (hash-table-copy input)))
-  (print (solve/2 (hash-table-copy input))))
+  (print (solve/1 (array-copy input)))
+  (print (solve/2 (array-copy input))))
