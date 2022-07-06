@@ -1,9 +1,8 @@
 (import
   (chicken io)
+  (euler)
   (srfi 1)
   (srfi 69))
-
-(include-relative "utils/queue.scm")
 
 (define offsets
   '(( 1  0)
@@ -181,20 +180,30 @@
        ((#\D) 1000))
      (- (length move) 1)))
 
+(define (comp? a b)
+  (< (car a)
+     (car b)))
+
+(define (helper! table queue cost grid)
+  (foldl
+    (lambda (queue move)
+      (let ((cost (+ (get-move-cost grid move) cost)) (grid (do-move grid move)))
+        (if (> (hash-table-ref/default table grid +inf.0) cost)
+          (begin
+            (hash-table-set! table grid cost)
+            (priority-queue-insert comp? (list cost grid) queue))
+          queue)))
+    (priority-queue-rest comp? queue) (get-amphipods-moves grid)))
+
 (define (solve from to)
-  (let ((acc (make-hash-table)) (queue (queue)))
-    (let loop ((current `(0 ,from)))
-      (if (null? current)
+  (let ((acc (make-hash-table)))
+    (let loop ((queue (priority-queue-insert comp? (list 0 from) priority-queue-empty)))
+      (if (priority-queue-empty? queue)
         (hash-table-ref acc to)
-        (receive (cost grid) (apply values current)
-          (for-each
-            (lambda (move)
-              (let ((new-cost (+ cost (get-move-cost grid move))) (new-grid (do-move grid move)))
-                (when (> (hash-table-ref/default acc new-grid +inf.0) new-cost)
-                  (hash-table-set! acc new-grid new-cost)
-                  (queue-push! queue new-cost new-grid))))
-            (get-amphipods-moves grid))
-          (loop (queue-pop! queue)))))))
+        (apply
+          (lambda (cost grid)
+            (loop (helper! acc queue cost grid)))
+          (priority-queue-first queue))))))
 
 (receive (input/1 goal/1 input/2 goal/2) (internalize-input (read-lines))
   (print (solve input/1 goal/1))

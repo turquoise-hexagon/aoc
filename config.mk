@@ -1,4 +1,5 @@
-BIN = $(shell find . -name 'day_*.scm' | sed 's|\.scm$$||g')
+SRC = $(wildcard day*.scm)
+BIN = $(basename $(SRC))
 
 all : CSCFLAGS += -O5
 all : $(BIN)
