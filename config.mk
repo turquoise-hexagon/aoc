@@ -1,4 +1,6 @@
-SRC = $(wildcard day*.scm)
+CSC ?= csc
+
+SRC = $(wildcard day_*.scm)
 BIN = $(basename $(SRC))
 
 all : CSCFLAGS += -O5
@@ -7,8 +9,8 @@ all : $(BIN)
 debug : CSCFLAGS += -O0 -d3
 debug : $(BIN)
 
-% : %.scm
-	csc $(CSCFLAGS) $<
+$(BIN) : $(SRC)
+	$(CSC) $(CSCFLAGS) $<
 
 clean :
 	rm -f $(BIN)
