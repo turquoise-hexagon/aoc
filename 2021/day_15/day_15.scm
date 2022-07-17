@@ -44,7 +44,7 @@
 
 (define (solve array from to)
   (let ((acc (make-hash-table))) 
-    (let loop ((queue (priority-queue-insert comp? `(0 ,from) priority-queue-empty)))
+    (let loop ((queue (list->priority-queue comp? `((0 ,from)))))
       (if (priority-queue-empty? queue)
         (hash-table-ref acc to)
         (apply
