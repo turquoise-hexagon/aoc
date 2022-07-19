@@ -11,7 +11,7 @@
 (define (generate-preamble lst)
   (let ((acc (bag (make-default-comparator))))
     (for-each (cut bag-adjoin! acc <>)
-      (map (cut apply + <>) (powerset lst 2)))
+      (map (cut apply + <>) (combinations lst 2)))
     acc))
 
 (define (find-number lst n)

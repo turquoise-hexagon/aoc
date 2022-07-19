@@ -45,7 +45,7 @@
     next))
 
 (define (solve input size n)
-  (let ((table (generate-tuples-table input size)) (offsets (combinations '(-1 0 1) size)))
+  (let ((table (generate-tuples-table input size)) (offsets (power '(-1 0 1) size)))
     (let loop ((table table) (n n))
       (if (= n 0) (hash-table-size table)
         (loop (iterate table offsets) (- n 1))))))

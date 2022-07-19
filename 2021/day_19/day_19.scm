@@ -85,4 +85,4 @@
     (print (length center))
     (print (apply max
              (map (cut apply manhattan <>)
-               (combinations translations 2))))))
+               (power translations 2))))))

@@ -89,7 +89,7 @@
      (map
        (lambda (lst)
          (magnitude (apply add lst)))
-       (combinations input 2))))
+       (power input 2))))
 
 (let ((input (import-input)))
   (print (solve/1 input))

@@ -10,7 +10,7 @@
   (apply * (find
              (lambda (lst)
                (= (apply + lst) 2020))
-             (powerset input n))))
+             (combinations input n))))
 
 (let ((input (import-input)))
   (print (solve input 2))
