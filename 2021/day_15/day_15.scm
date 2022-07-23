@@ -43,7 +43,7 @@
     (priority-queue-rest comp? queue) (neighbors array coord)))
 
 (define (solve array from to)
-  (let ((acc (make-hash-table))) 
+  (let ((acc (make-hash-table)))
     (let loop ((queue (list->priority-queue comp? `((0 ,from)))))
       (if (priority-queue-empty? queue)
         (hash-table-ref acc to)

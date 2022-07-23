@@ -150,7 +150,7 @@
                     ;; no invalid move to a room
                     (if (= y/b y)
                       (let ((res (valid-room? grid y type)))
-                        (if res 
+                        (if res
                           (equal? res b)
                           #f))
                       #f)))))))))
