@@ -23,7 +23,8 @@ die() {
 }
 
 request() {
-    curl -b "$AOC_COOKIE" "$@" 2> /dev/null
+    curl -A 'camille at laserbat dot pw via curl' -b "$AOC_COOKIE" \
+        "$@" 2> /dev/null
 }
 
 input() {
