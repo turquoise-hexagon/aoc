@@ -6,7 +6,7 @@ usage
 -----
     $ cd $day
     $ make
-    $ ./$day < input
+    $ ./solution < input
 
 depends on
 ----------

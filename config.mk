@@ -1,7 +1,7 @@
 CSC ?= csc
 
-SRC = $(wildcard day_*.scm)
-BIN = $(basename $(SRC))
+SRC = solution.scm
+BIN = solution
 
 all : CSCFLAGS += -O5
 all : $(BIN)
