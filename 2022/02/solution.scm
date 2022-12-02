@@ -1,0 +1,25 @@
+(import
+  (chicken io)
+  (chicken irregex))
+
+(define (import-input)
+  (map
+    (lambda (_)
+      (string->list (irregex-replace/all " " _ "")))
+    (read-lines)))
+
+(define (proc/1 a b c) (+ (* 3 (modulo (+ (- b a) 1) 3)) b 1))
+(define (proc/2 a b c) (+ (* 3 (modulo (+ (- c a) 1) 3)) c 1))
+
+(define (solve input proc)
+  (define (_solve a b)
+    (let*
+      ((a (- (char->integer a) (char->integer #\A)))
+       (b (- (char->integer b) (char->integer #\X)))
+       (c (modulo (+ (- b 1) a) 3)))
+      (proc a b c)))
+  (apply + (map (lambda (_) (apply _solve _)) input)))
+
+(let ((input (import-input)))
+  (print (solve input proc/1))
+  (print (solve input proc/2)))
