@@ -4,9 +4,11 @@
 (define (parse-game str)
   (apply
     (lambda (a _ b)
-      (cons
-        (- (char->integer a) (char->integer #\A))
-        (- (char->integer b) (char->integer #\X))))
+      (let*
+        ((a (- (char->integer a) (char->integer #\A)))
+         (b (- (char->integer b) (char->integer #\X)))
+         (c (modulo (+ (- b 1) a) 3)))
+        (list a b c)))
     (string->list str)))
 
 (define (import-input)
@@ -16,14 +18,7 @@
 (define (proc/2 a b c) (+ (* 3 (modulo (+ (- c a) 1) 3)) c 1))
 
 (define (solve input proc)
-  (apply +
-    (map
-      (lambda (game)
-        (let* ((a (car game))
-               (b (cdr game))
-               (c (modulo (+ (- b 1) a) 3)))
-          (proc a b c)))
-      input)))
+  (apply + (map (lambda (_) (apply proc _)) input)))
 
 (let ((input (import-input)))
   (print (solve input proc/1))
