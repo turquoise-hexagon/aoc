@@ -8,8 +8,8 @@
       (chop _ (/ (length _) 2)))
     (map string->list (read-lines))))
 
-(define (priority sack)
-  (let ((_ (car sack)))
+(define (priority lst)
+  (let ((_ (car lst)))
     (if (char-lower-case? _)
       (+ (- (char->integer _) (char->integer #\a)) 1)
       (+ (- (char->integer _) (char->integer #\A)) 27))))
