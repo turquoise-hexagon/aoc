@@ -14,20 +14,13 @@
       (+ (- (char->integer _) (char->integer #\a)) 1)
       (+ (- (char->integer _) (char->integer #\A)) 27))))
 
-(define (solve/1 input)
+(define (solve input)
   (apply +
     (map
       (lambda (sack)
         (priority (apply lset-intersection char=? sack)))
       input)))
 
-(define (solve/2 input)
-  (apply +
-    (map
-      (lambda (group)
-        (priority (apply lset-intersection char=? (map flatten group))))
-      (chop input 3))))
-
-(let ((input (import-input)))
-  (print (solve/1 input))
-  (print (solve/2 input)))
+(let* ((input/1 (import-input)) (input/2 (map (lambda (_) (map join _)) (chop input/1 3))))
+  (print (solve input/1))
+  (print (solve input/2)))
