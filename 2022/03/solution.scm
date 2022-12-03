@@ -17,8 +17,8 @@
 (define (solve input)
   (apply +
     (map
-      (lambda (sack)
-        (priority (apply lset-intersection char=? sack)))
+      (lambda (_)
+        (priority (apply lset-intersection char=? _)))
       input)))
 
 (let* ((input/1 (import-input)) (input/2 (map (lambda (_) (map join _)) (chop input/1 3))))
