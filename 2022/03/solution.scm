@@ -21,6 +21,6 @@
         (priority (car (apply lset-intersection char=? _))))
       input)))
 
-(let* ((input/1 (import-input)) (input/2 (map (lambda (_) (map join _)) (chop input/1 3))))
+(let* ((input/1 (import-input)) (input/2 (chop (map join input/1) 3)))
   (print (solve input/1))
   (print (solve input/2)))
