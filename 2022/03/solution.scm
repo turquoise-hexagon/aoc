@@ -8,17 +8,17 @@
       (chop _ (/ (length _) 2)))
     (map string->list (read-lines))))
 
-(define (priority lst)
-  (let ((_ (car lst)))
-    (if (char-lower-case? _)
-      (+ (- (char->integer _) (char->integer #\a)) 1)
-      (+ (- (char->integer _) (char->integer #\A)) 27))))
+(define (priority char)
+  (let ((_ (char->integer char)))
+    (if (char-lower-case? char)
+      (+ (- _ (char->integer #\a)) 1)
+      (+ (- _ (char->integer #\A)) 27))))
 
 (define (solve input)
   (apply +
     (map
       (lambda (_)
-        (priority (apply lset-intersection char=? _)))
+        (priority (car (apply lset-intersection char=? _))))
       input)))
 
 (let* ((input/1 (import-input)) (input/2 (map (lambda (_) (map join _)) (chop input/1 3))))
