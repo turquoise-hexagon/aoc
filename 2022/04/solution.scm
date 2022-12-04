@@ -9,22 +9,16 @@
       (map string->number (string-split _ "-,")))
     (read-lines)))
 
-(define (valid?/1 lst)
-  (apply
-    (lambda (a b c d)
-      (or (<= a c d b)
-          (<= c a b d)))
-    lst))
+(define (valid?/1 a b c d)
+  (or (<= a c d b)
+      (<= c a b d)))
 
-(define (valid?/2 lst)
-  (apply
-    (lambda (a b c d)
-      (and (<= a d)
-           (<= c b)))
-    lst))
+(define (valid?/2 a b c d)
+  (and (<= a d)
+       (<= c b)))
 
 (define (solve input proc)
-  (count proc input))
+  (count (lambda (_) (apply proc _)) input))
 
 (let ((input (import-input)))
   (print (solve input valid?/1))
