@@ -19,8 +19,8 @@
 (define (valid?/2 lst)
   (apply
     (lambda (a b c d)
-      (not (or (> a d)
-               (> c b))))
+      (and (<= a d)
+           (<= c b)))
     lst))
 
 (define (solve input proc)
