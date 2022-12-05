@@ -3,32 +3,32 @@
   (chicken irregex)
   (srfi 1))
 
-(define (strip-crate lst)
-  (filter char-alphabetic? lst))
-
-(define (parse-crates lst)
-  (map strip-crate
-    (filter
-      (lambda (_)
-        (char-numeric? (last _)))
-      (apply zip (map string->list lst)))))
-
-(define (parse-procedure lst)
+(define (parse-crates crates)
   (map
-    (lambda (_)
+    (lambda (crate)
+      (filter char-alphabetic? crate))
+    (filter
+      (lambda (lst)
+        (char-numeric? (last lst)))
+      (apply zip (map string->list crates)))))
+  
+(define (parse-procedure procedure)
+  (map
+    (lambda (instruction)
       (apply
         (lambda (n a b)
           (list n (- a 1) (- b 1)))
-        (map string->number (irregex-split "[a-z ]" _))))
-    lst))
+        (filter-map string->number
+          (irregex-split " " instruction))))
+    procedure))
 
 (define (import-input)
   (apply
     (lambda (crates procedure)
       (list (parse-crates crates) (parse-procedure procedure)))
     (map
-      (lambda (_)
-        (irregex-split "\n" _))
+      (lambda (chunk)
+        (irregex-split "\n" chunk))
       (irregex-split "\n{2}" (read-string #f)))))
 
 (define (solve input proc)
@@ -39,10 +39,11 @@
           (lambda (instruction)
             (apply
               (lambda (n a b)
-                (let-values (((head tail) (split-at (vector-ref acc a) n)))
-                  (vector-set! acc a tail)
-                  (vector-set! acc b
-                    (append (proc head) (vector-ref acc b)))))
+                (let ((lst/a (vector-ref acc a))
+                      (lst/b (vector-ref acc b)))
+                  (let-values (((head tail) (split-at lst/a n)))
+                    (vector-set! acc a tail)
+                    (vector-set! acc b (append (proc head) lst/b)))))
               instruction))
           procedure)
         (list->string (map car (vector->list acc)))))
