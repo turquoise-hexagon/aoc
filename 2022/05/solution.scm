@@ -18,8 +18,7 @@
       (apply
         (lambda (n a b)
           (list n (- a 1) (- b 1)))
-        (filter-map string->number
-          (irregex-split " " instruction))))
+        (filter-map string->number (irregex-split " " instruction))))
     procedure))
 
 (define (import-input)
