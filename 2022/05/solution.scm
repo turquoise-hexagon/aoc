@@ -4,19 +4,13 @@
   (srfi 1))
 
 (define (strip-crate lst)
-  (filter
-    (lambda (_)
-      (and (char<=? #\A _)
-           (char<=? _ #\Z)))
-    lst))
+  (filter char-alphabetic? lst))
 
 (define (parse-crates lst)
   (map strip-crate
     (filter
       (lambda (_)
-        (let ((_ (last _)))
-          (and (char<=? #\0 _)
-               (char<=? _ #\9))))
+        (char-numeric? (last _)))
       (apply zip (map string->list lst)))))
 
 (define (parse-procedure lst)
