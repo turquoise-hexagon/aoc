@@ -59,16 +59,15 @@
 (define (process-commands commands)
   (let ((tree (run-commands commands)))
     (let loop ()
+      (hash-table-for-each tree
+        (lambda (path contents)
+          (when (list? contents)
+            (when (processed-contents? tree contents)
+              (hash-table-set! tree path
+                (contents-size tree contents))))))
       (if (processed-tree? tree)
         tree
-        (begin
-          (hash-table-for-each tree
-            (lambda (path contents)
-              (when (list? contents)
-                (when (processed-contents? tree contents)
-                  (hash-table-set! tree path
-                    (contents-size tree contents))))))
-          (loop))))))
+        (loop)))))
 
 (define (import-input)
   (process-commands
