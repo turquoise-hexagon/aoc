@@ -81,23 +81,19 @@
       (irregex-split "\\$ " (read-string #f)))))
 
 (define (solve/1 input)
-  (hash-table-fold input
-    (lambda (_ size acc)
-      (if (>= 100000 size)
-        (+ acc size)
-        acc))
-    0))
+  (apply +
+    (filter
+      (lambda (size)
+        (>= 100000 size))
+      (hash-table-values input))))
 
 (define (solve/2 input)
   (let ((free-space (- 70000000 (hash-table-ref input '("/")))))
-    (hash-table-fold input
-      (lambda (_ size acc)
-        (if (>= (+ free-space size) 30000000)
-          (if (> acc size)
-            size
-            acc)
-          acc))
-      (apply max (hash-table-values input)))))
+    (apply min
+      (filter
+        (lambda (size)
+          (>= (+ free-space size) 30000000))
+        (hash-table-values input)))))
 
 (let ((input (import-input)))
   (print (solve/1 input))
