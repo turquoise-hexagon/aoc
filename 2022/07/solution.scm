@@ -41,7 +41,7 @@
         content))
     contents))
 
-(define (contents-size tree contents)
+(define (process-contents tree contents)
   (apply +
     (map
       (lambda (content)
@@ -61,7 +61,7 @@
           (when (list? contents)
             (when (processable-contents? tree contents)
               (hash-table-set! tree path
-                (contents-size tree contents))))))
+                (process-contents tree contents))))))
       (if (processed-tree? tree)
         tree
         (loop)))))
