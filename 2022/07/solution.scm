@@ -27,43 +27,22 @@
       '() commands)
     acc))
 
-(define (processed-tree? tree)
-  (every number? (hash-table-values tree)))
-
-(define (processable-contents? tree contents)
-  (every
-    (lambda (content)
-      (apply
-        (lambda (size path)
-          (or (not (string=? size "dir"))
-              (number? (hash-table-ref tree path))))
-        content))
-    contents))
-
-(define (process-contents tree contents)
-  (apply +
-    (map
-      (lambda (content)
-        (apply
-          (lambda (size path)
-            (if (string=? size "dir")
-              (hash-table-ref tree path)
-              (string->number size)))
-          content))
-      contents)))
-
 (define (process-commands commands)
-  (let ((tree (run-commands commands)))
-    (let loop ()
-      (hash-table-for-each tree
-        (lambda (path contents)
-          (when (list? contents)
-            (when (processable-contents? tree contents)
-              (hash-table-set! tree path
-                (process-contents tree contents))))))
-      (if (processed-tree? tree)
-        tree
-        (loop)))))
+  (let ((acc (run-commands commands)))
+    (let loop ((path '("/")))
+      (let ((_
+              (apply +
+                (map
+                  (lambda (content)
+                    (apply
+                      (lambda (size path)
+                        (if (string=? size "dir") (loop path)
+                          (string->number size)))
+                      content))
+                  (hash-table-ref acc path)))))
+        (hash-table-set! acc path _)
+        _))
+    acc))
 
 (define (import-input)
   (process-commands
