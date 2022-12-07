@@ -74,8 +74,7 @@
           (lambda (line)
             (irregex-split " " line))
           (irregex-split "\n" chunk)))
-      (irregex-split "\\$ "
-        (read-string #f)))))
+      (irregex-split "\\$ " (read-string #f)))))
 
 (define (solve/1 input)
   (apply +
