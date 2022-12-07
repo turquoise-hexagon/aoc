@@ -7,30 +7,30 @@
 
 (define (run-commands commands)
   (let ((acc (make-hash-table)))
-    (let loop ((lst commands) (path '()))
-      (if (null? lst)
-        acc
-        (loop (cdr lst)
-          (match (car lst)
-            ((("cd" "..")) (cdr path))
-            ((("cd" name)) (cons name path))
-            ((("ls") . contents)
-             (for-each
-               (lambda (content)
-                 (apply
-                   (lambda (size name)
-                     (hash-table-update!/default acc path
-                       (lambda (_)
-                         (cons (list size (cons name path)) _))
-                       '()))
-                   content))
-               contents)
-             path)))))))
+    (foldl
+      (lambda (path command)
+        (match command
+          ((("cd" "..")) (cdr path))
+          ((("cd" name)) (cons name path))
+          ((("ls") . contents)
+           (for-each
+             (lambda (content)
+               (apply
+                 (lambda (size name)
+                   (hash-table-update!/default acc path
+                     (lambda (_)
+                       (cons (list size (cons name path)) _))
+                     '()))
+                 content))
+             contents)
+           path)))
+      '() commands)
+    acc))
 
 (define (processed-tree? tree)
   (every number? (hash-table-values tree)))
 
-(define (processed-contents? tree contents)
+(define (processable-contents? tree contents)
   (every
     (lambda (content)
       (apply
@@ -59,7 +59,7 @@
       (hash-table-for-each tree
         (lambda (path contents)
           (when (list? contents)
-            (when (processed-contents? tree contents)
+            (when (processable-contents? tree contents)
               (hash-table-set! tree path
                 (contents-size tree contents))))))
       (if (processed-tree? tree)
@@ -74,21 +74,22 @@
           (lambda (line)
             (irregex-split " " line))
           (irregex-split "\n" chunk)))
-      (irregex-split "\\$ " (read-string #f)))))
+      (irregex-split "\\$ "
+        (read-string #f)))))
 
 (define (solve/1 input)
   (apply +
     (filter
       (lambda (size)
-        (>= 100000 size))
+        (>= #e1e5 size))
       (hash-table-values input))))
 
 (define (solve/2 input)
-  (let ((free-space (- 70000000 (hash-table-ref input '("/")))))
+  (let ((free-space (- #e7e7 (hash-table-ref input '("/")))))
     (apply min
       (filter
         (lambda (size)
-          (>= (+ free-space size) 30000000))
+          (>= (+ free-space size) #e3e7))
         (hash-table-values input)))))
 
 (let ((input (import-input)))
