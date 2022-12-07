@@ -36,8 +36,7 @@
       (apply
         (lambda (size path)
           (or (not (string=? size "dir"))
-              (let ((_ (hash-table-ref tree path)))
-                (number? _))))
+              (number? (hash-table-ref tree path))))
         content))
     contents))
 
