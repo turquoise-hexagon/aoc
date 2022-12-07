@@ -28,10 +28,7 @@
              path)))))))
 
 (define (processed-tree? tree)
-  (every
-    (lambda (path)
-      (number? (hash-table-ref tree path)))
-    (hash-table-keys tree)))
+  (every number? (hash-table-values tree)))
 
 (define (processed-contents? tree contents)
   (every
