@@ -18,7 +18,7 @@
                (cons (list size (cons name path)) _))
              '())
            path)
-          (("ls") path)))
+          (_ path)))
       '() commands)
     acc))
 
