@@ -42,14 +42,13 @@
     (apply *
       (map
         (lambda (coords)
-          (let ((_ (length
-                     (take-while
-                       (lambda (_)
-                         (> value (array-ref array _)))
-                       coords))))
-            (if (= _ (length coords))
-              _
-              (+ _ 1))))
+          (let loop ((lst coords) (acc 0))
+            (if (null? lst)
+              acc
+              (let ((_ (+ acc 1)))
+                (if (> value (array-ref array (car lst)))
+                  (loop (cdr lst) _)
+                  _)))))
         (neighbors array coord)))))
 
 (define (solve/1 input)
