@@ -17,45 +17,38 @@
         (map string->number (string-chop str 1)))
       (read-lines))))
 
-(define (_neighbors array coord offset)
-  (let loop ((coord coord) (acc '()))
+(define (_visible? array coord value offset)
+  (let loop ((coord coord))
     (let ((_ (map + coord offset)))
       (if (array-exists? array _)
-        (loop _ (cons _ acc))
-        (reverse acc)))))
-
-(define (neighbors array coord)
-  (map
-    (lambda (offset)
-      (_neighbors array coord offset))
-    offsets))
+        (if (> value (array-ref array _))
+          (loop _)
+          #f)
+        #t))))
 
 (define (visible? array coord)
   (let ((value (array-ref array coord)))
     (any
-      (lambda (coords)
-        (every
-          (lambda (coord)
-            (> value (array-ref array coord)))
-          coords))
-      (neighbors array coord))))
+      (lambda (offset)
+        (_visible? array coord value offset))
+      offsets)))
 
-(define (_scenic-score array value coords)
-  (let loop ((lst coords) (acc 0))
-    (if (null? lst)
-      acc
-      (let ((_ (+ acc 1)))
-        (if (> value (array-ref array (car lst)))
-          (loop (cdr lst) _)
-          _)))))
+(define (_scenic-score array coord value offset)
+  (let loop ((coord coord) (acc 0))
+    (let ((_ (map + coord offset)))
+      (if (array-exists? array _)
+        (if (> value (array-ref array _))
+          (loop _ (+ acc 1))
+          (+ acc 1))
+        acc))))
 
 (define (scenic-score array coord)
   (let ((value (array-ref array coord)))
     (apply *
       (map
-        (lambda (coords)
-          (_scenic-score array value coords))
-        (neighbors array coord)))))
+        (lambda (offset)
+          (_scenic-score array coord value offset))
+        offsets))))
 
 (define (solve/1 input)
   (count
