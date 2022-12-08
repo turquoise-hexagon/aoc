@@ -1,6 +1,6 @@
 (import
   (chicken io)
-  (chicken irregex)
+  (chicken string)
   (matchable)
   (srfi 1)
   (srfi 69))
@@ -8,22 +8,17 @@
 (define (run-commands commands)
   (let ((acc (make-hash-table)))
     (foldl
-      (lambda (path command)
-        (match command
-          ((("cd" "..")) (cdr path))
-          ((("cd" name)) (cons name path))
-          ((("ls") . contents)
-           (for-each
-             (lambda (content)
-               (apply
-                 (lambda (size name)
-                   (hash-table-update!/default acc path
-                     (lambda (_)
-                       (cons (list size (cons name path)) _))
-                     '()))
-                 content))
-             contents)
-           path)))
+      (lambda (path line)
+        (match line
+          (("cd" "..") (cdr path))
+          (("cd" name) (cons name path))
+          ((size name)
+           (hash-table-update!/default acc path
+             (lambda (_)
+               (cons (list size (cons name path)) _))
+             '())
+           path)
+          (("ls") path)))
       '() commands)
     acc))
 
@@ -47,12 +42,9 @@
 (define (import-input)
   (process-commands
     (map
-      (lambda (chunk)
-        (map
-          (lambda (line)
-            (irregex-split " " line))
-          (irregex-split "\n" chunk)))
-      (irregex-split "\\$ " (read-string #f)))))
+      (lambda (_)
+        (string-split _ "$ "))
+      (read-lines))))
 
 (define (solve/1 input)
   (apply +
