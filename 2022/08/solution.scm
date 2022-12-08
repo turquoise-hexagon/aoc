@@ -13,11 +13,11 @@
 (define (neighbors array coord)
   (map
     (lambda (offset)
-      (let loop ((coord (map + coord offset)) (acc '()))
-        (if (array-exists? array coord)
-          (loop (map + coord offset)
-            (cons coord acc))
-          (reverse acc))))
+      (let loop ((coord coord) (acc '()))
+        (let ((_ (map + coord offset)))
+          (if (array-exists? array _)
+            (loop _ (cons _ acc))
+            (reverse acc)))))
     offsets))
 
 (define (import-input)
