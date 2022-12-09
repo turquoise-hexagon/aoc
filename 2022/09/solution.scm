@@ -4,7 +4,7 @@
   (srfi 1)
   (srfi 69))
 
-(define offsets/directions
+(define offsets
   '((U (-1  0))
     (R ( 0  1))
     (D ( 1  0))
@@ -34,7 +34,7 @@
       a b)))
 
 (define (iterate! table knots direction value)
-  (let ((offset (cadr (assoc direction offsets/directions))))
+  (let ((offset (cadr (assoc direction offsets))))
     (foldl
       (lambda (knots _)
         (let ((knots (reverse
