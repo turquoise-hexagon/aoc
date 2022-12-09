@@ -24,8 +24,8 @@
 (define (adjust a b)
   (if (every
         (lambda (_)
-          (< _ 2))
-        (map abs (map - a b))) '(0 0)
+          (>= 1 _ -1))
+        (map - a b)) '(0 0)
     (map
       (lambda (a b)
         (cond ((> a b)  1)
