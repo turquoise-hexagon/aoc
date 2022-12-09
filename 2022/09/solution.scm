@@ -37,13 +37,12 @@
   (let ((offset (cadr (assoc direction offsets))))
     (foldl
       (lambda (knots _)
-        (let ((knots (reverse
-                       (foldl
-                         (lambda (knots knot)
-                           (cons (map + knot (adjust (car knots) knot)) knots))
-                         (list (map + (car knots) offset)) (cdr knots)))))
-          (hash-table-set! table (last knots) #t)
-          knots))
+        (let ((_ (foldl
+                   (lambda (knots knot)
+                     (cons (map + knot (adjust (car knots) knot)) knots))
+                   (list (map + (car knots) offset)) (cdr knots))))
+          (hash-table-set! table (car _) #t)
+          (reverse _)))
       knots (iota value))))
 
 (define (solve input n)
