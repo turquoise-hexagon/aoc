@@ -1,7 +1,6 @@
 (import
   (chicken io)
   (chicken string)
-  (euler)
   (srfi 1)
   (srfi 69))
 
@@ -10,9 +9,6 @@
     (R ( 0  1))
     (D ( 1  0))
     (L ( 0 -1))))
-
-(define offsets/all
-  (delete '(0 0) (power '(-1 0 1) 2)))
 
 (define (import-input)
   (map
@@ -26,10 +22,10 @@
     (read-lines)))
 
 (define (adjust a b)
-  (if (any
-        (lambda (offset)
-          (equal? (map + b offset) a))
-        offsets/all) '(0 0)
+  (if (every
+        (lambda (_)
+          (< _ 2))
+        (map abs (map - a b))) '(0 0)
     (map
       (lambda (a b)
         (cond ((> a b)  1)
