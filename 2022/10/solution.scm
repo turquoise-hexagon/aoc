@@ -8,12 +8,11 @@
   (reverse
     (foldl
       (lambda (acc str)
-        (let ((x (car acc)))
+        (let* ((x (car acc)) (acc (cons x acc)))
           (match (string-split str " ")
-            (("addx" n)
-             (cons (+ x (string->number n)) (cons x acc)))
-            (("noop")
-             (cons x acc)))))
+            ((_ n)
+             (cons (+ x (string->number n)) acc))
+            (_ acc))))
       '(1) (read-lines))))
 
 (define (solve/1 input)
