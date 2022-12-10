@@ -27,7 +27,7 @@
   (for-each
     (lambda (x i)
       (if (<= (abs (- x (modulo (- i 1) 40))) 1)
-        (display "#")
+        (display "▊")
         (display " "))
       (if (= (modulo i 40) 0)
         (newline)))
