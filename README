@@ -10,12 +10,14 @@ usage
 
 depends on
 ----------
-    * chicken
-    * srfi-1
-    * srfi-69
-    * srfi-113
-    * srfi-128
-    * srfi-133
-    * srfi-152
-    * euler
-    * matchable
+    system
+        * chicken
+    eggs
+        * srfi-1
+        * srfi-69
+        * srfi-113
+        * srfi-128
+        * srfi-133
+        * srfi-152
+        * euler
+        * matchable
