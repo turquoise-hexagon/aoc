@@ -11,15 +11,15 @@
     (("noop")
      (list 0))))
 
-(define (process-input lst)
+(define (process-instructions lst)
   (reverse
     (foldl
-      (lambda (acc i)
-        (cons (+ (car acc) i) acc))
+      (lambda (acc _)
+        (cons (+ (car acc) _) acc))
       '(1) lst)))
 
 (define (import-input)
-  (process-input (join (map parse-instruction (read-lines)))))
+  (process-instructions (join (map parse-instruction (read-lines)))))
 
 (define (solve/1 input)
   (apply +
@@ -30,11 +30,11 @@
 
 (define (solve/2 input)
   (for-each
-    (lambda (value index)
-      (if (<= (abs (- value (modulo (- index 1) 40))) 1)
+    (lambda (x _)
+      (if (<= (abs (- x (modulo (- _ 1) 40))) 1)
         (display "#")
-        (display "."))
-      (if (= (modulo index 40) 0)
+        (display " "))
+      (if (= (modulo _ 40) 0)
         (newline)))
     (butlast input) (range 1 (length input))))
 
