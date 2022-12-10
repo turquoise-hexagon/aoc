@@ -1,7 +1,6 @@
 (import
   (chicken io)
   (chicken string)
-  (matchable)
   (euler))
 
 (define (import-input)
@@ -9,10 +8,10 @@
     (foldl
       (lambda (acc str)
         (let* ((x (car acc)) (acc (cons x acc)))
-          (match (string-split str " ")
-            ((_ n)
-             (cons (+ x (string->number n)) acc))
-            (_ acc))))
+          (let ((_ (string-split str " ")))
+            (if (= (length _) 2)
+              (cons (+ x (string->number (cadr _))) acc)
+              acc))))
       '(1) (read-lines))))
 
 (define (solve/1 input)
