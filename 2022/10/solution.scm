@@ -4,22 +4,17 @@
   (matchable)
   (euler))
 
-(define (parse-instruction str)
-  (match (string-split str " ")
-    (("addx" n)
-     (list 0 (string->number n)))
-    (("noop")
-     (list 0))))
-
-(define (process-instructions lst)
+(define (import-input)
   (reverse
     (foldl
-      (lambda (acc _)
-        (cons (+ (car acc) _) acc))
-      '(1) lst)))
-
-(define (import-input)
-  (process-instructions (join (map parse-instruction (read-lines)))))
+      (lambda (acc str)
+        (let ((_ (car acc)))
+          (match (string-split str " ")
+            (("addx" n)
+             (cons (+ _ (string->number n)) (cons _ acc)))
+            (("noop")
+             (cons _ acc)))))
+      '(1) (read-lines))))
 
 (define (solve/1 input)
   (apply +
