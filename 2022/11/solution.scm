@@ -2,84 +2,73 @@
   (chicken io)
   (chicken irregex)
   (chicken sort)
-  (matchable)
   (srfi 1))
 
-(define-record _monkey start lst operation test a b)
+(define irx ".+\n.+: (.+)\n.+ (.) (.+)\n.+ (.+)\n.+ (.+)\n.+ (.+)\n?")
 
-(define (parse-start lst)
-  (filter-map string->number lst))
+(define-record monkey start lst operation test a b)
 
-(define (parse-operation lst)
-  (match lst
-    ((_ _ _ _ operator value)
-     (lambda (i)
-       ((case (string->symbol operator)
-          ((*) *)
-          ((+) +))
-        (let ((_ (string->number value)))
-          (if _ _ i))
-        i)))))
+(define (parse-operation operator value)
+  (let ((operator
+          (case (string->symbol operator)
+            ((*) *)
+            ((+) +)))
+        (value (string->number value)))
+    (lambda (i) (operator i (if value value i)))))
 
-(define (parse-others lst)
-  (car (filter-map string->number lst)))
-
-(define (parse-monkey chunk)
+(define (parse-chunk chunk)
   (apply
-    (lambda (_ start operation test a b)
-      (make-_monkey
-        (parse-start start) '()
-        (parse-operation operation)
-        (parse-others test)
-        (parse-others a)
-        (parse-others b)))
-    (map
-      (lambda (str)
-        (irregex-split "[, ]" str))
-      (irregex-split "\n" chunk))))
+    (lambda (start operator value test a b)
+      (make-monkey
+        (map string->number (irregex-split ", " start)) '()
+        (parse-operation operator value)
+        (string->number test)
+        (string->number a)
+        (string->number b)))
+    (let ((matches (irregex-match irx chunk)))
+      (map
+        (lambda (index)
+          (irregex-match-substring matches index))
+        (iota (irregex-match-num-submatches matches) 1)))))
 
 (define (import-input)
-  (map parse-monkey
-    (irregex-split "\n{2}" (read-string #f))))
-
-(define (iterate-monkey! monkey monkeys relief magic)
-  (match monkey
-    (($ _monkey _ lst operator test a b)
-     (for-each
-       (lambda (i)
-         (let*
-           ((i (operator i))
-            (i (quotient i relief))
-            (i (modulo i magic))
-            (t (list-ref monkeys
-                 (if (= (modulo i test) 0)
-                   a
-                   b))))
-           (_monkey-lst-set! t
-             (append (_monkey-lst t) (list i)))))
-       lst)
-     (_monkey-lst-set! monkey '())
-     (length lst))))
+  (map parse-chunk (irregex-split "\n{2}" (read-string))))
 
 (define (monkey-reset! monkey)
-  (match monkey
-    (($ _monkey start)
-     (_monkey-lst-set! monkey start))))
+  (monkey-lst-set! monkey (monkey-start monkey)))
 
-(define (solve input iterations relief)
-  (for-each monkey-reset! input)
-  (let*
-    ((magic (* relief (apply lcm (map _monkey-test input))))
-     (result (foldl
-               (lambda (acc _)
-                 (map + acc
-                   (map
-                     (lambda (monkey)
-                       (iterate-monkey! monkey input relief magic))
-                     input)))
-               (make-list (length input) 0) (iota iterations))))
-    (apply * (take (sort result >) 2))))
+(define (monkey-iterate! monkey monkeys relief magic)
+  (for-each
+    (lambda (i)
+      (let* ((i (modulo (quotient ((monkey-operation monkey) i) relief) magic))
+             (target
+               (list-ref monkeys
+                 (if (= (modulo i (monkey-test monkey)) 0)
+                   (monkey-a monkey)
+                   (monkey-b monkey)))))
+        (monkey-lst-set! target
+          (append (monkey-lst target) (list i)))))
+    (monkey-lst monkey))
+  (let ((result (length (monkey-lst monkey))))
+    (monkey-lst-set! monkey '())
+    result))
 
-(let* ((input (import-input)))
+(define (monkey-iterate!/all monkeys relief magic)
+  (map
+    (lambda (monkey)
+      (monkey-iterate! monkey monkeys relief magic))
+    monkeys))
+
+(define (solve . arguments)
+  (define (_solve input iterations relief)
+    (for-each monkey-reset! input)
+    (let ((magic (* relief (apply lcm (map monkey-test input)))))
+      (foldl
+        (lambda (acc _)
+          (map + acc (monkey-iterate!/all input relief magic)))
+        (make-list (length input) 0) (iota iterations))))
+  (apply * (take (sort (apply _solve arguments) >) 2)))
+
+(let ((input (import-input)))
   (print (solve input 20 3))
   (print (solve input 10000 1)))
