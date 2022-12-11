@@ -4,32 +4,38 @@
   (chicken sort)
   (srfi 1))
 
-(define irx ".+\n.+: (.+)\n.+ (.) (.+)\n.+ (.+)\n.+ (.+)\n.+ (.+)\n?")
-
 (define-record monkey start lst operation test a b)
 
-(define (parse-operation operator value)
-  (let ((operator
-          (case (string->symbol operator)
-            ((*) *)
-            ((+) +)))
-        (value (string->number value)))
-    (lambda (i) (operator i (if value value i)))))
+(define (parse-start lst)
+  (filter-map string->number lst))
+
+(define (parse-operation lst)
+  (apply
+    (lambda (_ _ _ _ operator value)
+      (let ((operator
+              (case (string->symbol operator)
+                ((+) +)
+                ((*) *)))
+            (value (string->number value)))
+        (lambda (i) (operator i (if value value i)))))
+    lst))
+
+(define (parse-others lst)
+  (string->number (last lst)))
 
 (define (parse-chunk chunk)
   (apply
-    (lambda (start operator value test a b)
+    (lambda (_ start operation test a b)
       (make-monkey
-        (map string->number (irregex-split ", " start)) '()
-        (parse-operation operator value)
-        (string->number test)
-        (string->number a)
-        (string->number b)))
-    (let ((matches (irregex-match irx chunk)))
-      (map
-        (lambda (index)
-          (irregex-match-substring matches index))
-        (iota (irregex-match-num-submatches matches) 1)))))
+        (parse-start start) '()
+        (parse-operation operation)
+        (parse-others test)
+        (parse-others a)
+        (parse-others b)))
+    (map
+      (lambda (str)
+        (irregex-split "[, ]" str))
+      (irregex-split "\n" chunk))))
 
 (define (import-input)
   (map parse-chunk (irregex-split "\n{2}" (read-string))))
