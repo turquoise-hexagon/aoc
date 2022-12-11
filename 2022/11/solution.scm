@@ -68,7 +68,7 @@
 (define (solve . arguments)
   (define (_solve input iterations relief)
     (for-each monkey-reset! input)
-    (let ((magic (* relief (apply lcm (map monkey-test input)))))
+    (let ((magic (foldl * relief (map monkey-test input))))
       (foldl
         (lambda (acc _)
           (map + acc (monkey-iterate!/all input relief magic)))
