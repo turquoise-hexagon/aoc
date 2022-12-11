@@ -13,11 +13,13 @@
 (define (parse-operation lst)
   (match lst
     ((_ _ _ _ operator value)
-     (list
-       (case (string->symbol operator)
-         ((*) *)
-         ((+) +))
-       (string->number value)))))
+     (lambda (i)
+       ((case (string->symbol operator)
+          ((*) *)
+          ((+) +))
+        (let ((_ (string->number value)))
+          (if _ _ i))
+        i)))))
 
 (define (parse-others lst)
   (car (filter-map string->number lst)))
@@ -48,14 +50,11 @@
 
 (define (iterate-monkey! monkey monkeys relief magic)
   (match monkey
-    (($ _monkey lst (operator value) test a b)
+    (($ _monkey lst operator test a b)
      (for-each
        (lambda (i)
          (let*
-           ((i (operator i
-                 (if value
-                   value
-                   i)))
+           ((i (operator i))
             (i (quotient i relief))
             (i (modulo i magic))
             (t (list-ref monkeys
