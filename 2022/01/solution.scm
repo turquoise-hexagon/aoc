@@ -1,15 +1,17 @@
 (import
   (chicken io)
-  (chicken irregex)
   (chicken sort)
   (srfi 1))
 
 (define (import-input)
   (sort
-    (map
-      (lambda (_)
-        (apply + (map string->number (irregex-split "\n" _))))
-      (irregex-split "\n{2}" (read-string #f)))
+    (foldl
+      (lambda (acc str)
+        (if (string=? str "")
+          (cons 0 acc)
+          (let ((_ (string->number str)))
+            (cons (+ (car acc) _) (cdr acc)))))
+      '(1) (read-lines))
     >))
 
 (define (solve input n)
