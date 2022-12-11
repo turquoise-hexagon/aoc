@@ -9,7 +9,7 @@
       (lambda (acc i)
         (if i (cons (+ (car acc) i) (cdr acc))
           (cons 0 acc)))
-      '(1) (map string->number (read-lines)))
+      '(0) (map string->number (read-lines)))
     >))
 
 (define (solve input n)
