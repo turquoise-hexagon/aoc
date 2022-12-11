@@ -53,7 +53,7 @@
                    (monkey-a monkey)
                    (monkey-b monkey)))))
         (monkey-lst-set! target
-          (append (monkey-lst target) (list i)))))
+          (cons i (monkey-lst target)))))
     (monkey-lst monkey))
   (let ((result (length (monkey-lst monkey))))
     (monkey-lst-set! monkey '())
