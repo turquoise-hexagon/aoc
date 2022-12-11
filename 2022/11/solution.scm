@@ -5,9 +5,9 @@
   (matchable)
   (srfi 1))
 
-(define-record _monkey lst operation test a b)
+(define-record _monkey start lst operation test a b)
 
-(define (parse-lst lst)
+(define (parse-start lst)
   (filter-map string->number lst))
 
 (define (parse-operation lst)
@@ -26,9 +26,9 @@
 
 (define (parse-monkey chunk)
   (apply
-    (lambda (_ lst operation test a b)
+    (lambda (_ start operation test a b)
       (make-_monkey
-        (parse-lst lst)
+        (parse-start start) '()
         (parse-operation operation)
         (parse-others test)
         (parse-others a)
@@ -42,15 +42,9 @@
   (map parse-monkey
     (irregex-split "\n{2}" (read-string #f))))
 
-(define (monkey-copy monkey)
-  (match monkey 
-    ;; yikes
-    (($ _monkey lst operation test a b)
-     (make-_monkey lst operation test a b))))
-
 (define (iterate-monkey! monkey monkeys relief magic)
   (match monkey
-    (($ _monkey lst operator test a b)
+    (($ _monkey _ lst operator test a b)
      (for-each
        (lambda (i)
          (let*
@@ -67,7 +61,13 @@
      (_monkey-lst-set! monkey '())
      (length lst))))
 
+(define (monkey-reset! monkey)
+  (match monkey
+    (($ _monkey start)
+     (_monkey-lst-set! monkey start))))
+
 (define (solve input iterations relief)
+  (for-each monkey-reset! input)
   (let*
     ((magic (* relief (apply lcm (map _monkey-test input))))
      (result (foldl
@@ -80,6 +80,6 @@
                (make-list (length input) 0) (iota iterations))))
     (apply * (take (sort result >) 2))))
 
-(let* ((input/1 (import-input)) (input/2 (map monkey-copy input/1)))
-  (print (solve input/1 20 3))
-  (print (solve input/2 10000 1)))
+(let* ((input (import-input)))
+  (print (solve input 20 3))
+  (print (solve input 10000 1)))
