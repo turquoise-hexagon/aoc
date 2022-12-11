@@ -6,12 +6,10 @@
 (define (import-input)
   (sort
     (foldl
-      (lambda (acc str)
-        (if (string=? str "")
-          (cons 0 acc)
-          (let ((_ (string->number str)))
-            (cons (+ (car acc) _) (cdr acc)))))
-      '(1) (read-lines))
+      (lambda (acc i)
+        (if i (cons (+ (car acc) i) (cdr acc))
+          (cons 0 acc)))
+      '(1) (map string->number (read-lines)))
     >))
 
 (define (solve input n)
