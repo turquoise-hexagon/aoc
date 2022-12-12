@@ -56,7 +56,7 @@
 
 (define (find-path array from to)
   (let ((acc (make-hash-table)))
-    (let loop ((queue (list->priority-queue comp? (list (list 0 from)))))
+    (let loop ((queue (list->priority-queue comp? (map (lambda (_) (list 0 _)) from))))
       (if (priority-queue-empty? queue)
         (hash-table-ref/default acc to #e1e32)
         (apply
@@ -64,19 +64,10 @@
             (loop (helper! array acc queue cost coord)))
           (priority-queue-first queue))))))
 
-(define (solve/1 input)
-  (let ((a (first (find-coordinates input #\S)))
-        (b (first (find-coordinates input #\E))))
-    (find-path input a b)))
-
-(define (solve/2 input)
-  (let ((b (first (find-coordinates input #\E))))
-    (apply min
-      (map
-        (lambda (a)
-          (find-path input a b))
-        (find-coordinates input #\a)))))
+(define (solve input value)
+  (find-path input (find-coordinates input value)
+    (first (find-coordinates input #\E))))
 
 (let ((input (import-input)))
-  (print (solve/1 input))
-  (print (solve/2 input)))
+  (print (solve input #\S))
+  (print (solve input #\a)))
