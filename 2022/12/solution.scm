@@ -30,14 +30,12 @@
   (let ((_ (correct-value array coord)))
     (filter
       (lambda (coord)
-        (>= 1 (- (correct-value array coord) _)))
-      (filter
-        (lambda (coord)
-          (array-exists? array coord))
-        (map
-          (lambda (offset)
-            (map + coord offset))
-          offsets)))))
+        (and (array-exists? array coord)
+          (>= 1 (- (correct-value array coord) _))))
+      (map
+        (lambda (offset)
+          (map + coord offset))
+        offsets))))
 
 (define (comp? a b)
   (< (car a)
