@@ -47,7 +47,7 @@
   (foldl
     (lambda (queue coord)
       (let ((cost (+ cost 1)))
-        (if (> (hash-table-ref/default acc coord #e1e32) cost)
+        (if (> (hash-table-ref/default acc coord +inf.0) cost)
           (begin
             (hash-table-set! acc coord cost)
             (priority-queue-insert comp? (list cost coord) queue))
@@ -58,7 +58,7 @@
   (let ((acc (make-hash-table)))
     (let loop ((queue (list->priority-queue comp? (map (lambda (_) (list 0 _)) from))))
       (if (priority-queue-empty? queue)
-        (hash-table-ref/default acc to #e1e32)
+        (hash-table-ref acc to)
         (apply
           (lambda (cost coord)
             (loop (helper! array acc queue cost coord)))
