@@ -1,16 +1,17 @@
 (import
   (chicken io)
-  (chicken string)
-  (chicken port)
-  (euler))
+  (euler)
+  (srfi 158)
+  (srfi 180))
 
-(define (internalize str)
-  ;; "[[1,2],3]" => "'[[1 2] 3]" => '((1 2) 3)
-  (let ((str (string-append "'" (string-translate str "," " "))))
-    (eval (call-with-input-string str read))))
+(define (convert i)
+  (if (vector? i)
+    (let ((_ (vector->list i)))
+      (map convert _))
+    i))
 
 (define (import-input)
-  (map internalize (read-lines)))
+  (generator-map->list convert (json-lines-read)))
 
 (define (1st lst) (car  lst))
 (define (2nd lst) (cadr lst))
