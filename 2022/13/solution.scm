@@ -44,7 +44,7 @@
     0 input (iota (length input) 1)))
 
 (define (solve/2 input)
-  (let* ((separators '([[2]] [[6]])) (input (delete-duplicates (join input separators))))
+  (let* ((separators '([[2]] [[6]])) (input (append (join input) separators)))
     (fold
       (lambda (lst index acc)
         (if (member lst separators)
