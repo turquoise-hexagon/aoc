@@ -7,7 +7,7 @@
   (srfi 1))
 
 (define (internalize str)
-  (let ((_ (string-append "'" (string-translate str "[]," "() "))))
+  (let ((_ (string-append "'" (string-translate str "," " "))))
     (eval (call-with-input-string _ read))))
 
 (define (import-input)
