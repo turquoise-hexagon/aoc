@@ -48,13 +48,13 @@
     0 input (iota (length input) 1)))
 
 (define (solve/2 input)
-  (let* ((separators '(((2)) ((6)))) (result (sort (delete-duplicates (join input separators) equal?) order)))
+  (let* ((separators '(((2)) ((6)))) (input (delete-duplicates (join input separators))))
     (fold
       (lambda (lst index acc)
         (if (member lst separators)
           (* acc index)
           acc))
-      1 result (iota (length result) 1))))
+      1 (sort input order) (iota (length input) 1))))
 
 (let ((input (import-input)))
   (print (solve/1 input))
