@@ -1,20 +1,17 @@
 (import
-  (chicken io)
-  (chicken irregex)
-  (chicken port)
   (chicken sort)
-  (chicken string)
-  (srfi 1))
+  (srfi 1)
+  (srfi 158)
+  (srfi 180))
 
-(define (internalize str)
-  (let ((_ (string-append "'" (string-translate str "," " "))))
-    (eval (call-with-input-string _ read))))
+(define (convert i)
+  (if (vector? i)
+    (let ((_ (vector->list i)))
+      (map convert _))
+    i))
 
 (define (import-input)
-  (map
-    (lambda (_)
-      (map internalize (irregex-split "\n" _)))
-    (irregex-split "\n\n" (read-string))))
+  (chop (generator-map->list convert (json-lines-read)) 2))
 
 (define (compare? l r)
   (cond
@@ -23,21 +20,20 @@
      (cond ((> l r) #f)
            ((= l r) '_)
            ((< l r) #t)))
+    ((integer? l) (compare? (list l) r))
+    ((integer? r) (compare? l (list r)))
     ((and (null? l)
           (null? r))
      '_)
     ((null? l) #t)
     ((null? r) #f)
-    ((and (list? l)
-          (list? r))
+    (else
      (let ((_ (compare? (car l)
-                     (car r))))
+                        (car r))))
        (if (boolean? _)
          _
          (compare? (cdr l)
-                (cdr r)))))
-    ((integer? l) (compare? (list l) r))
-    ((integer? r) (compare? l (list r)))))
+                   (cdr r)))))))
 
 (define (solve/1 input)
   (fold
@@ -48,7 +44,7 @@
     0 input (iota (length input) 1)))
 
 (define (solve/2 input)
-  (let* ((separators '(((2)) ((6)))) (input (delete-duplicates (join input separators))))
+  (let* ((separators '([[2]] [[6]])) (input (delete-duplicates (join input separators))))
     (fold
       (lambda (lst index acc)
         (if (member lst separators)
