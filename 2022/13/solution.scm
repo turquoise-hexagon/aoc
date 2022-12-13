@@ -25,7 +25,7 @@
            ((< l r) #t)))
     ((and (null? l)
           (null? r))
-     2)
+     '_)
     ((null? l) #t)
     ((null? r) #f)
     ((and (list? l)
