@@ -16,7 +16,7 @@
       (map internalize (irregex-split "\n" _)))
     (irregex-split "\n\n" (read-string))))
 
-(define (order l r)
+(define (compare? l r)
   (cond
     ((and (integer? l)
           (integer? r))
@@ -30,19 +30,19 @@
     ((null? r) #f)
     ((and (list? l)
           (list? r))
-     (let ((_ (order (car l)
+     (let ((_ (compare? (car l)
                      (car r))))
        (if (boolean? _)
          _
-         (order (cdr l)
+         (compare? (cdr l)
                 (cdr r)))))
-    ((integer? l) (order (list l) r))
-    ((integer? r) (order l (list r)))))
+    ((integer? l) (compare? (list l) r))
+    ((integer? r) (compare? l (list r)))))
 
 (define (solve/1 input)
   (fold
     (lambda (lst index acc)
-      (if (apply order lst)
+      (if (apply compare? lst)
         (+ acc index)
         acc))
     0 input (iota (length input) 1)))
@@ -54,7 +54,7 @@
         (if (member lst separators)
           (* acc index)
           acc))
-      1 (sort input order) (iota (length input) 1))))
+      1 (sort input compare?) (iota (length input) 1))))
 
 (let ((input (import-input)))
   (print (solve/1 input))
