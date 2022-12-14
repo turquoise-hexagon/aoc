@@ -43,11 +43,9 @@
           next)))))
 
 (define (make-drop-sand!)
-  (set! acc '((500 0))) ;; init cache
+  (set! acc '(_ (500 0))) ;; init cache
   (lambda (table bottom)
-    (let loop ()
-      (unless (test-offsets table (car acc))
-        (set! acc (cdr acc)))) ;; trim cache
+    (set! acc (cdr acc))
     (let loop ()
       (if (or (null? acc) (> (second (car acc)) bottom))
         #f
