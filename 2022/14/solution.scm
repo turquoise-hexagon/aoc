@@ -23,14 +23,12 @@
       lst)
     acc))
 
-(define (parse-report str)
-  (map
-    (lambda (_)
-      (map string->number (string-split _ ",")))
-    (string-split str "-> ")))
-
 (define (import-input)
-  (create-cave (map parse-report (read-lines))))
+  (create-cave
+    (map
+      (lambda (_)
+        (chop (map string->number (string-split _ "->, ")) 2))
+      (read-lines))))
 
 (define (test-offset array current offset)
   (let ((next (map + current offset)))
