@@ -25,13 +25,9 @@
   (if (every
         (lambda (_)
           (>= 1 _ -1))
-        (map - a b)) '(0 0)
-    (map
-      (lambda (a b)
-        (cond ((> a b)  1)
-              ((= a b)  0)
-              ((< a b) -1)))
-      a b)))
+        (map - a b))
+    '(0 0)
+    (map signum (map - a b))))
 
 (define (iterate! table knots direction value)
   (let ((offset (cadr (assoc direction offsets))))
