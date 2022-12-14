@@ -12,12 +12,6 @@
         current
         (loop (map + current offset))))))
 
-(define (draw-floor! array)
-  (let ((_ (+ (find-bottom array) 2)))
-    (draw-line! array
-      (list 0   _)
-      (list 999 _))))
-
 (define (create-cave lst)
   (let ((acc (list->array (make-list #e1e3 (make-list #e1e3 #f)))))
     (for-each
@@ -38,13 +32,6 @@
 (define (import-input)
   (create-cave (map parse-report (read-lines))))
 
-(define (find-bottom array)
-  (let ((_ (filter
-             (lambda (coord)
-               (array-ref array coord))
-             (array-indexes array))))
-    (apply max (map second _))))
-
 (define (test-offset array current offset)
   (let ((next (map + current offset)))
     (if (array-ref array next)
@@ -60,12 +47,25 @@
       ((test-offset array current '( 1 1)) => loop)
       (else (array-set! array current #t) #t))))
 
+(define (find-bottom array)
+  (let ((_ (filter
+             (lambda (coord)
+               (array-ref array coord))
+             (array-indexes array))))
+    (apply max (map second _))))
+
 (define (solve input)
   (let* ((acc (array-copy input)) (bottom (find-bottom acc)))
     (let loop ((i 0))
       (if (drop-sand! acc bottom)
         (loop (+ i 1))
         i))))
+
+(define (draw-floor! array)
+  (let ((_ (+ (find-bottom array) 2)))
+    (draw-line! array
+      (list 0   _)
+      (list 999 _))))
 
 (let ((input (import-input)))
   (print (solve input))
