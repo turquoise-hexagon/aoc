@@ -2,18 +2,18 @@
   (chicken io)
   (chicken string)
   (srfi 1)
-  (euler))
+  (srfi 69))
 
-(define (draw-line! array current target)
+(define (draw-line! table current target)
   (let ((offset (map signum (map - target current))))
     (let loop ((current current))
-      (array-set! array current #t)
+      (hash-table-set! table current #t)
       (if (equal? current target)
         current
         (loop (map + current offset))))))
 
 (define (create-cave lst)
-  (let ((acc (list->array (make-list #e1e3 (make-list #e3e2 #f)))))
+  (let ((acc (make-hash-table)))
     (for-each
       (lambda (report)
         (foldl
@@ -30,40 +30,48 @@
         (chop (map string->number (string-split _ "->, ")) 2))
       (read-lines))))
 
-(define (test-offset array current offset)
-  (let ((next (map + current offset)))
-    (if (array-ref array next)
+(define (find-bottom table)
+  (apply max (map cadr (hash-table-keys table))))
+
+(define (test-offsets table coord)
+  (let loop ((offsets '((0 1) (-1 1) (1 1))))
+    (if (null? offsets)
       #f
-      next)))
+      (let ((next (map + coord (car offsets))))
+        (if (hash-table-exists? table next)
+          (loop (cdr offsets))
+          next)))))
 
-(define (drop-sand! array bottom)
-  (let loop ((current '(500 0)))
-    (cond
-      ((or (array-ref array current) (> (second current) bottom)) #f)
-      ((test-offset array current '( 0 1)) => loop)
-      ((test-offset array current '(-1 1)) => loop)
-      ((test-offset array current '( 1 1)) => loop)
-      (else (array-set! array current #t) #t))))
-
-(define (find-bottom array)
-  (let ((_ (filter
-             (lambda (coord)
-               (array-ref array coord))
-             (array-indexes array))))
-    (apply max (map second _))))
+(define (make-drop-sand!)
+  (set! acc '((500 0))) ;; init cache
+  (lambda (table bottom)
+    (let loop ()
+      (unless (test-offsets table (car acc))
+        (set! acc (cdr acc)))) ;; trim cache
+    (let loop ()
+      (if (or (null? acc) (> (second (car acc)) bottom))
+        #f
+        (cond
+          ((test-offsets table (car acc)) =>
+           (lambda (next)
+             (set! acc (cons next acc))
+             (loop)))
+          (else
+           (hash-table-set! table (car acc) #t)
+           #t))))))
 
 (define (solve input)
-  (let* ((acc (array-copy input)) (bottom (find-bottom acc)))
+  (let* ((acc (hash-table-copy input)) (bottom (find-bottom acc)) (drop-sand! (make-drop-sand!)))
     (let loop ((i 0))
       (if (drop-sand! acc bottom)
         (loop (+ i 1))
         i))))
 
-(define (draw-floor! array)
-  (let ((_ (+ (find-bottom array) 2)))
-    (draw-line! array
-      (list 0   _)
-      (list 999 _))))
+(define (draw-floor! table)
+  (let ((_ (+ (find-bottom table) 2)))
+    (draw-line! table
+      (list -1000 _)
+      (list  1000 _))))
 
 (let ((input (import-input)))
   (print (solve input))
