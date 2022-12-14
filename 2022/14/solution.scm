@@ -1,21 +1,33 @@
 (import
   (chicken io)
   (chicken string)
-  (srfi 69))
+  (srfi 1)
+  (euler))
 
-(define (draw! table current target)
+(define (draw-line! array current target)
   (let ((offset (map signum (map - target current))))
     (let loop ((current current))
-      (hash-table-set! table current #t)
+      (array-set! array current #t)
       (if (equal? current target)
         current
         (loop (map + current offset))))))
 
-(define (draw-floor! table)
-  (let ((bound (+ (apply max (map cadr (hash-table-keys table))) 2)))
-    (draw! table
-      (list 0    bound)
-      (list 1000 bound))))
+(define (draw-floor! array)
+  (let ((_ (+ (find-bottom array) 2)))
+    (draw-line! array
+      (list 0   _)
+      (list 999 _))))
+
+(define (create-cave lst)
+  (let ((acc (list->array (make-list #e1e3 (make-list #e1e3 #f)))))
+    (for-each
+      (lambda (report)
+        (foldl
+          (lambda (current target)
+            (draw-line! acc current target))
+          (car report) (cdr report)))
+      lst)
+    acc))
 
 (define (parse-report str)
   (map
@@ -23,42 +35,35 @@
       (map string->number (string-split _ ",")))
     (string-split str "-> ")))
 
-(define (cave lst)
-  (let ((acc (make-hash-table)))
-    (for-each
-      (lambda (report)
-        (foldl
-          (lambda (current target)
-            (draw! acc current target))
-          (car report) (cdr report)))
-      lst)
-    acc))
-
 (define (import-input)
-  (cave (map parse-report (read-lines))))
+  (create-cave (map parse-report (read-lines))))
 
-(define (test-offset table current offset)
+(define (find-bottom array)
+  (let ((_ (filter
+             (lambda (coord)
+               (array-ref array coord))
+             (array-indexes array))))
+    (apply max (map second _))))
+
+(define (test-offset array current offset)
   (let ((next (map + current offset)))
-    (if (hash-table-exists? table next)
+    (if (array-ref array next)
       #f
       next)))
 
-(define (drop-sand! table bound)
+(define (drop-sand! array bottom)
   (let loop ((current '(500 0)))
     (cond
-      ((or (hash-table-exists? table current) (> (cadr current) bound))
-       #f)
-      ((test-offset table current '( 0 1)) => loop)
-      ((test-offset table current '(-1 1)) => loop)
-      ((test-offset table current '( 1 1)) => loop)
-      (else
-       (hash-table-set! table current #t)
-       #t))))
+      ((or (array-ref array current) (> (second current) bottom)) #f)
+      ((test-offset array current '( 0 1)) => loop)
+      ((test-offset array current '(-1 1)) => loop)
+      ((test-offset array current '( 1 1)) => loop)
+      (else (array-set! array current #t) #t))))
 
 (define (solve input)
-  (let* ((acc (hash-table-copy input)) (bound (apply max (map cadr (hash-table-keys acc)))))
+  (let* ((acc (array-copy input)) (bottom (find-bottom acc)))
     (let loop ((i 0))
-      (if (drop-sand! acc bound)
+      (if (drop-sand! acc bottom)
         (loop (+ i 1))
         i))))
 
