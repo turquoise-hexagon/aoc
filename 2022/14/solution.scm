@@ -31,7 +31,7 @@
       (read-lines))))
 
 (define (find-bottom table)
-  (apply max (map cadr (hash-table-keys table))))
+  (apply max (map second (hash-table-keys table))))
 
 (define (test-offsets table coord)
   (let loop ((offsets '((0 1) (-1 1) (1 1))))
