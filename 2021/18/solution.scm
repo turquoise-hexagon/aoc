@@ -79,11 +79,7 @@
        (* 2 (magnitude (2nd arg))))))
 
 (define (solve/1 input)
-  (magnitude
-    (foldl
-      (lambda (acc cur)
-        (add acc cur))
-      (car input) (cdr input))))
+  (magnitude (foldl add (car input) (cdr input))))
 
 (define (solve/2 input)
   (apply max
