@@ -13,7 +13,7 @@
         (loop (map + current offset))))))
 
 (define (create-cave lst)
-  (let ((acc (list->array (make-list #e1e3 (make-list #e1e3 #f)))))
+  (let ((acc (list->array (make-list #e1e3 (make-list #e3e2 #f)))))
     (for-each
       (lambda (report)
         (foldl
