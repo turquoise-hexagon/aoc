@@ -1,7 +1,6 @@
 (import
   (chicken io)
   (chicken string)
-  (srfi 1)
   (srfi 69))
 
 (define (draw! table current target)
