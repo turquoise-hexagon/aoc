@@ -17,21 +17,16 @@
 (define (import-input)
   (map parse-sensor (read-lines)))
 
-(define (process-sensor lst n)
-  (apply
-    (lambda (d a b)
-      (let ((_ (- d (abs (- b n)))))
-        (if (> _ 0)
-          (list (- a _)
-                (+ a _))
-          #f))) lst))
-
 (define (generate-ranges lst n)
-  (sort
-    (filter-map
-      (lambda (sensor)
-        (process-sensor sensor n))
-      lst)
+  (define (_helper sensor)
+    (apply
+      (lambda (d a b)
+        (let ((_ (- d (abs (- b n)))))
+          (if (> _ 0)
+            (list (- a _)
+                  (+ a _))
+            #f))) sensor))
+  (sort (filter-map _helper lst)
     (lambda (a b)
       (< (car a)
          (car b)))))
