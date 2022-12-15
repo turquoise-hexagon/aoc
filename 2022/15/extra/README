@@ -1,6 +1,6 @@
 usage
 -----
-    ./run input
+    ./run < input
 
 depends on
 ----------
