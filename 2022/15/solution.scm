@@ -48,10 +48,9 @@
           (((head . tail) acc)
            ((a b) head)
            ((c d) next))
-          (let ((_ (list a (max b d))))
-            (if (>= b c)
-              (cons _ tail)
-              (cons head acc)))))
+          (if (>= b c)
+            (cons (list a (max b d)) tail)
+            (cons head acc))))
       (list (car _)) (cdr _))))
 
 (define (solve/1 input n)
