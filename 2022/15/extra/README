@@ -1,0 +1,8 @@
+usage
+-----
+    ./run input
+
+depends on
+----------
+    * minizinc
+    * or-tools
