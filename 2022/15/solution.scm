@@ -60,7 +60,7 @@
         (apply
           (lambda (_ a)
             (+ (* (+ a 1) #e4e6) i))
-          (last _))))))
+          (car _))))))
 
 (let ((input (import-input)))
   (print (solve/1 input))
