@@ -1,67 +1,104 @@
 (import
   (chicken io)
-  (chicken string)
+  (chicken irregex)
   (chicken sort)
-  (srfi 1))
+  (matchable)
+  (euler)
+  (srfi 1)
+  (srfi 69))
 
 (define (distance a b)
   (apply + (map abs (map - a b))))
 
 (define (parse-sensor str)
-  (apply
-    (lambda (a b)
-      (cons (distance a b) a))
-    (let ((_ (string-split str " =,:")))
-      (chop (filter-map string->number _) 2))))
+  (let ((_ (irregex-extract "-?[0-9]+" str)))
+    (match (chop (map string->number _) 2)
+      ((a b)
+       (list a (distance a b))))))
 
 (define (import-input)
   (map parse-sensor (read-lines)))
 
-(define (generate-ranges lst n)
-  (define (_helper sensor)
-    (apply
-      (lambda (d a b)
-        (let ((_ (- d (abs (- b n)))))
-          (if (> _ 0)
-            (list (- a _)
-                  (+ a _))
-            #f))) sensor))
-  (sort (filter-map _helper lst)
-    (lambda (a b)
-      (< (car a)
-         (car b)))))
+(define (solve/1 input n)
+  (define process-sensor
+    (match-lambda
+      (((x y) r)
+       (let ((_ (- r (abs (- y n)))))
+         (if (> _ 0)
+           (list
+             (- x _)
+             (+ x _))
+           #f)))))
 
-(define (merge-ranges lst)
-  (foldl
-    (lambda (acc lst)
-      (apply
-        (lambda (a b c d)
-          (if (>= b c)
-            (cons (list a (max b d)) (cdr acc))
-            (cons (car acc) acc)))
-        (append (car acc) lst)))
-    (list (car lst)) (cdr lst)))
+  (define (generate-ranges)
+    (sort (filter-map process-sensor input)
+      (lambda (a b)
+        (< (car a)
+           (car b)))))
 
-(define (find-spaces lst n)
-  (merge-ranges (generate-ranges lst n)))
+  (define (find-spaces)
+    (let ((_ (generate-ranges)))
+      (foldl
+        (lambda (acc next)
+          (match-let*
+            (((head . tail) acc)
+             ((a b) head)
+             ((c d) next))
+            (let ((temp (list a (max b d))))
+              (if (>= b c)
+                (cons temp tail)
+                (cons head acc)))))
+        (list (car _)) (cdr _))))
 
-(define (solve/1 input)
   (apply +
     (map
-      (lambda (lst)
-        (apply - (reverse lst)))
-      (find-spaces input #e2e6))))
+      (lambda (_)
+        (apply - (reverse _)))
+      (find-spaces))))
 
-(define (solve/2 input)
-  (let loop ((i 0))
-    (let ((_ (find-spaces input i)))
-      (if (null? (cdr _))
-        (loop (+ i 1))
-        (apply
-          (lambda (_ a)
-            (+ (* (+ a 1) #e4e6) i))
-          (car _))))))
+(define (solve/2 input n)
+  (let ((t (make-hash-table))
+        (a (make-hash-table))
+        (b (make-hash-table)))
+
+    (define (in-bound? point)
+      (every
+        (lambda (_)
+          (<= 0 _ n))
+        point))
+
+    (define (in-range? point)
+      (every
+        (lambda (_)
+          (> (distance _ point) (hash-table-ref t _)))
+        (hash-table-keys t)))
+
+    (for-each
+      (lambda (_)
+        (apply hash-table-set! t _))
+      input)
+
+    (for-each
+      (match-lambda
+        (((x y) r)
+         (hash-table-set! a (+ (- y x) (+ r 1)) #t)
+         (hash-table-set! a (- (- y x) (- r 1)) #t)
+         (hash-table-set! b (+ (+ y x) (+ r 1)) #t)
+         (hash-table-set! b (- (+ y x) (- r 1)) #t)))
+      input)
+
+    (let loop ((lst (product (hash-table-keys a) (hash-table-keys b))))
+      (match lst
+        (((a b) . tail)
+         (let*
+           ((x (quotient (- b a) 2))
+            (y (quotient (+ b a) 2))
+            (p (list x y)))
+           (if (and (in-bound? p)
+                    (in-range? p))
+             (+ (* x n) y)
+             (loop tail))))))))
 
 (let ((input (import-input)))
-  (print (solve/1 input))
-  (print (solve/2 input)))
+  (print (solve/1 input #e2e6))
+  (print (solve/2 input #e4e6)))
