@@ -37,18 +37,15 @@
          (car b)))))
 
 (define (merge-ranges lst)
-  (let loop ((lst lst) (m '_) (n '_) (acc '()))
-    (if (null? lst)
-      (cons (list m n) acc)
+  (foldl
+    (lambda (acc lst)
       (apply
-        (lambda (a b)
-          (if (and (number? m)
-                   (number? n))
-            (if (>= n a)
-              (loop (cdr lst) m (max n b) acc)
-              (loop (cdr lst) a b (cons (list m n) acc)))
-            (loop (cdr lst) a b acc)))
-        (car lst)))))
+        (lambda (a b c d)
+          (if (>= b c)
+            (cons (list a (max b d)) (cdr acc))
+            (cons (car acc) acc)))
+        (append (car acc) lst)))
+    (list (car lst)) (cdr lst)))
 
 (define (find-spaces lst n)
   (merge-ranges (generate-ranges lst n)))
