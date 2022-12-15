@@ -63,8 +63,8 @@
       (if (null? (cdr _))
         (loop (+ i 1))
         (apply
-          (lambda (a b)
-            (+ (* (+ b 1) #e4e6) i))
+          (lambda (_ a)
+            (+ (* (+ a 1) #e4e6) i))
           (car (reverse _)))))))
 
 (let ((input (import-input)))
