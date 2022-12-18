@@ -12,7 +12,7 @@
 (define OFFSET 2)
 (define SECTION 30)
 
-(define ROCKS 
+(define ROCKS
   '(("####")
 
     (".#."
