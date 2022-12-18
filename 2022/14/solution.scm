@@ -45,7 +45,7 @@
 (define (make-drop-sand!)
   (set! acc '(_ (500 0))) ;; init cache
   (lambda (table bottom)
-    (set! acc (cdr acc)) ;; trim cache 
+    (set! acc (cdr acc)) ;; trim cache
     (let loop ()
       (if (or (null? acc) (> (second (car acc)) bottom))
         #f
