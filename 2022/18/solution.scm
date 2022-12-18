@@ -1,10 +1,6 @@
 (import
   (chicken io)
-  (chicken irregex)
-  (chicken sort)
   (chicken string)
-  (matchable)
-  (euler)
   (srfi 1)
   (srfi 69))
 
