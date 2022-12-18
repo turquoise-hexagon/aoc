@@ -37,15 +37,13 @@
           (let
             ((head (car lst))
              (tail (cdr lst)))
-            (if (hash-table-exists? acc head)
-              (loop tail)
-              (if (every <= mini head maxi)
-                (if (hash-table-exists? points head)
-                  (loop tail)
-                  (let ((_ (neighbors head)))
-                    (hash-table-set! acc head #t)
-                    (loop (append _ tail))))
-                (loop tail)))))))))
+            (cond
+              ((hash-table-exists? acc    head) (loop tail))
+              ((hash-table-exists? points head) (loop tail))
+              ((not (every <= mini head maxi))  (loop tail))
+              (else
+                (hash-table-set! acc head #t)
+                (loop (append (neighbors head) tail))))))))))
 
 (define (solve/1 input)
   (apply +
