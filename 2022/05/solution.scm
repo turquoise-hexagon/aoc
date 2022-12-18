@@ -11,7 +11,7 @@
       (lambda (lst)
         (char-numeric? (last lst)))
       (apply zip (map string->list crates)))))
-  
+
 (define (parse-procedure procedure)
   (map
     (lambda (instruction)
