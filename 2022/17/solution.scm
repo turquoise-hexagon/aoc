@@ -106,7 +106,7 @@
                     (lambda (coord)
                       (hash-table-set! mem coord #t))
                     push)
-                  (let* ((h (min h (apply min (map first push)))) (id (identifier mem h moves-i rocks-i)))
+                  (let* ((h (apply min h (map first push))) (id (identifier mem h moves-i rocks-i)))
 
                     (if (hash-table-exists? cache id)
                       ;; jump ahead
