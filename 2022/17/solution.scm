@@ -116,14 +116,12 @@
                             ((diff-i (- i old-i))
                              (diff-h (- h old-h))
                              (mul (quotient (- n i) diff-i)))
-                            (loop (+ i (* mul diff-i) 1) h (+ added-h (* mul diff-h)) moves-i
-                              (modulo (+ rocks-i 1) (length rocks)))))
+                            (loop (+ i (* mul diff-i) 1) h (+ added-h (* mul diff-h)) moves-i (modulo (+ rocks-i 1) (length rocks)))))
                         (hash-table-ref cache id))
 
                       (begin
                         (hash-table-set! cache id (list i h))
-                        (loop (+ i 1) h added-h moves-i
-                          (modulo (+ rocks-i 1) (length rocks)))))))
+                        (loop (+ i 1) h added-h moves-i (modulo (+ rocks-i 1) (length rocks)))))))
                 (subloop grav moves-i)))))))))
 
 (let ((moves (import-input)) (rocks (map parse-rock ROCKS)))
