@@ -13,13 +13,11 @@
     ( 0  0  1)))
 
 (define (import-input)
-  (let ((acc (make-hash-table)))
-    (for-each
+  (alist->hash-table
+    (map
       (lambda (_)
-        (let ((_ (map string->number (string-split _ ","))))
-          (hash-table-set! acc _ #t)))
-      (read-lines))
-    acc))
+        (cons (map string->number (string-split _ ",")) #t))
+      (read-lines))))
 
 (define (neighbors coord)
   (map
