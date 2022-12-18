@@ -51,7 +51,7 @@
     (list rates dists)))
 
 (define (id current time unopened elephant)
-  ;; make the job of the hash function easier
+  ;; make the hash function's job easier
   (string-append current (number->string time) (apply string-append unopened) (if elephant "1" "0")))
 
 (define cache
