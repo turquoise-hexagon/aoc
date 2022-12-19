@@ -4,7 +4,7 @@
   (euler)
   (srfi 1))
 
-(define MAGIC 15000)
+(define MAGIC 10000)
 
 (define (parse-blueprint str)
   (apply
