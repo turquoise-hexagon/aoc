@@ -4,16 +4,14 @@
 
 ;; unfortunately srfi-1 does not provide these
 (define (delete-at lst index)
-  (let loop ((i 0) (lst lst) (acc '()))
-    (if (= i index)
-      (append (reverse acc) (cdr lst))
-      (loop (+ i 1) (cdr lst) (cons (car lst) acc)))))
+  (if (= index 0)
+    (cdr lst)
+    (cons (car lst) (delete-at (cdr lst) (- index 1)))))
 
 (define (insert-at lst index item)
-  (let loop ((i 0) (lst lst) (acc '()))
-    (if (= i index)
-      (append (reverse acc) (cons item lst))
-      (loop (+ i 1) (cdr lst) (cons (car lst) acc)))))
+  (if (= index 0)
+    (cons item lst)
+    (cons (car lst) (insert-at (cdr lst) (- index 1) item))))
 
 (define (import-input)
   (map string->number (read-lines)))
