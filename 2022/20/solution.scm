@@ -19,10 +19,7 @@
   (map string->number (read-lines)))
 
 (define (convert lst)
-  (let ((i (list-index
-             (lambda (_)
-               (= (car _) 0))
-             lst)))
+  (let ((i (list-index (lambda (_) (= (car _) 0)) lst)))
     (apply +
       (map
         (lambda (_)
@@ -30,15 +27,12 @@
         '(1000 2000 3000)))))
 
 (define (move lst index)
-  (let loop ((i 0) (tmp lst))
-    (let ((item (car tmp)))
-      (if (= (cdr item) index)
-        (let*
-          ((lst (delete-at lst i))
-           (t (modulo (+ i (car item)) (length lst)))
-           (lst (insert-at lst t item)))
-          lst)
-        (loop (+ i 1) (cdr tmp))))))
+  (let* ((i (list-index (lambda (_) (= (cdr _) index)) lst)) (item (list-ref lst i)))
+    (let*
+      ((lst (delete-at lst i))
+       (i (modulo (+ i (car item)) (length lst)))
+       (lst (insert-at lst i item)))
+      lst)))
 
 (define (solve input iterations)
   (convert
