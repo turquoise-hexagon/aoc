@@ -57,11 +57,11 @@
     (third a)))
 
 (define (search lst n)
-  (let ((cache (make-hash-table)))
+  (let ((cache (make-hash-table))) ;; avoid repeated computation
     (priority-queue-first
       (foldl
         (lambda (acc _)
-          (priority-queue-take comp?
+          (priority-queue-take comp? ;; prune the queue
             (priority-queue-fold comp? acc
               (lambda (acc _)
                 (apply
@@ -72,7 +72,7 @@
                           (lambda (cost addition)
                             (if (every >= resources cost)
                               (let* ((_ (list (map + resources (map - robots cost)) (map + robots addition) (map + robots total))) (id (list->number (flatten _))))
-                                (if (hash-table-exists? cache id)
+                                (if (hash-table-exists? cache id) ;; cache
                                   acc
                                   (begin
                                     (hash-table-set! cache id #t)
