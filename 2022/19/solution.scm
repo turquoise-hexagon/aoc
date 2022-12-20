@@ -25,19 +25,17 @@
     ((or (null? a)
          (null? b))
      #t)
-    ((< (car a)
-        (car b))
-     #t)
-    ((> (car a)
-        (car b))
-     #f)
+    ((< (car a) (car b)) #t)
+    ((> (car a) (car b)) #f)
     (else
-     (_comp? (cdr a)
-             (cdr b)))))
+     (_comp?
+       (cdr a)
+       (cdr b)))))
 
 (define (comp? a b)
-  (_comp? (third b)
-          (third a)))
+  (_comp?
+    (third b)
+    (third a)))
 
 (define (priority-queue-take comp? queue n)
   (let loop ((i 0) (queue queue) (acc priority-queue-empty))
