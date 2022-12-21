@@ -26,14 +26,15 @@
   (match (hash-table-ref input "root")
     ((a _ b)
      (hash-table-set! input "root" (list a - b))))
-  (let loop ((l 1) (h #e1e16))
-    (let ((m (quotient (+ l h) 2)))
-      (hash-table-set! input "humn" m)
-      (let ((_ (solve/1 input)))
-        (cond
-          ((> _ 0) (loop m h))
-          ((< _ 0) (loop l m))
-          ((= _ 0) m))))))
+  (let ((i (signum (solve/1 input))))
+    (let loop ((l 0) (h #e1e16))
+      (let ((m (quotient (+ l h) 2)))
+        (hash-table-set! input "humn" m)
+        (let ((_ (signum (solve/1 input))))
+          (if (= _ 0) m
+            (if (= _ i)
+              (loop m h)
+              (loop l m))))))))
 
 (let ((input (import-input)))
   (print (solve/1 input))
