@@ -24,15 +24,13 @@
 
 (define (run table)
   (let ((acc (make-hash-table)))
-    (hash-table-set! acc name value)
-    (define (_run name)
+    (let loop ((name "root"))
       (match (hash-table-ref table name)
         ((a op b)
-         (hash-table-set! acc name
-           (op (hash-table-ref/default acc a (_run a))
-               (hash-table-ref/default acc b (_run b)))))
-        (a (hash-table-set! acc name a))))
-    (for-each _run (hash-table-keys table))
+         (let ((_ (op (hash-table-ref/default acc a (loop a))
+                      (hash-table-ref/default acc b (loop b)))))
+           (hash-table-set! acc name _) _))
+        (a (hash-table-set! acc name a) a)))
     (hash-table-ref acc "root")))
 
 (define (solve/1 input)
