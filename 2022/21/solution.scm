@@ -12,20 +12,15 @@
     ((*) *)
     ((/) /)))
 
-(define (parse-monkey! table str)
+(define (parse-monkey str)
   (match (string-split str ": ")
     ((name a op b)
-     (hash-table-set! table name (list a (parse-operator op) b)))
+     (list name a (parse-operator op) b))
     ((name a)
-     (hash-table-set! table name (string->number a)))))
+     (cons name (string->number a)))))
 
 (define (import-input)
-  (let ((acc (make-hash-table)))
-    (for-each
-      (lambda (_)
-        (parse-monkey! acc _))
-      (read-lines))
-    acc))
+  (alist->hash-table (map parse-monkey (read-lines))))
 
 (define (run table)
   (let ((acc (make-hash-table)))
