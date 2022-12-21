@@ -52,7 +52,7 @@
     (let ((m (quotient (+ l h) 2)))
       (hash-table-set! input "humn" m)
       (case (run input)
-        (( 1) (loop (+ m 1) h))
+        (( 1) (loop m h))
         ((-1) (loop l m))
         (( 0) m)))))
 
