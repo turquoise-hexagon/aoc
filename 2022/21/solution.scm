@@ -24,7 +24,7 @@
 
 (define (solve/2 input)
   (match (hash-table-ref input "root")
-    ((a op b)
+    ((a _ b)
      (hash-table-set! input "root" (list a - b))))
   (let loop ((l 1) (h #e1e16))
     (let ((m (quotient (+ l h) 2)))
