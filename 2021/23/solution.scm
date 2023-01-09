@@ -180,6 +180,9 @@
        ((#\D) 1000))
      (- (length move) 1)))
 
+(define (id grid)
+  (apply string-append (map list->string (map vector->list (vector->list grid)))))
+
 (define (comp? a b)
   (< (car a)
      (car b)))
@@ -187,10 +190,10 @@
 (define (helper! table queue cost grid)
   (foldl
     (lambda (queue move)
-      (let ((cost (+ (get-move-cost grid move) cost)) (grid (do-move grid move)))
-        (if (> (hash-table-ref/default table grid +inf.0) cost)
+      (let* ((cost (+ (get-move-cost grid move) cost)) (grid (do-move grid move)) (id (id grid)))
+        (if (> (hash-table-ref/default table id +inf.0) cost)
           (begin
-            (hash-table-set! table grid cost)
+            (hash-table-set! table id cost)
             (priority-queue-insert comp? (list cost grid) queue))
           queue)))
     (priority-queue-rest comp? queue) (get-amphipods-moves grid)))
@@ -199,7 +202,7 @@
   (let ((acc (make-hash-table)))
     (let loop ((queue (list->priority-queue comp? `((0, from)))))
       (if (priority-queue-empty? queue)
-        (hash-table-ref acc to)
+        (hash-table-ref acc (id to))
         (apply
           (lambda (cost grid)
             (loop (helper! acc queue cost grid)))
