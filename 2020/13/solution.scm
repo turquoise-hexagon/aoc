@@ -10,7 +10,7 @@
       (let ((lst (string-split schedule ",")))
         (map string->number lst)))))
 
-(define (solve-chinese offsets)
+(define (chinese-remainder-theorem offsets)
   (let loop ((acc 0))
     (let ((lst (filter
                  (lambda (lst)
@@ -33,7 +33,7 @@
 
 (define (solve/2 input)
   (receive (earliest schedule) (apply values input)
-    (solve-chinese (fold
+    (chinese-remainder-theorem (fold
                      (lambda (a b acc)
                        (if (number? a)
                          (cons (list a b) acc)
