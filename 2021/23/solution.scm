@@ -194,13 +194,13 @@
         (if (> (hash-table-ref/default table id +inf.0) cost)
           (begin
             (hash-table-set! table id cost)
-            (priority-queue-insert comp? (list cost grid) queue))
+            (priority-queue-insert queue (list cost grid)))
           queue)))
-    (priority-queue-rest comp? queue) (get-amphipods-moves grid)))
+    (priority-queue-rest queue) (get-amphipods-moves grid)))
 
 (define (solve from to)
   (let ((acc (make-hash-table)))
-    (let loop ((queue (list->priority-queue comp? `((0, from)))))
+    (let loop ((queue (list->priority-queue `((0, from)) comp?)))
       (if (priority-queue-empty? queue)
         (hash-table-ref acc (id to))
         (apply
