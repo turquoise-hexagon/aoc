@@ -23,13 +23,11 @@
   (read-lines))
 
 (define (parse str regex)
-  (let ((len (string-length str)))
-    (let loop ((i 0))
-      (if (= i len) '()
-        (let ((match (irregex-search regex str i len)))
-          (if match
-            (cons (irregex-match-substring match 1) (loop (+ (irregex-match-start-index match) 1)))
-            '()))))))
+  (let loop ((i 0))
+    (let ((match (irregex-search regex str i)))
+      (if match
+        (cons (irregex-match-substring match 1) (loop (+ (irregex-match-start-index match) 1)))
+        '()))))
 
 (define (solve input regex)
   (apply +
