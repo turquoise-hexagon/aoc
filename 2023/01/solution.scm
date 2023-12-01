@@ -26,7 +26,7 @@
   (let loop ((i 0))
     (let ((match (irregex-search regex str i)))
       (if match
-        (cons (irregex-match-substring match 1) (loop (+ (irregex-match-start-index match) 1)))
+        (cons (irregex-match-substring match) (loop (+ (irregex-match-start-index match) 1)))
         '()))))
 
 (define (solve input regex)
