@@ -1,7 +1,7 @@
 CSC ?= csc
 
 SRC = solution.scm
-BIN = solution
+BIN = $(basename $(SRC))
 
 all : CSCFLAGS += -O5
 all : $(BIN)
@@ -14,5 +14,6 @@ $(BIN) : $(SRC)
 
 clean :
 	rm -f $(BIN)
+	rm -f $(BIN).link
 
 .PHONY : all debug clean
