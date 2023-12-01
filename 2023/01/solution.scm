@@ -29,7 +29,7 @@
         (let ((match (irregex-search regex str i len)))
           (if match
             (cons (irregex-match-substring match 1) (loop (+ (irregex-match-start-index match) 1)))
-            (loop (+ i 1))))))))
+            '()))))))
 
 (define (solve input regex)
   (apply +
