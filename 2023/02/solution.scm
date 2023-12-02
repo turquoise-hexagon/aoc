@@ -14,13 +14,10 @@
   (let ((acc (make-hash-table)))
     (for-each
       (lambda (str)
-        (for-each
-          (lambda (str)
-            (apply
-              (lambda (value color)
-                (hash-table-update!/default acc color (lambda (_) (cons (string->number value) _)) '()))
-              (string-split str " ")))
-          (string-split str ",")))
+        (apply
+          (lambda (value color)
+            (hash-table-update!/default acc color (lambda (_) (cons (string->number value) _)) '()))
+          (string-split str " ")))
       lst)
     acc))
 
@@ -28,7 +25,7 @@
   (apply
     (lambda (id . data)
       (list (parse-id id) (parse-data data)))
-    (string-split str ":;")))
+    (string-split str ":,;")))
 
 (define (import-input)
   (map parse (read-lines)))
