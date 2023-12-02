@@ -3,28 +3,22 @@
   (chicken string)
   (srfi 69))
 
-(define (parse-id str)
-  (apply
-    (lambda (_ id)
-      (string->number id))
-    (string-split str " ")))
-
 (define (parse-data lst)
   (let ((acc (make-hash-table)))
     (for-each
-      (lambda (str)
+      (lambda (lst)
         (apply
           (lambda (value color)
             (hash-table-update!/default acc color (lambda (_) (max (string->number value) _)) 0))
-          (string-split str " ")))
-      lst)
+          lst))
+      (chop lst 2))
     acc))
 
 (define (parse str)
   (apply
-    (lambda (id . data)
-      (list (parse-id id) (parse-data data)))
-    (string-split str ":,;")))
+    (lambda (_ id . data)
+      (list (string->number id) (parse-data data)))
+    (string-split str " :,;")))
 
 (define (import-input)
   (map parse (read-lines)))
