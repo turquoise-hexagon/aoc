@@ -26,6 +26,5 @@
           ((down)    (loop (cdr lst) pos (+ depth/1 val) depth/2))
           ((forward) (loop (cdr lst) (+ pos val) depth/1 (+ depth/2 (* depth/1 val)))))))))
 
-(let* ((input (import-input))
-       (parts (solve input)))
+(let ((parts (solve (import-input))))
   (for-each print parts) (assert (equal? parts '(1714950 1281977850))))
