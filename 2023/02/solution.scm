@@ -54,8 +54,8 @@
         game))
     0 input))
 
-(let* ((input (time (import-input)))
-       (part/1 (time (solve/1 input)))
-       (part/2 (time (solve/2 input))))
+(let* ((input (import-input))
+       (part/1 (solve/1 input))
+       (part/2 (solve/2 input)))
   (print part/1) (assert (= part/1 2006))
   (print part/2) (assert (= part/2 84911)))
