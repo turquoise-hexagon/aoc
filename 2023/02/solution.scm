@@ -17,12 +17,12 @@
       (chop lst 2))
     acc))
 
-(define (parse str)
-  (bind (_ id . data) (string-split str " :,;")
-    (list (string->number id) (parse-data data))))
-
 (define (import-input)
-  (map parse (read-lines)))
+  (map
+    (lambda (str)
+      (bind (_ id . data) (string-split str " :,;")
+        (list (string->number id) (parse-data data))))
+    (read-lines)))
 
 (define (solve/1 input)
   (foldl
