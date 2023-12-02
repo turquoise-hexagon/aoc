@@ -20,6 +20,8 @@
 (define (solve input proc)
   (apply + (map (lambda (_) (apply proc _)) input)))
 
-(let ((input (import-input)))
-  (print (solve input proc/1))
-  (print (solve input proc/2)))
+(let* ((input (import-input))
+       (part/1 (solve input proc/1))
+       (part/2 (solve input proc/2)))
+  (print part/1) (assert (= part/1 12679))
+  (print part/2) (assert (= part/2 14470)))
