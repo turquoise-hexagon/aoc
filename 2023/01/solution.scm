@@ -37,8 +37,8 @@
           (string->number (string-append (car result) (last result)))))
       input)))
 
-(let* ((input (import-input))
-       (part/1 (solve input regex/1))
-       (part/2 (solve input regex/2)))
-  (print part/1) (assert (= part/1 54630))
-  (print part/2) (assert (= part/2 54770)))
+(let ((input (import-input)))
+  (let ((part/1 (solve input regex/1)))
+    (print part/1) (assert (= part/1 54630)))
+  (let ((part/2 (solve input regex/2)))
+    (print part/2) (assert (= part/2 54770))))
