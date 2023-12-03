@@ -76,12 +76,6 @@
       (char=? (array-ref array coord) #\*))
     (array-indexes array)))
 
-(define (solve/1 input part-numbers)
-  (foldl
-    (lambda (acc coords)
-      (+ acc (convert input coords)))
-    0 part-numbers))
-
 (define (adjascent-part-numbers array table coord)
   (let ((mem (make-hash-table)))
     (for-each
@@ -93,6 +87,12 @@
       (lambda (coord)
         (convert array (number array coord)))
       (hash-table-keys mem))))
+
+(define (solve/1 input part-numbers)
+  (foldl
+    (lambda (acc coords)
+      (+ acc (convert input coords)))
+    0 part-numbers))
 
 (define (solve/2 input part-numbers)
   (let ((mem (make-hash-table)))
