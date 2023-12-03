@@ -21,5 +21,7 @@
         offsets))))
 
 (let ((input (import-input)))
-  (print (solve input '((3 1))))
-  (print (solve input '((1 1) (3 1) (5 1) (7 1) (1 2)))))
+  (let ((part/1 (solve input '((3 1)))))
+    (print part/1) (assert (= part/1 242)))
+  (let ((part/2 (solve input '((1 1) (3 1) (5 1) (7 1) (1 2)))))
+    (print part/2) (assert (= part/2 2265549792))))
