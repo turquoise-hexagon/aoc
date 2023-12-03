@@ -28,11 +28,9 @@
   (let ((mem (make-hash-table)))
     (for-each
       (lambda (coord)
-        (hash-table-set! mem (number-start array coord) #t))
-      (filter
-        (lambda (coord)
-          (char-numeric? (array-ref array coord)))
-        (array-indexes array)))
+        (when (char-numeric? (array-ref array coord))
+          (hash-table-set! mem (number-start array coord) #t)))
+      (array-indexes array))
     (map
       (lambda (coord)
         (number array coord))
@@ -89,11 +87,9 @@
   (let ((mem (make-hash-table)))
     (for-each
       (lambda (coord)
-        (hash-table-set! mem (number-start array coord) #t))
-      (filter
-        (lambda (coord)
-          (hash-table-exists? table coord))
-        (neighbors array coord)))
+        (when (hash-table-exists? table coord)
+          (hash-table-set! mem (number-start array coord) #t)))
+      (neighbors array coord))
     (map
       (lambda (coord)
         (convert array (number array coord)))
