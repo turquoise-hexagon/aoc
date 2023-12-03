@@ -9,19 +9,15 @@
 (define (number-start array coord)
   (let loop ((coord coord))
     (let ((next (map + coord '(0 -1))))
-      (if (array-exists? array next)
-        (if (char-numeric? (array-ref array next))
-          (loop next)
-          coord)
+      (if (and (array-exists? array next) (char-numeric? (array-ref array next)))
+        (loop next)
         coord))))
 
 (define (number array coord)
   (let loop ((coord coord) (acc (list coord)))
     (let ((next (map + coord '(0 1))))
-      (if (array-exists? array next)
-        (if (char-numeric? (array-ref array next))
-          (loop next (cons next acc))
-          (reverse acc))
+      (if (and (array-exists? array next) (char-numeric? (array-ref array next)))
+        (loop next (cons next acc))
         (reverse acc)))))
 
 (define (numbers array)
@@ -85,14 +81,15 @@
       (neighbors array coord))
     (map
       (lambda (coord)
-        (convert array (number array coord)))
+        (number array coord))
       (hash-table-keys mem))))
 
 (define (solve/1 input part-numbers)
-  (foldl
-    (lambda (acc coords)
-      (+ acc (convert input coords)))
-    0 part-numbers))
+  (apply +
+    (map
+      (lambda (coords)
+        (convert input coords))
+      part-numbers)))
 
 (define (solve/2 input part-numbers)
   (let ((mem (make-hash-table)))
@@ -103,13 +100,15 @@
             (hash-table-set! mem coord #t))
           coords))
       part-numbers)
-    (foldl
-      (lambda (acc coord)
-        (let ((result (adjascent-part-numbers input mem coord)))
-          (if (= (length result) 2)
-            (+ acc (apply * result))
-            acc)))
-      0 (maybe-gears input))))
+    (apply +
+      (filter-map
+        (lambda (coord)
+          (let ((result (adjascent-part-numbers input mem coord)))
+            (if (= (length result) 2)
+              (* (convert input (car  result))
+                 (convert input (cadr result)))
+              #f)))
+        (maybe-gears input)))))
 
 (let-values (((array part-numbers) (import-input)))
   (let ((part/1 (solve/1 array part-numbers)))
