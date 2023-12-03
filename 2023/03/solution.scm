@@ -9,9 +9,6 @@
     ( 0 -1)         ( 0  1)
     ( 1 -1) ( 1  0) ( 1  1)))
 
-(define (import-input)
-  (list->array (map string->list (read-lines))))
-
 (define (number-start array coord)
   (let loop ((coord coord))
     (let ((next (map + coord '(0 -1))))
@@ -66,6 +63,10 @@
         coords))
     (numbers array)))
 
+(define (import-input)
+  (let ((array (list->array (map string->list (read-lines)))))
+    (values array (part-numbers array))))
+
 (define (convert array coords)
   (string->number
     (list->string
@@ -80,12 +81,12 @@
       (char=? (array-ref array coord) #\*))
     (array-indexes array)))
 
-(define (solve/1 input)
+(define (solve/1 input part-numbers)
   (apply +
     (map
       (lambda (coords)
         (convert input coords))
-      (part-numbers input))))
+      part-numbers)))
 
 (define (adjascent-part-numbers array table coord)
   (let ((mem (make-hash-table)))
@@ -101,7 +102,7 @@
         (convert array (number array coord)))
       (hash-table-keys mem))))
 
-(define (solve/2 input)
+(define (solve/2 input part-numbers)
   (let ((mem (make-hash-table)))
     (for-each
       (lambda (coords)
@@ -109,7 +110,7 @@
           (lambda (coord)
             (hash-table-set! mem coord #t))
           coords))
-      (part-numbers input))
+      part-numbers)
     (foldl
       (lambda (acc coord)
         (let ((result (adjascent-part-numbers input mem coord)))
@@ -118,8 +119,8 @@
             acc)))
       0 (maybe-gears input))))
 
-(let ((input (import-input)))
-  (let ((part/1 (solve/1 input)))
+(let-values (((array part-numbers) (import-input)))
+  (let ((part/1 (solve/1 array part-numbers)))
     (print part/1) (assert (= part/1 530495)))
-  (let ((part/2 (solve/2 input)))
+  (let ((part/2 (solve/2 array part-numbers)))
     (print part/2) (assert (= part/2 80253814))))
