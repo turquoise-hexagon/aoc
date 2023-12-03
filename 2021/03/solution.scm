@@ -44,5 +44,7 @@
      (list->number (co2 input) 2)))
 
 (let ((input (import-input)))
-  (print (solve/1 input))
-  (print (solve/2 input)))
+  (let ((part/1 (solve/1 input)))
+    (print part/1) (assert (= part/1 1025636)))
+  (let ((part/2 (solve/2 input)))
+    (print part/2) (assert (= part/2 793873))))
