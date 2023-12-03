@@ -38,8 +38,8 @@
 (define (solve input proc)
   (count proc input))
 
-(let* ((input (import-input))
-       (part/1 (solve input valid?/1))
-       (part/2 (solve input valid?/2)))
-  (print part/1) (assert (= part/1 564))
-  (print part/2) (assert (= part/2 325)))
+(let ((input (import-input)))
+  (let ((part/1 (solve input valid?/1)))
+    (print part/1) (assert (= part/1 564)))
+  (let ((part/2 (solve input valid?/2)))
+    (print part/2) (assert (= part/2 325))))
