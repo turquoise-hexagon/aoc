@@ -22,5 +22,7 @@
       input)))
 
 (let* ((input/1 (import-input)) (input/2 (chop (map join input/1) 3)))
-  (print (solve input/1))
-  (print (solve input/2)))
+  (let ((part/1 (solve input/1)))
+    (print part/1) (assert (= part/1 8493)))
+  (let ((part/2 (solve input/2)))
+    (print part/2) (assert (= part/2 2552))))
