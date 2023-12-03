@@ -77,11 +77,10 @@
     (array-indexes array)))
 
 (define (solve/1 input part-numbers)
-  (apply +
-    (map
-      (lambda (coords)
-        (convert input coords))
-      part-numbers)))
+  (foldl
+    (lambda (acc coords)
+      (+ acc (convert input coords)))
+    0 part-numbers))
 
 (define (adjascent-part-numbers array table coord)
   (let ((mem (make-hash-table)))
