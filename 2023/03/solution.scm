@@ -4,10 +4,7 @@
   (srfi 1)
   (srfi 69))
 
-(define-constant offsets
-  '((-1 -1) (-1  0) (-1  1)
-    ( 0 -1)         ( 0  1)
-    ( 1 -1) ( 1  0) ( 1  1)))
+(define offsets (delete-first (power '(-1 0 1) 2) '(0 0) equal?))
 
 (define (number-start array coord)
   (let loop ((coord coord))
