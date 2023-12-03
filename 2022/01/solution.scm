@@ -15,8 +15,8 @@
 (define (solve input n)
   (apply + (take input n)))
 
-(let* ((input (import-input))
-       (part/1 (solve input 1))
-       (part/2 (solve input 3)))
-  (print part/1) (assert (= part/1 67027))
-  (print part/2) (assert (= part/2 197291)))
+(let ((input (import-input)))
+  (let ((part/1 (solve input 1)))
+    (print part/1) (assert (= part/1 67027)))
+  (let ((part/2 (solve input 3)))
+    (print part/2) (assert (= part/2 197291))))
