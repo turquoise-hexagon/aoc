@@ -27,8 +27,8 @@
     (for-each
       (lambda (value index)
         (let ((count (vector-ref acc index)))
-          (do ((i 0 (+ i 1))) ((= i value))
-            (let ((_ (+ index i 1)))
+          (do ((i 1 (+ i 1))) ((> i value))
+            (let ((_ (+ index i)))
               (vector-set! acc _ (+ (vector-ref acc _) count))))))
       input (iota (length input)))
     (apply + (vector->list acc))))
