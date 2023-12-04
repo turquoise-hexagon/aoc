@@ -4,32 +4,22 @@
   (srfi 1)
   (srfi 69))
 
-(define-syntax bind
-  (syntax-rules ()
-    ((_ pattern data expression expression* ...)
-     (apply (lambda pattern expression expression* ...) data))))
-
-(define (parse str)
-  (bind (_ . data) (string-split str ":|")
-    (map
-      (lambda (str)
-        (string-split str " "))
-      data)))
-
-(define (matches lst)
-  (let ((mem (make-hash-table)))
-    (bind (a b) lst
-      (for-each
-        (lambda (i)
-          (hash-table-set! mem i #t))
-        a)
-      (count
-        (lambda (i)
-          (hash-table-exists? mem i))
-        b))))
+(define (process str)
+  (apply
+    (lambda (_ a b)
+      (let ((mem (make-hash-table)))
+        (for-each
+          (lambda (i)
+            (hash-table-set! mem i #t))
+          (string-split a " "))
+        (count
+          (lambda (i)
+            (hash-table-exists? mem i))
+          (string-split b " "))))
+    (string-split str ":|")))
 
 (define (import-input)
-  (map matches (map parse (read-lines))))
+  (map process (read-lines)))
 
 (define (solve/1 input)
   (apply +
