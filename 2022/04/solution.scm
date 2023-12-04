@@ -21,5 +21,7 @@
   (count (lambda (_) (apply proc _)) input))
 
 (let ((input (import-input)))
-  (print (solve input valid?/1))
-  (print (solve input valid?/2)))
+  (let ((part/1 (solve input valid?/1)))
+    (print part/1) (assert (= part/1 536)))
+  (let ((part/2 (solve input valid?/2)))
+    (print part/2) (assert (= part/2 845))))
