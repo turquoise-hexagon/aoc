@@ -1,42 +1,58 @@
 (import
   (chicken io)
-  (chicken irregex)
+  (chicken string)
   (srfi 1))
 
 (define (parse-numbers str)
-  (map string->number (irregex-split "," str)))
+  (map string->number (string-split str ",")))
 
-(define (parse-board str)
-  (map (cut map string->number <>)
-    (map (cut irregex-split " " <>) (irregex-split "\n" str))))
+(define (parse-board lst)
+  (map
+    (lambda (i)
+      (map string->number (string-split i " ")))
+    lst))
 
 (define (import-input)
-  (let ((lst (irregex-split "\n{2}" (read-string #f))))
-    (receive (numbers boards) (car+cdr lst)
-      (values (parse-numbers numbers) (map parse-board boards)))))
+  (apply
+    (lambda (numbers . boards)
+      (values (parse-numbers (car numbers)) (map parse-board boards)))
+    (foldr
+      (lambda (i acc)
+        (if (string=? i "") (cons '() acc)
+          (cons (cons i (car acc)) (cdr acc))))
+      '(()) (read-lines))))
 
-(define (has numbers board)
-  (any (cut lset<= = <> numbers)
-    ;; make list of lines and columns from board
+(define (has called board)
+  (any
+    (lambda (i)
+      (lset<= = i called))
     (append board (apply zip board))))
 
-(define (unmarked numbers board)
-  (lset-difference = (flatten board) numbers))
+(define (unmarked called board)
+  (lset-difference = (join board) called))
 
 (define (solve/1 numbers boards)
-   (let loop ((numbers numbers) (acc '()))
-     (let ((res (find (cut has acc <>) boards)))
-       (if res
-         (* (apply + (unmarked acc res)) (car acc))
-         (loop (cdr numbers) (cons (car numbers) acc))))))
+  (let loop ((numbers numbers) (called '()))
+    (let ((_ (find
+               (lambda (i)
+                 (has called i))
+               boards)))
+      (if _
+        (* (apply + (unmarked called _)) (car called))
+        (loop (cdr numbers) (cons (car numbers) called))))))
 
 (define (solve/2 numbers boards)
-  (let loop ((numbers numbers) (boards boards) (acc '()))
-    (let ((res (remove (cut has acc <>) boards)))
-      (if (null? res)
-        (* (apply + (unmarked acc (last boards))) (car acc))
-        (loop (cdr numbers) res (cons (car numbers) acc))))))
+  (let loop ((boards boards) (numbers numbers) (called '()))
+    (let ((_ (remove
+               (lambda (i)
+                 (has called i))
+               boards)))
+      (if (null? _)
+        (* (apply + (unmarked called (last boards))) (car called))
+        (loop _ (cdr numbers) (cons (car numbers) called))))))
 
-(receive (numbers boards) (import-input)
-  (print (solve/1 numbers boards))
-  (print (solve/2 numbers boards)))
+(let-values (((numbers boards) (import-input)))
+  (let ((part/1 (solve/1 numbers boards)))
+    (print part/1) (assert (= part/1 58374)))
+  (let ((part/2 (solve/2 numbers boards)))
+    (print part/2) (assert (= part/2 11377))))
