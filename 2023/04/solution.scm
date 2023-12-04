@@ -1,20 +1,14 @@
 (import
   (chicken io)
   (chicken string)
-  (srfi 1)
-  (srfi 69))
+  (srfi 1))
 
 (define (process str)
   (apply
     (lambda (_ a b)
-      (let ((mem (make-hash-table)))
-        (for-each
-          (lambda (i)
-            (hash-table-set! mem i #t))
-          (string-split a " "))
-        (count
-          (lambda (i)
-            (hash-table-exists? mem i))
+      (length
+        (lset-intersection string=?
+          (string-split a " ")
           (string-split b " "))))
     (string-split str ":|")))
 
