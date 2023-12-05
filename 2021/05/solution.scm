@@ -1,39 +1,45 @@
 (import
   (chicken io)
-  (chicken irregex)
+  (chicken string)
   (srfi 1)
   (srfi 69))
 
-(define (parse-segment str)
-  (map (cut map string->number <>)
-    (map (cut irregex-split "," <>)
-      (irregex-split " -> " str))))
+(define (parse str)
+  (chop (map string->number (string-split str ", ->")) 2))
 
 (define (import-input)
-  (let ((lst (map parse-segment (read-lines))))
-    ;; split lst in lines and diagonals
-    (partition (cut apply any = <>) lst)))
+  (partition
+    (lambda (i)
+      (apply any = i))
+    (map parse (read-lines))))
 
 (define (segment->points lst)
-  (receive (a b) (apply values lst)
-    (let ((offsets (map signum (map - b a))))
-      (let loop ((t a) (acc '()))
-        (let ((acc (cons t acc)))
-          (if (equal? t b)
-            acc
-            (loop (map + t offsets) acc)))))))
+  (apply
+    (lambda (a b)
+      (let ((offset (map signum (map - b a))))
+        (let loop ((i a) (acc '()))
+          (let ((acc (cons i acc)))
+            (if (equal? i b)
+              acc
+              (loop (map + i offset) acc))))))
+    lst))
 
-(define (solve mem lst)
+(define (solve mem input)
   (for-each
-    (lambda (segment)
+    (lambda (i)
       (for-each
-        (lambda (point)
-          (hash-table-update!/default mem point (cut + <> 1) 0))
-        (segment->points segment)))
-    lst)
-  (count (cut > <> 1) (hash-table-values mem)))
+        (lambda (i)
+          (hash-table-update!/default mem i add1 0))
+        (segment->points i)))
+    input)
+  (count
+    (lambda (i)
+      (> i 1))
+    (hash-table-values mem)))
 
-(receive (lines diags) (import-input)
+(let-values (((lines diags) (import-input)))
   (let ((mem (make-hash-table)))
-    (print (solve mem lines))
-    (print (solve mem diags))))
+    (let ((part/1 (solve mem lines)))
+      (print part/1) (assert (= part/1 8622)))
+    (let ((part/2 (solve mem diags)))
+      (print part/2) (assert (= part/2 22037)))))
