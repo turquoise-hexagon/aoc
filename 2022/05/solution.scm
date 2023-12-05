@@ -49,5 +49,7 @@
     input))
 
 (let ((input (import-input)))
-  (print (solve input fold))
-  (print (solve input fold-right)))
+  (let ((part/1 (solve input fold)))
+    (print part/1) (assert (string=? part/1 "ZBDRNPMVH")))
+  (let ((part/2 (solve input fold-right)))
+    (print part/2) (assert (string=? part/2 "WDLPFNNNB"))))
