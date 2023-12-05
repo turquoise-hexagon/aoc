@@ -1,71 +1,66 @@
 (import
-  (chicken fixnum)
   (chicken io)
-  (chicken irregex)
-  (srfi 1))
+  (chicken irregex))
 
 (define-syntax bind
   (syntax-rules ()
     ((_ pattern data expression expression* ...)
      (apply (lambda pattern expression expression* ...) data))))
 
-(define (parse-header str)
-  (bind (_ . data) (irregex-split " " str)
-    (map string->number data)))
+(define (parse str)
+  (map string->number (irregex-extract "[0-9]+" str)))
 
-(define (parse-map str)
-  (bind (_ . data) (irregex-split "\n" str)
-    (map
-      (lambda (i)
-        (map string->number (irregex-split " " i)))
-      data)))
+(define (parse-mappings str)
+  (chop (parse str) 3))
 
 (define (import-input)
-  (bind (header . maps) (irregex-split "\n\n" (read-string))
-    (values (parse-header header) (map parse-map maps))))
+  (bind (seeds . maps) (irregex-split "\n\n" (read-string))
+    (values (parse seeds) (map parse-mappings maps))))
+
+(define (transform/1 seeds)
+  (map
+    (lambda (i)
+      (list i i))
+    seeds))
+
+(define (transform/2 seeds)
+  (map
+    (lambda (i)
+      (bind (a b) i
+        (list a (+ a b -1))))
+    (chop seeds 2)))
 
 (define (process seed maps)
-  (foldl
-    (lambda (seed mappings)
-      (let loop ((mappings mappings))
+  (bind (a b) seed
+    (if (null? maps) a
+      (let loop ((mappings (car maps)))
         (if (null? mappings)
-          seed
-          (bind (destination source range-length) (car mappings)
-            (if (and (fx<= source seed) (fx<= seed (fx- (fx+ source range-length) 1)))
-              (fx+ destination (fx- seed source))
-              (loop (cdr mappings)))))))
-    seed maps))
+          (process seed (cdr maps))
+          (bind (d s r) (car mappings)
+            (cond
+              ((and (<= s a (+ s r -1)) (<= s b (+ s r -1)))
+               (process `(,(+ d (- a s)) ,(+ d (- b s))) (cdr maps)))
+              ((and (<= s a (+ s r -1)) (< (+ s r) b))
+               (min (process `(,(+ s r) ,b) maps)
+                    (process `(,(+ d (- a s)) ,(+ d r)) (cdr maps))))
+              ((and (< a s) (<= s b (+ s r -1)))
+               (min (process `(,a ,(- s 1)) maps)
+                    (process `(,d ,(+ d (- b s))) (cdr maps))))
+              ((and (< a s) (> b (+ s r)))
+               (min (process `(,a ,(- s 1)) maps)
+                    (process `(,(+ s r) ,b) maps)
+                    (process `(,d ,(+ d r)) (cdr maps))))
+              (else (loop (cdr mappings))))))))))
 
-(define (transform maps)
-  (map
-    (lambda (mappings)
-      (map
-        (lambda (mapping)
-          (let-values (((a b) (split-at mapping 2)))
-            (append (reverse a) b)))
-        (reverse mappings)))
-    (reverse maps)))
+(define (solve seeds maps)
+  (apply min
+    (map
+      (lambda (i)
+        (process i maps))
+      seeds)))
 
-(define (solve/1 header maps)
-  (foldl
-    (lambda (acc i)
-      (fxmin acc (process i maps)))
-    most-positive-fixnum header))
-
-(define (solve/2 header maps)
-  (let ((header (chop header 2)) (maps (transform maps)))
-    (let loop ((i 0))
-      (let subloop ((header header))
-        (if (null? header)
-          (loop (fx+ i 1))
-          (let ((seed (process i maps)))
-            (bind (source range-length) (car header)
-              (if (and (fx<= source seed) (fx<= seed (fx- (fx+ source range-length) 1)))
-                i
-                (subloop (cdr header))))))))))
-
-(let-values (((headers maps) (import-input)))
-  (let ((part/1 (solve/1 headers maps)))
+(let-values (((seeds maps) (import-input)))
+  (let ((part/1 (solve (transform/1 seeds) maps)))
     (print part/1) (assert (= part/1 51752125)))
-  (let ((part/2 (solve/2 headers maps)))
+  (let ((part/2 (solve (transform/2 seeds) maps)))
     (print part/2) (assert (= part/2 12634632))))
