@@ -5,13 +5,19 @@
 
 (define (import-input)
   (map
-    (lambda (str)
-      (map string->list (irregex-split "\n" str)))
-    (irregex-split "\n{2}" (read-string #f))))
+    (lambda (i)
+      (map string->list (irregex-split "\n" i)))
+    (irregex-split "\n\n" (read-string))))
 
 (define (solve input proc)
-  (length (flatten (map (cut apply proc char=? <>) input))))
+  (apply +
+    (map
+      (lambda (i)
+        (length (apply proc char=? i)))
+      input)))
 
 (let ((input (import-input)))
-  (print (solve input lset-union))
-  (print (solve input lset-intersection)))
+  (let ((part/1 (solve input lset-union)))
+    (print part/1) (assert (= part/1 6686)))
+  (let ((part/2 (solve input lset-intersection)))
+    (print part/2) (assert (= part/2 3476))))
