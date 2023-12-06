@@ -1,6 +1,9 @@
 (import
   (chicken io)
-  (chicken irregex))
+  (chicken irregex)
+  (srfi 1))
+
+(define-constant inf #e1e32)
 
 (define-syntax bind
   (syntax-rules ()
@@ -10,61 +13,29 @@
 (define (parse str)
   (map string->number (irregex-extract "[0-9]+" str)))
 
-(define (parse-mappings str)
-  (chop (parse str) 3))
-
 (define (import-input)
   (bind (seeds . maps) (irregex-split "\n\n" (read-string))
-    (values (parse seeds) (map parse-mappings maps))))
+    (values (map (lambda (i) (chop (parse i) 3)) maps) (parse seeds))))
 
-(define (transform/1 seeds)
-  (map
-    (lambda (i)
-      (list i i))
-    seeds))
+(define (process seeds maps)
+  (foldl
+    (lambda (acc seed)
+      (bind (a b) seed
+        (bind (d s r) (let ((_ (find (lambda (i) (bind (d s r) i (<= s a (+ s r -1)))) maps))) (if _ _ `(,inf ,inf ,inf)))
+          (let*
+            ((m (+ a b))
+             (n (+ s r))
+             (acc (cons `(,(+ d (- a s)) ,(- (min m n) a)) acc)))
+            (if (> m n)
+              (append acc (process `((,n ,(- m n))) maps))
+              acc)))))
+    '() seeds))
 
-(define (transform/2 seeds)
-  (map
-    (lambda (i)
-      (bind (a b) i
-        (list a (+ a b -1))))
-    (chop seeds 2)))
+(define (solve maps seeds)
+  (apply min (map first (foldl process seeds maps))))
 
-(define (process seed maps)
-  (bind (a b) seed
-    (if (null? maps) a
-      (let loop ((mappings (car maps)))
-        (if (null? mappings)
-          (process seed (cdr maps))
-          (bind (d s r) (car mappings)
-            (let
-              ((t (+ s r -1))
-               (m (+ d (- a s)))
-               (n (+ d (- b s))))
-              (cond
-                ((<= s a b t)
-                 (process (list m n) (cdr maps)))
-                ((<= s a t b)
-                 (min (process `(,(+ s r) ,b) maps)
-                      (process `(,m ,(+ d r)) (cdr maps))))
-                ((<= a s b t)
-                 (min (process `(,a ,(- s 1)) maps)
-                      (process `(,d ,n) (cdr maps))))
-                ((<= a s t b)
-                 (min (process `(,a ,(- s 1)) maps)
-                      (process `(,(+ s r) ,b) maps)
-                      (process `(,d ,(+ d r)) (cdr maps))))
-                (else (loop (cdr mappings)))))))))))
-
-(define (solve seeds maps)
-  (apply min
-    (map
-      (lambda (i)
-        (process i maps))
-      seeds)))
-
-(let-values (((seeds maps) (import-input)))
-  (let ((part/1 (solve (transform/1 seeds) maps)))
+(let-values (((maps seeds) (import-input)))
+  (let ((part/1 (solve maps (map (lambda (i) (list i 1)) seeds))))
     (print part/1) (assert (= part/1 51752125)))
-  (let ((part/2 (solve (transform/2 seeds) maps)))
+  (let ((part/2 (solve maps (chop seeds 2))))
     (print part/2) (assert (= part/2 12634632))))
