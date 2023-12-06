@@ -21,12 +21,12 @@
   (foldl
     (lambda (acc seed)
       (bind (a b) seed
-        (bind (d s r) (let ((_ (find (lambda (i) (bind (d s r) i (<= s a (+ s r -1)))) maps))) (if _ _ `(,inf ,inf ,inf)))
+        (bind (d s r) (let ((_ (find (lambda (i) (bind (d s r) i (<= s a (+ s r -1)))) maps))) (if _ _ (list inf inf inf)))
           (let ((m (+ a b))
                 (n (+ s r)))
-            (cons `(,(+ d (- a s)) ,(- (min m n) a))
+            (cons (list (+ d (- a s)) (- (min m n) a))
               (if (> m n)
-                (append acc (process `((,n ,(- m n))) maps))
+                (append acc (process (list (list n (- m n))) maps))
                 acc))))))
     '() seeds))
 
