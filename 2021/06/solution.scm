@@ -1,36 +1,42 @@
 (import
   (chicken io)
   (chicken string)
-  (srfi 1)
   (srfi 69))
 
 (define (increment! table key increment)
-  (hash-table-update!/default table key (cut + <> increment) 0))
+  (hash-table-update!/default table key (lambda (_) (+ increment _)) 0))
 
 (define (import-input)
-  (let ((mem (make-hash-table)))
-    (for-each (cut increment! mem <> 1)
+  (let ((acc (make-hash-table)))
+    (for-each
+      (lambda (i)
+        (increment! acc i 1))
       (map string->number (string-split (read-line) ",")))
-    mem))
+    acc))
 
 (define (iterate table)
-  (let ((next (make-hash-table)))
+  (let ((acc (make-hash-table)))
     (hash-table-for-each table
       (lambda (i n)
-        (for-each (cut increment! next <> n)
-          (if (= i 0) `(6 8) `(,(- i 1))))))
-    next))
+        (for-each
+          (lambda (i)
+            (increment! acc i n))
+          (if (= i 0) '(6 8)
+            (list (- i 1))))))
+    acc))
 
 (define (accumulate table n)
-  (reverse (foldl
-             (lambda (acc _)
-               (cons (iterate (car acc)) acc))
-             `(,table) (iota n))))
+  (let loop ((i 0) (table table))
+    (if (> i n)
+      '()
+      (cons table (loop (+ i 1) (iterate table))))))
 
 (define (solve lst n)
   (apply + (hash-table-values (list-ref lst n))))
 
 (let ((input (import-input)))
-  (let ((res (accumulate input 256)))
-    (print (solve res 80))
-    (print (solve res 256))))
+  (let ((lst (accumulate input 256)))
+    (let ((part/1 (solve lst 80)))
+      (print part/1) (assert (= part/1 375482)))
+    (let ((part/2 (solve lst 256)))
+      (print part/2) (assert (= part/2 1689540415957)))))
