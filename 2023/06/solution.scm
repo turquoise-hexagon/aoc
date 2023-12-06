@@ -2,6 +2,8 @@
   (chicken io)
   (chicken irregex))
 
+(define-constant e #e1e-10)
+
 (define (parse str)
   (irregex-extract "[0-9]+" str))
 
@@ -16,19 +18,18 @@
 (define (transform/2 lst)
   (list (string->number (apply string-append lst))))
 
-(define (solve time distance)
-  (apply *
-    (map
-      (lambda (time distance)
-        (do ((i 0 (+ i 1))
-             (acc 0 (if (> (* (- time i) i) distance)
-                      (+ acc 1)
-                      acc)))
-          ((> i time) acc)))
-      time distance)))
+(define (function t d)
+  (let ((_ (sqrt (- (* t t) (* 4 d)))))
+    (inexact->exact
+      (- (floor   (- (/ (+ t _) 2) e))
+         (ceiling (+ (/ (- t _) 2) e))
+         -1))))
+
+(define (solve t d)
+  (apply * (map function t d)))
 
 (let ((input (import-input)))
   (let ((part/1 (apply solve (map transform/1 input))))
-    (print part/1))
+    (print part/1) (assert (= part/1 74698)))
   (let ((part/2 (apply solve (map transform/2 input))))
-    (print part/2)))
+    (print part/2) (assert (= part/2 27563421))))
