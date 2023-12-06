@@ -12,5 +12,7 @@
       (loop (cdr lst) (+ acc 1)))))
 
 (let ((input (import-input)))
-  (print (solve input 4))
-  (print (solve input 14)))
+  (let ((part/1 (solve input 4)))
+    (print part/1) (assert (= part/1 1651)))
+  (let ((part/2 (solve input 14)))
+    (print part/2) (assert (= part/2 3837))))
