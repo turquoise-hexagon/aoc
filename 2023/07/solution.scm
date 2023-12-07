@@ -55,15 +55,11 @@
     (hash-table-values acc)))
 
 (define (strongest-first a b)
-  (if (or (null? a)
-          (null? b))
+  (if (or (null? a) (null? b))
     #t
-    (if (= (car a)
-           (car b))
-      (strongest-first (cdr a)
-                       (cdr b))
-      (< (car a)
-         (car b)))))
+    (if (= (car a) (car b))
+      (strongest-first (cdr a) (cdr b))
+      (< (car a) (car b)))))
 
 (define (hand-value/1 lst)
   (hash-table-ref hand-values (sort (card-counts lst) >)))
