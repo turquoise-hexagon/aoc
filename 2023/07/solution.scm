@@ -10,21 +10,15 @@
     ((_ pattern data expression expression* ...)
      (apply (lambda pattern expression expression* ...) data))))
 
+(define-constant cards "23456789TJQKA")
+
 (define card-values
-  (alist->hash-table
-    '((#\2 .  2)
-      (#\3 .  3)
-      (#\4 .  4)
-      (#\5 .  5)
-      (#\6 .  6)
-      (#\7 .  7)
-      (#\8 .  8)
-      (#\9 .  9)
-      (#\T . 10)
-      (#\J . 11)
-      (#\Q . 12)
-      (#\K . 13)
-      (#\A . 14))))
+  (let ((acc (make-hash-table)))
+    (for-each
+      (lambda (card value)
+        (hash-table-set! acc card value))
+      (string->list cards) (iota (string-length cards) 2))
+    acc))
 
 (define hand-values
   (alist->hash-table
