@@ -32,5 +32,7 @@
     (sum (map (cut move-proc <> n) input))))
 
 (let ((input (import-input)))
-  (print (solve input target/1 move/1))
-  (print (solve input target/2 move/2)))
+  (let ((part/1 (solve input target/1 move/1)))
+    (print part/1) (assert (= part/1 347011)))
+  (let ((part/2 (solve input target/2 move/2)))
+    (print part/2) (assert (= part/2 98363777))))
