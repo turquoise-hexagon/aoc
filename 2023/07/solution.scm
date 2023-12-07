@@ -46,14 +46,6 @@
 (define (card-value n)
   (hash-table-ref card-values n))
 
-(define (card-counts lst)
-  (let ((acc (make-hash-table)))
-    (for-each
-      (lambda (i)
-        (hash-table-update!/default acc i add1 0))
-      lst)
-    (hash-table-values acc)))
-
 (define (strongest-first a b)
   (if (or (null? a) (null? b))
     #t
@@ -62,7 +54,12 @@
       (< (car a) (car b)))))
 
 (define (hand-value/1 lst)
-  (hash-table-ref hand-values (sort (card-counts lst) >)))
+  (let ((acc (make-hash-table)))
+    (for-each
+      (lambda (i)
+        (hash-table-update!/default acc i add1 0))
+      lst)
+    (hash-table-ref hand-values (sort (hash-table-values acc) >))))
 
 (define (hand-value/2 lst)
   (if (member 1 lst)
