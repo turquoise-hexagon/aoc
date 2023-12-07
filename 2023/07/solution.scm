@@ -54,10 +54,7 @@
       (map hand-value/1
         (map
           (lambda (value)
-            (map
-              (lambda (i)
-                (if (= i 1) value i))
-              lst))
+            (map (lambda (i) (if (= i 1) value i)) lst))
           (hash-table-values card-values))))
     (hand-value/1 lst)))
 
