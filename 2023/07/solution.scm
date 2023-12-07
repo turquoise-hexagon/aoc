@@ -30,12 +30,12 @@
       ((4 1)       . 6)
       ((5)         . 7))))
 
-(define (parse str)
-  (bind (hand bid) (string-split str " ")
-    (list (string->list hand) (string->number bid))))
-
 (define (import-input)
-  (map parse (read-lines)))
+  (map
+    (lambda (i)
+      (bind (hand bid) (string-split i " ")
+        (list (string->list hand) (string->number bid))))
+    (read-lines)))
 
 (define (card-value n)
   (hash-table-ref card-values n))
