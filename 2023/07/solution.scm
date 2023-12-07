@@ -81,26 +81,24 @@
           (hash-table-values card-values))))
     (hand-value/1 lst)))
 
-(define-inline (compare? a b)
-  (bind (a _ b _) (append a b)
-    (let ((m (proc a))
-          (n (proc b)))
-      (cond ((< m n) #t)
-            ((= m n)
-             (strongest-first a b))
-            (else #f)))))
-
 (define (solve input proc)
   (apply +
     (map
       (lambda (lst index)
-        (bind (_ bid) lst (* index bid)))
+        (bind (_ _ bid) lst (* index bid)))
       (sort
         (map
           (lambda (lst)
-            (bind (hand bid) lst (list (map card-value hand) bid)))
+            (bind (hand bid) lst
+              (let ((_ (map card-value hand)))
+                (list _ (proc _) bid))))
           input)
-        compare?)
+        (lambda (a b)
+          (bind (hand/a value/a _ hand/b value/b _) (append a b)
+            (cond
+              ((< value/a value/b) #t)
+              ((> value/a value/b) #f)
+              (else (strongest-first hand/a hand/b))))))
       (iota (length input) 1))))
 
 (let ((input (import-input)))
