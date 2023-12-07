@@ -68,12 +68,12 @@
 (define (solve input proc)
   (apply +
     (map
-      (lambda (lst index)
-        (bind (_ _ bid) lst (* index bid)))
+      (lambda (i index)
+        (bind (_ _ bid) i (* index bid)))
       (sort
         (map
-          (lambda (lst)
-            (bind (hand bid) lst (let ((_ (map card-value hand))) (list _ (proc _) bid))))
+          (lambda (i)
+            (bind (hand bid) i (let ((_ (map card-value hand))) (list _ (proc _) bid))))
           input)
         (lambda (a b)
           (bind (hand/a value/a _ hand/b value/b _) (append a b)
