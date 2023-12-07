@@ -49,11 +49,13 @@
     (hand-value/1 lst)))
 
 (define (strongest-first a b)
-  (if (or (null? a) (null? b))
-    #t
-    (if (= (car a) (car b))
-      (strongest-first (cdr a) (cdr b))
-      (< (car a) (car b)))))
+  (call/cc
+    (lambda (return)
+      (for-each
+        (lambda (a b)
+          (unless (= a b) (return (< a b))))
+        a b)
+      (return #t))))
 
 (define (solve input proc)
   (apply +
