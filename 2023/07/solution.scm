@@ -46,13 +46,6 @@
 (define (card-value n)
   (hash-table-ref card-values n))
 
-(define (strongest-first a b)
-  (if (or (null? a) (null? b))
-    #t
-    (if (= (car a) (car b))
-      (strongest-first (cdr a) (cdr b))
-      (< (car a) (car b)))))
-
 (define (hand-value/1 lst)
   (let ((acc (make-hash-table)))
     (for-each
@@ -73,6 +66,13 @@
               lst))
           (hash-table-values card-values))))
     (hand-value/1 lst)))
+
+(define (strongest-first a b)
+  (if (or (null? a) (null? b))
+    #t
+    (if (= (car a) (car b))
+      (strongest-first (cdr a) (cdr b))
+      (< (car a) (car b)))))
 
 (define (solve input proc)
   (apply +
