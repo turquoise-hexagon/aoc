@@ -31,10 +31,10 @@
   (hash-table-ref card-values n))
 
 (define (hand-value/1 lst)
-  (let ((acc (make-hash-table)))
+  (let ((acc (make-hash-table #:initial 0)))
     (for-each
       (lambda (i)
-        (hash-table-update!/default acc i add1 0))
+        (hash-table-update! acc i add1))
       lst)
     (- (apply max (hash-table-values acc)) (hash-table-size acc))))
 
