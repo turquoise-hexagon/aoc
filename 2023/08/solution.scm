@@ -1,11 +1,10 @@
 (import
   (chicken io)
   (chicken irregex)
-  (srfi 1)
   (srfi 69))
 
 (define (parse-instructions str)
-  (apply circular-list
+  (list->vector
     (map
       (lambda (i)
         (case i
@@ -31,23 +30,22 @@
     (irregex-split "\n\n" (read-string))))
 
 (define (run instructions network from to)
-  (let loop ((instructions instructions) (node from) (acc 0))
-    (if (irregex-match? to node)
-      acc
-      (loop (cdr instructions) ((car instructions) (hash-table-ref network node)) (+ acc 1)))))
+  (let ((len (vector-length instructions)))
+    (let loop ((i 0) (node from))
+      (if (irregex-match? to node)
+        i
+        (loop (+ i 1) ((vector-ref instructions (modulo i len)) (hash-table-ref network node)))))))
 
 (define (solve/1 instructions network)
   (run instructions network "AAA" "ZZZ"))
 
 (define (solve/2 instructions network)
-  (apply lcm
-    (map
-      (lambda (i)
-        (run instructions network i ".*Z"))
-      (filter
-        (lambda (i)
-          (irregex-match? ".*A" i))
-        (hash-table-keys network)))))
+  (foldl
+    (lambda (acc i)
+      (if (irregex-match? ".*A" i)
+        (lcm acc (run instructions network i ".*Z"))
+        acc))
+    1 (hash-table-keys network)))
 
 (let-values (((instructions network) (import-input)))
   (let ((part/1 (solve/1 instructions network)))
