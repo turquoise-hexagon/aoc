@@ -9,11 +9,11 @@
      (apply (lambda pattern expression expression* ...) data))))
 
 (define (parse-data lst)
-  (let ((acc (make-hash-table)))
+  (let ((acc (make-hash-table #:initial 0)))
     (for-each
       (lambda (lst)
         (bind (value color) lst
-          (hash-table-update!/default acc color (lambda (_) (max (string->number value) _)) 0)))
+          (hash-table-update! acc color (lambda (_) (max (string->number value) _)))))
       (chop lst 2))
     acc))
 
