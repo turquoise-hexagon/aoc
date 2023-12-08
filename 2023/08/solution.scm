@@ -18,8 +18,8 @@
     (for-each
       (lambda (i)
         (apply
-          (lambda (i l r)
-            (hash-table-set! acc i (cons l r)))
+          (lambda (current left right)
+            (hash-table-set! acc current (cons left right)))
           (irregex-split "[ =(,)]" i)))
       (irregex-split "\n" str))
     acc))
@@ -30,11 +30,11 @@
       (values (parse-instructions instructions) (parse-network network)))
     (irregex-split "\n\n" (read-string))))
 
-(define (run instructions network node regex)
-  (let loop ((instructions instructions) (count 0) (node node))
-    (if (irregex-match? regex node)
-      count
-      (loop (cdr instructions) (+ count 1) ((car instructions) (hash-table-ref network node))))))
+(define (run instructions network from to)
+  (let loop ((instructions instructions) (node from) (acc 0))
+    (if (irregex-match? to node)
+      acc
+      (loop (cdr instructions) ((car instructions) (hash-table-ref network node)) (+ acc 1)))))
 
 (define (solve/1 instructions network)
   (run instructions network "AAA" "ZZZ"))
