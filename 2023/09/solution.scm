@@ -1,6 +1,8 @@
 (import
   (chicken io)
-  (chicken string))
+  (chicken string)
+  (euler)
+  (srfi 1))
 
 (define (import-input)
   (map
@@ -8,22 +10,19 @@
       (map string->number (string-split i " ")))
     (read-lines)))
 
-(define (iterate lst)
-  (if ((list-of? zero?) lst)
-    '()
-    (cons lst (iterate (map - lst (cdr lst))))))
+(define (extrapolate lst)
+  (let ((len (length lst)))
+    (apply +
+      (map
+        (lambda (value index)
+          (* (expt -1 index) (binomial len index) value))
+        lst (iota len)))))
 
-(define (proc/1 lst)
-  (proc/2 (reverse lst)))
-
-(define (proc/2 lst)
-  (apply + (map car (iterate lst))))
-
-(define (solve input proc)
-  (apply + (map proc input)))
+(define (solve input)
+  (apply + (map extrapolate input)))
 
 (let ((input (import-input)))
-  (let ((part/1 (solve input proc/1)))
+  (let ((part/1 (solve input)))
     (print part/1) (assert (= part/1 2105961943)))
-  (let ((part/2 (solve input proc/2)))
+  (let ((part/2 (solve (map reverse input))))
     (print part/2) (assert (= part/2 1019))))
