@@ -10,8 +10,10 @@
 
 (define (generate-preamble lst)
   (let ((acc (bag (make-default-comparator))))
-    (for-each (cut bag-adjoin! acc <>)
-      (map (cut apply + <>) (combinations lst 2)))
+    (for-each
+      (lambda (i)
+        (bag-adjoin! acc (apply + i)))
+      (combinations lst 2))
     acc))
 
 (define (find-number lst n)
@@ -45,6 +47,7 @@
            (apply min res))))))
 
 (let ((input (import-input)))
-  (let ((n (find-number input 25)))
-    (print n)
-    (print (solve input n))))
+  (let ((part/1 (find-number input 25)))
+    (print part/1) (assert (= part/1 1721308972))
+    (let ((part/2 (solve input part/1)))
+      (print part/2) (assert (= part/2 209694133)))))
