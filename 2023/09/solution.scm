@@ -14,7 +14,7 @@
         (lambda (i)
           (= i 0))
         lst)
-    (list lst)
+    '()
     (cons lst (iterate (proc lst) proc))))
 
 (define (proc/1 lst)
