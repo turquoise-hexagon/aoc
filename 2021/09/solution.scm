@@ -8,18 +8,25 @@
 
 (define (import-input)
   (list->array
-    (map (cut map string->number <>)
-      (map (cut string-chop <> 1)
-        (read-lines)))))
+    (map
+      (lambda (i)
+        (map string->number (string-chop i 1)))
+      (read-lines))))
 
 (define (neighbors array coord)
-  (filter (cut array-exists? array <>)
-    (map (cut map + <> coord)
+  (filter
+    (lambda (i)
+      (array-exists? array i))
+    (map
+      (lambda (i)
+        (map + coord i))
       '((1 0) (0 1) (-1 0) (0 -1)))))
 
 (define (low-point? array coord)
   (> (apply min
-       (map (cut array-ref array <>)
+       (map
+         (lambda (i)
+           (array-ref array i))
          (neighbors array coord)))
      (array-ref array coord)))
 
@@ -34,15 +41,18 @@
 
 (define (solve/1 input low-points)
   (apply +
-    (map (cut + <> 1)
-      (map (cut array-ref input <>)
-        low-points))))
+    (map
+      (lambda (i)
+        (+ (array-ref input i) 1))
+      low-points)))
 
 (define (solve/2 input low-points)
-  (let ((lens (map hash-table-size (map (cut bassin input <>) low-points))))
+  (let ((lens (map (lambda (i) (hash-table-size (bassin input i))) low-points)))
     (apply * (take (sort lens >) 3))))
 
 (let ((input (import-input)))
-  (let ((low-points (filter (cut low-point? input <>) (array-indexes input))))
-    (print (solve/1 input low-points))
-    (print (solve/2 input low-points))))
+  (let ((low-points (filter (lambda (i) (low-point? input i)) (array-indexes input))))
+    (let ((part/1 (solve/1 input low-points)))
+      (print part/1) (assert (= part/1 444)))
+    (let ((part/2 (solve/2 input low-points)))
+      (print part/2) (assert (= part/2 1168440)))))
