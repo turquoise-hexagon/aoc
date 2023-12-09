@@ -3,10 +3,11 @@
   (euler))
 
 (define (import-input)
-  (map string->number (read-lines)))
+  (apply values (map string->number (read-lines))))
 
 (define (solve subject door card mod)
-  (expt-mod card (discrete-log subject door mod) mod))
+  (modular-expt card (discrete-log subject door mod) mod))
 
-(receive (door card) (apply values (import-input))
-  (print (solve 7 door card 20201227)))
+(let-values (((door card) (import-input)))
+  (let ((part (solve 7 door card 20201227)))
+    (print part) (assert (= part 711945))))
