@@ -6,19 +6,25 @@
   (srfi 69))
 
 (define signals
-  (map (cut string-chop <> 1)
+  (map
+    (lambda (i)
+      (string-chop i 1))
     '("abcefg" "cf" "acdeg" "acdfg" "bcdf" "abdfg" "abdefg" "acf" "abcdefg" "abcdfg")))
 
 (define (signals->frequencies lst)
-  (let ((mem (make-hash-table)))
+  (let ((mem (make-hash-table #:initial 0)))
     (for-each
       (lambda (char)
-        (hash-table-update!/default mem char (cut + <> 1) 0))
+        (hash-table-update! mem char add1))
       (flatten lst))
     mem))
 
 (define (signal->identifier freqs signal)
-  (foldl + 0 (map (cut hash-table-ref freqs <>) signal)))
+  (apply +
+    (map
+      (lambda (i)
+        (hash-table-ref freqs i))
+      signal)))
 
 (define signals-identifiers
   (let ((freqs (signals->frequencies signals)) (mem (make-hash-table)))
@@ -38,9 +44,12 @@
 
 (define (parse-entry str)
   (map
-    (lambda (lst)
-      (map (cut string-chop <> 1) lst))
-    (map (cut string-split <> " ") (string-split str "|"))))
+    (lambda (i)
+      (map
+        (lambda (i)
+          (string-chop i 1))
+        (string-split i " ")))
+    (string-split str "|")))
 
 (define (import-input)
   (map translate (map parse-entry (read-lines))))
@@ -54,8 +63,10 @@
     (flatten input)))
 
 (define (solve/2 input)
-  (foldl + 0 (map list->number input)))
+  (apply + (map list->number input)))
 
 (let ((input (import-input)))
-  (print (solve/1 input))
-  (print (solve/2 input)))
+  (let ((part/1 (solve/1 input)))
+    (print part/1) (assert (= part/1 318)))
+  (let ((part/2 (solve/2 input)))
+    (print part/2) (assert (= part/2 996280))))
