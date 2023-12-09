@@ -10,10 +10,7 @@
     (read-lines)))
 
 (define (iterate lst proc)
-  (if (every
-        (lambda (i)
-          (= i 0))
-        lst)
+  (if (every zero? lst)
     '()
     (cons lst (iterate (proc lst) proc))))
 
