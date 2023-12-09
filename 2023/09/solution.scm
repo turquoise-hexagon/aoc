@@ -1,8 +1,7 @@
 (import
   (chicken io)
   (chicken string)
-  (euler)
-  (srfi 1))
+  (euler))
 
 (define (import-input)
   (map
@@ -16,7 +15,7 @@
       (map
         (lambda (value index)
           (* (expt -1 index) (binomial len index) value))
-        lst (iota len)))))
+        lst (range (sub1 len))))))
 
 (define (solve input)
   (apply + (map extrapolate input)))
