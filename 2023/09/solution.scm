@@ -1,7 +1,6 @@
 (import
   (chicken io)
-  (chicken string)
-  (srfi 1))
+  (chicken string))
 
 (define (import-input)
   (map
@@ -9,16 +8,16 @@
       (map string->number (string-split i " ")))
     (read-lines)))
 
-(define (iterate lst proc)
-  (if (every zero? lst)
+(define (iterate lst)
+  (if ((list-of? zero?) lst)
     '()
-    (cons lst (iterate (proc lst) proc))))
+    (cons lst (iterate (map - lst (cdr lst))))))
 
 (define (proc/1 lst)
-  (apply + (map last  (iterate lst (lambda (i) (map - (cdr i) i))))))
+  (proc/2 (reverse lst)))
 
 (define (proc/2 lst)
-  (apply + (map first (iterate lst (lambda (i) (map - i (cdr i)))))))
+  (apply + (map car (iterate lst))))
 
 (define (solve input proc)
   (apply + (map proc input)))
