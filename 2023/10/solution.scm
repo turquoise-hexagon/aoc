@@ -67,9 +67,7 @@
         (loop next
           (if (array-ref table next)
             (case (array-ref array next)
-              ((#\|) (not acc))
-              ((#\J) (not acc))
-              ((#\L) (not acc))
+              ((#\| #\J #\L) (not acc))
               (else acc))
             acc))
         acc))))
