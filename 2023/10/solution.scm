@@ -43,10 +43,7 @@
                          (nexts array coord))))
             (if (null? nexts)
               (return acc)
-              (for-each
-                (lambda (next)
-                  (loop next))
-                nexts))))))))
+              (for-each loop nexts))))))))
 
 (define (import-input)
   (let ((array (list->array (map string->list (read-lines)))))
