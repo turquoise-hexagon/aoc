@@ -48,25 +48,35 @@
     (values (run array) array)))
 
 (define (solve/1 path)
-  (quotient (count identity (join (array->list path))) 2))
+  (quotient
+    (count
+      (lambda (coord)
+        (array-ref path coord))
+      (array-indexes path))
+    2))
 
-(define (valid? array path coord)
-  (let loop ((coord coord) (acc #f))
-    (let ((next (map + coord '(0 -1))))
-      (if (array-exists? array next)
-        (loop next
-          (if (array-ref path next)
-            (case (array-ref array next)
-              ((#\| #\J #\L) (not acc))
-              (else acc))
-            acc))
-        acc))))
+(define (iterate! path array inside i)
+  (let loop ((coord (list i 0)) (acc #f))
+    (when (array-exists? array coord)
+      (loop (map + coord '(0 1))
+        (if (array-ref path coord)
+          (case (array-ref array coord)
+            ((#\| #\J #\L) (not acc))
+            (else acc))
+          (begin
+            (array-set! inside coord acc)
+            acc))))))
 
 (define (solve/2 path array)
-  (count
-    (lambda (coord)
-      (and (not (array-ref path coord)) (valid? array path coord)))
-    (array-indexes array)))
+  (let ((acc (make-array (array-dimensions array) #f)))
+    (for-each
+      (lambda (i)
+        (iterate! path array acc i))
+      (range (sub1 (car (array-dimensions array)))))
+    (count
+      (lambda (coord)
+        (array-ref acc coord))
+      (array-indexes acc))))
 
 (let-values (((path array) (import-input)))
   (let ((part/1 (solve/1 path)))
