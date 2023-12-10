@@ -45,8 +45,8 @@
 (define (solve/1 path)
   (quotient (value path) 2))
 
-(define (iterate! path array inside i)
-  (let loop ((i (list i 0)) (acc #f))
+(define (iterate! path array inside coord)
+  (let loop ((i coord) (acc #f))
     (when (array-exists? array i)
       (loop (map + i '(0 1))
         (if (array-ref path i)
@@ -61,7 +61,7 @@
   (let ((acc (make-array (array-dimensions array) #f)))
     (for-each
       (lambda (i)
-        (iterate! path array acc i))
+        (iterate! path array acc (list i 0)))
       (range (sub1 (car (array-dimensions array)))))
     (value acc)))
 
