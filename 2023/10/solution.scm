@@ -1,18 +1,17 @@
 (import
   (chicken io)
   (euler)
-  (srfi 1)
-  (srfi 69))
+  (srfi 1))
 
 (define (moves array coord)
   (case (array-ref array coord)
+    ((#\S) '((-1  0) ( 0  1) ( 1  0) ( 0 -1)))
     ((#\|) '((-1  0) ( 1  0)))
     ((#\-) '(( 0 -1) ( 0  1)))
     ((#\L) '((-1  0) ( 0  1)))
     ((#\J) '((-1  0) ( 0 -1)))
     ((#\7) '(( 1  0) ( 0 -1)))
     ((#\F) '(( 1  0) ( 0  1)))
-    ((#\S) '((-1  0) ( 0  1) ( 1  0) ( 0 -1)))
     ((#\.) '())))
 
 (define (nexts array coord)
@@ -35,31 +34,38 @@
 (define (run array)
   (call/cc
     (lambda (return)
-      (let loop ((coord (start array)) (acc '()))
-        (let ((nexts (remove
-                       (lambda (next)
-                         (member next acc))
-                       (nexts array coord))))
-          (if (null? nexts)
-            (return acc)
-            (for-each
-              (lambda (next)
-                (loop next (cons next acc)))
-              nexts)))))))
+      (let ((acc (make-array (array-dimensions array) #f)))
+        (let loop ((coord (start array)))
+          (array-set! acc coord #t)
+          (let ((nexts (remove
+                         (lambda (next)
+                           (array-ref acc next))
+                         (nexts array coord))))
+            (if (null? nexts)
+              (return acc)
+              (for-each
+                (lambda (next)
+                  (loop next))
+                nexts))))))))
 
 (define (import-input)
   (let ((array (list->array (map string->list (read-lines)))))
     (values (run array) array)))
 
 (define (solve/1 path)
-  (quotient (length path) 2))
+  (quotient
+    (count
+      (lambda (coord)
+        (array-ref path coord))
+      (array-indexes path))
+    2))
 
 (define (valid? array table coord)
   (let loop ((coord coord) (acc #f))
     (let ((next (map + coord '(0 -1))))
       (if (array-exists? array next)
         (loop next
-          (if (hash-table-exists? table next)
+          (if (array-ref table next)
             (case (array-ref array next)
               ((#\|) (not acc))
               ((#\J) (not acc))
@@ -69,18 +75,13 @@
         acc))))
 
 (define (solve/2 path array)
-  (let ((table (make-hash-table)))
-    (for-each
+  (count
+    (lambda (coord)
+      (valid? array path coord))
+    (remove
       (lambda (coord)
-        (hash-table-set! table coord #t))
-      path)
-    (count
-      (lambda (coord)
-        (valid? array table coord))
-      (remove
-        (lambda (coord)
-          (hash-table-exists? table coord))
-        (array-indexes array)))))
+        (array-ref path coord))
+      (array-indexes array))))
 
 (let-values (((path array) (import-input)))
   (let ((part/1 (solve/1 path)))
