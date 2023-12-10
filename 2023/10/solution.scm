@@ -18,7 +18,7 @@
   (filter-map
     (lambda (offset)
       (let ((next (map + coord offset)))
-        (if (and (array-exists? array next))
+        (if (array-exists? array next)
           (if (member offset (map (cut map - <>) (moves array next)))
             next
             #f)
