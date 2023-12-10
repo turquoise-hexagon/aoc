@@ -14,15 +14,6 @@
     ((#\F) '((+1 +0) (+0 +1)))
     ((#\.) '())))
 
-(define (nexts array coord)
-  (filter-map
-    (lambda (offset)
-      (let ((next (map + coord offset)))
-        (if (and (array-exists? array next) (member (map - offset) (moves array next)))
-          next
-          #f)))
-    (moves array coord)))
-
 (define (start array)
   (find
     (lambda (i)
@@ -31,13 +22,14 @@
 
 (define (run array)
   (let ((acc (make-array (array-dimensions array) #f)))
-    (let loop ((coord (start array)))
-      (array-set! acc coord #t)
+    (let loop ((i (start array)))
+      (array-set! acc i #t)
       (for-each
-        (lambda (next)
-          (unless (array-ref acc next)
-            (loop next)))
-        (nexts array coord)))
+        (lambda (o)
+          (let ((i (map + i o)))
+            (when (and (array-exists? array i) (not (array-ref acc i)) (member (map - o) (moves array i)))
+              (loop i))))
+        (moves array i)))
     acc))
 
 (define (import-input)
@@ -46,23 +38,23 @@
 
 (define (value array)
   (count
-    (lambda (coord)
-      (array-ref array coord))
+    (lambda (i)
+      (array-ref array i))
     (array-indexes array)))
 
 (define (solve/1 path)
   (quotient (value path) 2))
 
 (define (iterate! path array inside i)
-  (let loop ((coord (list i 0)) (acc #f))
-    (when (array-exists? array coord)
-      (loop (map + coord '(0 1))
-        (if (array-ref path coord)
-          (case (array-ref array coord)
+  (let loop ((i (list i 0)) (acc #f))
+    (when (array-exists? array i)
+      (loop (map + i '(0 1))
+        (if (array-ref path i)
+          (case (array-ref array i)
             ((#\| #\J #\L) (not acc))
             (else acc))
           (begin
-            (array-set! inside coord acc)
+            (array-set! inside i acc)
             acc))))))
 
 (define (solve/2 path array)
