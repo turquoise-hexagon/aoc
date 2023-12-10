@@ -50,12 +50,7 @@
     (values (run array) array)))
 
 (define (solve/1 path)
-  (quotient
-    (count
-      (lambda (coord)
-        (array-ref path coord))
-      (array-indexes path))
-    2))
+  (quotient (count identity (join (array->list path))) 2))
 
 (define (valid? array path coord)
   (let loop ((coord coord) (acc #f))
