@@ -47,13 +47,14 @@
   (let ((array (list->array (map string->list (read-lines)))))
     (values (run array) array)))
 
+(define (value array)
+  (count
+    (lambda (coord)
+      (array-ref array coord))
+    (array-indexes array)))
+
 (define (solve/1 path)
-  (quotient
-    (count
-      (lambda (coord)
-        (array-ref path coord))
-      (array-indexes path))
-    2))
+  (quotient (value path) 2))
 
 (define (iterate! path array inside i)
   (let loop ((coord (list i 0)) (acc #f))
@@ -73,10 +74,7 @@
       (lambda (i)
         (iterate! path array acc i))
       (range (sub1 (car (array-dimensions array)))))
-    (count
-      (lambda (coord)
-        (array-ref acc coord))
-      (array-indexes acc))))
+    (value acc)))
 
 (let-values (((path array) (import-input)))
   (let ((part/1 (solve/1 path)))
