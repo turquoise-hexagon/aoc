@@ -75,11 +75,8 @@
 (define (solve/2 path array)
   (count
     (lambda (coord)
-      (valid? array path coord))
-    (remove
-      (lambda (coord)
-        (array-ref path coord))
-      (array-indexes array))))
+      (and (not (array-ref path coord)) (valid? array path coord)))
+    (array-indexes array)))
 
 (let-values (((path array) (import-input)))
   (let ((part/1 (solve/1 path)))
