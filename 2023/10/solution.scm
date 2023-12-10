@@ -25,9 +25,9 @@
     (let loop ((i (start array)))
       (array-set! acc i #t)
       (for-each
-        (lambda (o)
-          (let ((i (map + i o)))
-            (when (and (array-exists? array i) (not (array-ref acc i)) (member (map - o) (moves array i)))
+        (lambda (offset)
+          (let ((i (map + i offset)))
+            (when (and (array-exists? array i) (not (array-ref acc i)) (member (map - offset) (moves array i)))
               (loop i))))
         (moves array i)))
     acc))
