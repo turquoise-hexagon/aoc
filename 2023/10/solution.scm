@@ -30,18 +30,15 @@
     (array-indexes array)))
 
 (define (run array)
-  (call/cc
-    (lambda (return)
-      (let ((acc (make-array (array-dimensions array) #f)))
-        (let loop ((coord (start array)))
-          (array-set! acc coord #t)
-          (let ((nexts (remove
-                         (lambda (next)
-                           (array-ref acc next))
-                         (nexts array coord))))
-            (if (null? nexts)
-              (return acc)
-              (for-each loop nexts))))))))
+  (let ((acc (make-array (array-dimensions array) #f)))
+    (let loop ((coord (start array)))
+      (array-set! acc coord #t)
+      (for-each
+        (lambda (next)
+          (unless (array-ref acc next)
+            (loop next)))
+        (nexts array coord)))
+    acc))
 
 (define (import-input)
   (let ((array (list->array (map string->list (read-lines)))))
