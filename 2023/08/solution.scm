@@ -29,21 +29,21 @@
       (values (parse-instructions instructions) (parse-network network)))
     (irregex-split "\n\n" (read-string))))
 
-(define (run instructions network from to)
+(define (run instructions network from)
   (let ((len (vector-length instructions)))
     (let loop ((i 0) (node from))
-      (if (irregex-match? to node)
+      (if (char=? (string-ref node 2) #\Z)
         i
         (loop (+ i 1) ((vector-ref instructions (modulo i len)) (hash-table-ref network node)))))))
 
 (define (solve/1 instructions network)
-  (run instructions network "AAA" "ZZZ"))
+  (run instructions network "AAA"))
 
 (define (solve/2 instructions network)
   (foldl
     (lambda (acc i)
-      (if (irregex-match? ".*A" i)
-        (lcm acc (run instructions network i ".*Z"))
+      (if (char=? (string-ref i 2) #\A)
+        (lcm acc (run instructions network i))
         acc))
     1 (hash-table-keys network)))
 
