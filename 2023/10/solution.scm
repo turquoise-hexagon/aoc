@@ -24,12 +24,14 @@
   (let ((acc (make-array (array-dimensions array) #f)))
     (let loop ((i (start array)))
       (array-set! acc i #t)
-      (for-each
-        (lambda (offset)
-          (let ((i (map + i offset)))
-            (when (and (array-exists? array i) (not (array-ref acc i)) (member (map - offset) (moves array i)))
-              (loop i))))
-        (moves array i)))
+      (let subloop ((l (moves array i)))
+        (unless (null? l)
+          (let*
+            ((o (map - (car l)))
+             (i (map - i o)))
+            (when (and (array-exists? array i) (not (array-ref acc i)) (member o (moves array i)))
+              (loop i)))
+          (subloop (cdr l)))))
     acc))
 
 (define (import-input)
