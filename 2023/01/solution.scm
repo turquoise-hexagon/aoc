@@ -43,4 +43,4 @@
   (let ((part/1 (solve input numeric)))
     (print part/1) (assert (= part/1 54630)))
   (let ((part/2 (solve input (append numeric textual))))
-    (print part/2) (assert (= 54770))))
+    (print part/2) (assert (= part/2 54770))))
