@@ -2,12 +2,15 @@
   (euler)
   (chicken io))
 
+(define (increment! vec i)
+  (vector-set! vec i (+ (vector-ref vec i) 1)))
+
 (define (counts array)
   (let ((acc (map (lambda (i) (make-vector i 0)) (array-dimensions array))))
     (for-each
       (lambda (i)
         (when (char=? (array-ref array i) #\#)
-          (for-each (lambda (i acc) (vector-set! acc i (+ (vector-ref acc i) 1))) i acc)))
+          (for-each increment! acc i)))
       (array-indexes array))
     (map vector->list acc)))
 
