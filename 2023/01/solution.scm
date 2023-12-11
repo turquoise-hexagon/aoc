@@ -33,11 +33,7 @@
 
 (define (solve input lst)
   (let ((regex (string-append "(" (string-intersperse lst "|") ")")))
-    (apply +
-      (map
-        (lambda (i)
-          (value i regex))
-        input))))
+    (apply + (map (lambda (i) (value i regex)) input))))
 
 (let ((input (import-input)))
   (let ((part/1 (solve input numeric)))
