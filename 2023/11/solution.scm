@@ -17,14 +17,14 @@
 (define (import-input)
   (counts (list->array (map string->list (read-lines)))))
 
-(define (adjust lst m)
+(define (adjust lst multiplier)
   (let loop ((lst lst) (total 0))
     (if (null? lst)
       '()
       (let ((_ (car lst)))
         (let subloop ((i 0))
           (if (= i _)
-            (loop (cdr lst) (+ total (if (= _ 0) m 1)))
+            (loop (cdr lst) (+ total (if (= _ 0) multiplier 1)))
             (cons total (subloop (+ i 1)))))))))
 
 (define (compute lst multiplier)
