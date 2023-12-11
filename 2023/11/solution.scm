@@ -1,68 +1,40 @@
 (import
-  (chicken io)
   (euler)
-  (srfi 1))
+  (chicken io))
 
-(define (pairs array)
-  (combinations
-    (filter
+(define (counts array)
+  (let ((acc (map (lambda (i) (make-vector i 0)) (array-dimensions array))))
+    (for-each
       (lambda (i)
-        (char=? (array-ref array i) #\#))
+        (when (char=? (array-ref array i) #\#)
+          (for-each (lambda (i acc) (vector-set! acc i (+ (vector-ref acc i) 1))) i acc)))
       (array-indexes array))
-    2))
-
-(define (_empty array a b fun)
-  (filter
-    (lambda (a)
-      (every
-        (lambda (b)
-          (char=? (array-ref array (fun a b)) #\.))
-        b))
-    a))
-
-(define (empty array)
-  (apply
-    (lambda (h w)
-      (list
-        (_empty array h w (lambda (a b) (list a b)))
-        (_empty array w h (lambda (a b) (list b a)))))
-    (map iota (array-dimensions array))))
-
-(define (manhattan a b)
-  (apply + (map abs (map - a b))))
-
-(define (counts a b empty)
-  (apply +
-    (map
-      (lambda (a b i)
-        (let ((a (min a b))
-              (b (max a b)))
-          (count
-            (lambda (i)
-              (<= a i b))
-            i)))
-      a b empty)))
-
-(define (process pairs empty)
-  (map
-    (lambda (i)
-      (apply
-        (lambda (a b)
-          (cons (manhattan a b) (counts a b empty)))
-        i))
-    pairs))
+    (map vector->list acc)))
 
 (define (import-input)
-  (let ((array (list->array (map string->list (read-lines)))))
-    (process
-      (pairs array)
-      (empty array))))
+  (counts (list->array (map string->list (read-lines)))))
 
-(define (solve input expansion)
+(define (adjust lst m)
+  (let loop ((lst lst) (total 0))
+    (if (null? lst)
+      '()
+      (let ((_ (car lst)))
+        (let subloop ((i 0))
+          (if (= i _)
+            (loop (cdr lst) (+ total (if (= _ 0) m 1)))
+            (cons total (subloop (+ i 1)))))))))
+
+(define (compute lst multiplier)
+  (let loop ((lst (adjust lst multiplier)) (i 0) (total 0) (partial 0))
+    (if (null? lst)
+      total
+      (loop (cdr lst) (+ i 1) (+ total (- (* i (car lst)) partial)) (+ partial (car lst))))))
+
+(define (solve input multiplier)
   (apply +
     (map
       (lambda (i)
-        (+ (car i) (* (cdr i) (- expansion 1))))
+        (compute i multiplier))
       input)))
 
 (let ((input (import-input)))
