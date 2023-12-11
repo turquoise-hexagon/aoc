@@ -3,53 +3,69 @@
   (euler)
   (srfi 1))
 
-(define offsets
-  (delete '(0 0) (power '(-1 0 1) 2)))
+(define offsets (delete-first (power '(-1 0 1) 2) '(0 0) equal?))
 
 (define (import-input)
   (list->array (map string->list (read-lines))))
 
-(define (count-neighbors/1 array coord)
-  (count (cut char=? <> #\#)
-    (map (cut array-ref array <>)
-      (filter (cut array-exists? array <>)
-        (map (cut map + <> coord) offsets)))))
+(define (neighbors/1 array coord)
+  (filter
+    (lambda (i)
+      (array-exists? array i))
+    (map
+      (lambda (i)
+        (map + coord i))
+      offsets)))
 
-(define (count-neighbors/h array coord offset)
-  (let ((coord (map + coord offset)))
-    (if (array-exists? array coord)
-      (case (array-ref array coord)
-        ((#\#) 1)
-        ((#\L) 0)
-        ((#\.) (count-neighbors/h array coord offset)))
-      0)))
+(define (lookup array coord offset)
+  (let loop ((i coord))
+    (let ((next (map + i offset)))
+      (if (array-exists? array next)
+        (let ((value (array-ref array next)))
+          (if (or (char=? value #\#)
+                  (char=? value #\L))
+            next
+            (loop next)))
+        #f))))
 
-(define (count-neighbors/2 array coord)
-  (apply + (map (cut count-neighbors/h array coord <>) offsets)))
+(define (neighbors/2 array coord)
+  (filter-map
+    (lambda (i)
+      (lookup array coord i))
+    offsets))
 
 (define (iterate array proc n)
   (let ((acc (array-copy array)))
     (for-each
-      (lambda (coord)
-        (let ((value (array-ref array coord)))
-          (unless (char=? value #\.)
-            (let ((cnt (proc array coord)))
-              (case value
-                ((#\L) (when (=  cnt 0) (array-set! acc coord #\#)))
-                ((#\#) (when (>= cnt n) (array-set! acc coord #\L))))))))
+      (lambda (i)
+        (let ((value (array-ref array i)))
+          (when (or (char=? value #\#)
+                    (char=? value #\L))
+            (let ((count (count
+                           (lambda (i)
+                             (char=? (array-ref array i) #\#))
+                           (proc array i))))
+              (cond
+                ((= count 0) (array-set! acc i #\#))
+                ((> count n) (array-set! acc i #\L)))))))
       (array-indexes array))
-    (if (equal? array acc)
-      #f
-      acc)))
+    acc))
+
+(define (value array)
+  (count
+    (lambda (i)
+      (char=? (array-ref array i) #\#))
+    (array-indexes array)))
 
 (define (solve input proc n)
-  (let loop ((acc input))
-    (let ((next (iterate acc proc n)))
-      (if next (loop next)
-        (count (cut char=? <> #\#)
-          (map (cut array-ref acc <>)
-            (array-indexes acc)))))))
+  (let loop ((i input) (cnt (value input)))
+    (let* ((next/i (iterate i proc n)) (next/cnt (value next/i)))
+      (if (= cnt next/cnt)
+        cnt
+        (loop next/i next/cnt)))))
 
 (let ((input (import-input)))
-  (print (solve input count-neighbors/1 4))
-  (print (solve input count-neighbors/2 5)))
+  (let ((part/1 (solve input neighbors/1 3)))
+    (print part/1) (assert (= part/1 2277)))
+  (let ((part/2 (solve input neighbors/2 4)))
+    (print part/2) (assert (= part/2 2066))))
