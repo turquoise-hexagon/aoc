@@ -26,9 +26,8 @@
       (array-set! acc i #t)
       (let subloop ((l (moves array i)))
         (unless (null? l)
-          (let*
-            ((o (map - (car l)))
-             (i (map - i o)))
+          (let* ((o (map - (car l)))
+                 (i (map - i o)))
             (if (and (array-exists? array i) (not (array-ref acc i)) (member o (moves array i)))
               (loop i)
               (subloop (cdr l)))))))
