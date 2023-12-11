@@ -29,9 +29,9 @@
           (let*
             ((o (map - (car l)))
              (i (map - i o)))
-            (when (and (array-exists? array i) (not (array-ref acc i)) (member o (moves array i)))
-              (loop i)))
-          (subloop (cdr l)))))
+            (if (and (array-exists? array i) (not (array-ref acc i)) (member o (moves array i)))
+              (loop i)
+              (subloop (cdr l)))))))
     acc))
 
 (define (import-input)
