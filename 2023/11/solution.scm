@@ -30,7 +30,7 @@
 
 (define (import-input)
   (let ((array (list->array (map string->list (read-lines)))))
-    (values (galaxies array) (empty array))))
+    (values (combinations (galaxies array) 2) (empty array))))
 
 (define (distance empty expansion a b)
   (+ (apply + (map abs (map - a b)))
@@ -46,15 +46,15 @@
             a b empty))
         (- expansion 1))))
 
-(define (solve galaxies empty expansion)
+(define (solve pairs empty expansion)
   (apply +
     (map
       (lambda (i)
         (apply distance empty expansion i))
-      (combinations galaxies 2))))
+      pairs)))
 
-(let-values (((galaxies empty) (import-input)))
-  (let ((part/1 (solve galaxies empty 2)))
+(let-values (((pairs empty) (import-input)))
+  (let ((part/1 (solve pairs empty 2)))
     (print part/1) (assert (= part/1 10292708)))
-  (let ((part/2 (solve galaxies empty 1000000)))
+  (let ((part/2 (solve pairs empty 1000000)))
     (print part/2) (assert (= part/2 790194712336))))
