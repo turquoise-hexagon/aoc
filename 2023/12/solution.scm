@@ -40,7 +40,7 @@
   (string-append (list->string a) (string-intersperse (map number->string b))))
 
 (define process
-  (let ((cache (make-hash-table #:size #e1e6 #:test string=? #:hash string-hash)))
+  (let ((cache (make-hash-table #:size #e1e6)))
     (lambda (a b)
       (let ((id (id a b)))
         (if (hash-table-exists? cache id)
