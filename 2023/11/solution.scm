@@ -1,21 +1,19 @@
 (import
   (euler)
-  (chicken io))
+  (chicken io)
+  (srfi 1))
 
-(define (increment! vec i)
-  (vector-set! vec i (+ (vector-ref vec i) 1)))
-
-(define (counts array)
-  (let ((acc (map (lambda (i) (make-vector i 0)) (array-dimensions array))))
-    (for-each
-      (lambda (i)
-        (when (char=? (array-ref array i) #\#)
-          (for-each increment! acc i)))
-      (array-indexes array))
-    (map vector->list acc)))
+(define (counts lst)
+  (map
+    (lambda (i)
+      (map
+        (lambda (i)
+          (count (lambda (i) (char=? i #\#)) i))
+        i))
+    (list lst (apply zip lst))))
 
 (define (import-input)
-  (counts (list->array (map string->list (read-lines)))))
+  (counts (map string->list (read-lines))))
 
 (define (adjust lst multiplier)
   (let loop ((lst lst) (total 0))
