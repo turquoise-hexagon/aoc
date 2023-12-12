@@ -19,8 +19,8 @@
          (list (string->list a) (map string->number (string-split b ","))))))
     lst))
 
-(define (_process a b)
-  (match (list a b)
+(define _process
+  (match-lambda*
     ((() ()) 1)
     ((()  _) 0)
     (((#\# . _) ()) 0)
@@ -28,7 +28,7 @@
     (((#\? . a)  b)
      (+ (process (cons #\. a) b)
         (process (cons #\# a) b)))
-    ((_ (i . b))
+    ((a (i . b))
      (if (and (>= (length a) i)
               (not (member #\. (_take a i)))
               (not (char=? #\# (_list-ref a i))))
