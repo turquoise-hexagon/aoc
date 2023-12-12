@@ -10,8 +10,8 @@
     ((zero? n) '())
     (else (cons (##sys#slot l 0) (_take (##sys#slot l 1) (- n 1))))))
 
-(define (_list-ref l n)
+(define (_list-ref l n #!optional (i #f))
   (cond
-    ((null? l) #f)
+    ((null? l) i)
     ((zero? n) (##sys#slot l 0))
     (else (_list-ref (##sys#slot l 1) (- n 1)))))

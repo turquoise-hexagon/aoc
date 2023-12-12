@@ -28,8 +28,8 @@
     (((#\? . a)  b) (+ (process a b) (process (cons #\# a) b)))
     ((a (i . b))
      (if (or (< (length a) i)
-             (member #\. (_take a i))
-             (char=? #\# (_list-ref a i)))
+             (member #\. (_take a i) char=?)
+             (char=? #\# (_list-ref a i #\.)))
        0
        (process (_drop a (+ i 1)) b)))))
 
