@@ -26,7 +26,7 @@
     (((#\# . _) ()) 0)
     (((#\. . a)  b) (loop a b))
     (((#\? . a)  b) (+ (loop a b) (loop (cons #\# a) b)))
-    ((a (i . b))
+    ((_ (i . b))
      (if (or (< (length a) i)
              (member #\. (_take a i))
              (char=? #\# (_list-ref a i #\.)))
