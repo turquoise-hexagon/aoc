@@ -26,7 +26,7 @@
     (((#\# . _) ()) 0)
     (((#\. . a)  b) (process a b))
     (((#\? . a)  b)
-     (+ (process (cons #\. a) b)
+     (+ (process a b)
         (process (cons #\# a) b)))
     ((a (i . b))
      (if (and (>= (length a) i)
