@@ -33,8 +33,9 @@
        0
        (loop (_drop a (+ i 1)) b)))))
 
-(define (id . l)
-  (string-intersperse (map number->string (map length l))))
+(define (id a b)
+  (let* ((a (length a)) (b (length b)) (_ (+ a b)))
+    (+ (quotient (* _ (+ _ 1)) 2) b)))
 
 (define (process a b)
   (let ((cache (make-hash-table)))
