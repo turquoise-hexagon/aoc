@@ -32,14 +32,10 @@
        0
        (loop (_drop a (+ i 1)) b)))))
 
-(define (id a b)
-  (let* ((a (length a)) (b (length b)) (_ (+ a b)))
-    (+ (quotient (* _ (+ _ 1)) 2) b)))
-
 (define (process a b)
   (let ((cache (make-vector 10000 #f)))
     (let loop ((a a) (b b))
-      (let ((id (id a b)))
+      (let ((id (_id a b)))
         (let ((acc (vector-ref cache id)))
           (if acc
             acc
