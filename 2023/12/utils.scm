@@ -24,4 +24,4 @@
   (cond
     ((null? l) i)
     ((fx= n 0) (##sys#slot l 0))
-    (else (_list-ref (##sys#slot l 1) (fx- n 1)))))
+    (else (_list-ref (##sys#slot l 1) (fx- n 1) i))))
