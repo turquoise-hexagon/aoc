@@ -1,5 +1,4 @@
 (import
-  (euler)
   (chicken io)
   (srfi 1))
 
