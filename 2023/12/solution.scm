@@ -2,7 +2,6 @@
   (chicken io)
   (chicken string)
   (matchable)
-  (srfi 69)
   (srfi 1))
 
 (include-relative "utils.scm")
@@ -38,14 +37,15 @@
     (+ (quotient (* _ (+ _ 1)) 2) b)))
 
 (define (process a b)
-  (let ((cache (make-hash-table)))
+  (let ((cache (make-vector 10000 #f)))
     (let loop ((a a) (b b))
       (let ((id (id a b)))
-        (if (hash-table-exists? cache id)
-          (hash-table-ref cache id)
-          (let ((acc (_process a b loop)))
-            (hash-table-set! cache id acc)
-            acc))))))
+        (let ((acc (vector-ref cache id)))
+          (if acc
+            acc
+            (let ((acc (_process a b loop)))
+              (vector-set! cache id acc)
+              acc)))))))
 
 (define (solve input)
   (apply + (map (lambda (i) (apply process i)) input)))
