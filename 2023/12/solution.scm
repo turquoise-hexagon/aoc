@@ -2,8 +2,8 @@
   (chicken io)
   (chicken string)
   (matchable)
-  (srfi 1)
-  (srfi 69))
+  (srfi 69)
+  (srfi 1))
 
 (include-relative "utils.scm")
 
@@ -19,7 +19,7 @@
          (list (string->list a) (map string->number (string-split b ","))))))
     lst))
 
-(define-inline (_process a b)
+(define (_process a b loop)
   (match (list a b)
     ((() ()) 1)
     ((()  _) 0)
@@ -33,23 +33,21 @@
        0
        (loop (_drop a (+ i 1)) b)))))
 
-;; speed up caching
 (define (id . l)
   (string-intersperse (map number->string (map length l))))
 
-(define (process)
+(define (process a b)
   (let ((cache (make-hash-table)))
-    (lambda (a b)
-      (let loop ((a a) (b b))
-        (let ((id (id a b)))
-          (if (hash-table-exists? cache id)
-            (hash-table-ref cache id)
-            (let ((acc (_process a b)))
-              (hash-table-set! cache id acc)
-              acc)))))))
+    (let loop ((a a) (b b))
+      (let ((id (id a b)))
+        (if (hash-table-exists? cache id)
+          (hash-table-ref cache id)
+          (let ((acc (_process a b loop)))
+            (hash-table-set! cache id acc)
+            acc))))))
 
 (define (solve input)
-  (apply + (map (lambda (i) (apply (process) i)) input)))
+  (apply + (map (lambda (i) (apply process i)) input)))
 
 (let ((input (import-input)))
   (let ((part/1 (solve (transform input 1))))
