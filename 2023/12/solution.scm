@@ -42,11 +42,12 @@
 (define process
   (let ((cache (make-hash-table)))
     (lambda (a b)
-      (if (hash-table-exists? cache (id a b))
-        (hash-table-ref cache (id a b))
-        (let ((acc (_process a b)))
-          (hash-table-set! cache (id a b) acc)
-          acc)))))
+      (let ((id (id a b)))
+        (if (hash-table-exists? cache id)
+          (hash-table-ref cache id)
+          (let ((acc (_process a b)))
+            (hash-table-set! cache id acc)
+            acc))))))
 
 (define (solve input)
   (apply + (map (lambda (i) (apply process i)) input)))
