@@ -19,39 +19,40 @@
          (list (string->list a) (map string->number (string-split b ","))))))
     lst))
 
-(define _process
-  (match-lambda*
+(define-inline (_process a b)
+  (match (list a b)
     ((() ()) 1)
     ((()  _) 0)
     (((#\# . _) ()) 0)
-    (((#\. . a)  b) (process a b))
+    (((#\. . a)  b) (loop a b))
     (((#\? . a)  b)
      (let ((_ (cons #\# a)))
-       (+ (process a b)
-          (process _ b))))
+       (+ (loop a b)
+          (loop _ b))))
     ((a (i . b))
      (if (or (< (length a) i)
              (member #\. (_take a i))
              (char=? #\# (_list-ref a i #\.)))
        0
-       (process (_drop a (+ i 1)) b)))))
+       (loop (_drop a (+ i 1)) b)))))
 
 ;; speed up caching
-(define (id a b)
-  (string-append (list->string a) (string-intersperse (map number->string b))))
+(define (id . l)
+  (string-intersperse (map number->string (map length l))))
 
-(define process
-  (let ((cache (make-hash-table #:size #e1e6)))
+(define (process)
+  (let ((cache (make-hash-table)))
     (lambda (a b)
-      (let ((id (id a b)))
-        (if (hash-table-exists? cache id)
-          (hash-table-ref cache id)
-          (let ((acc (_process a b)))
-            (hash-table-set! cache id acc)
-            acc))))))
+      (let loop ((a a) (b b))
+        (let ((id (id a b)))
+          (if (hash-table-exists? cache id)
+            (hash-table-ref cache id)
+            (let ((acc (_process a b)))
+              (hash-table-set! cache id acc)
+              acc)))))))
 
 (define (solve input)
-  (apply + (map (lambda (i) (apply process i)) input)))
+  (apply + (map (lambda (i) (apply (process) i)) input)))
 
 (let ((input (import-input)))
   (let ((part/1 (solve (transform input 1))))
