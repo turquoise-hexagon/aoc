@@ -1,11 +1,12 @@
 (import
   (chicken io)
-  (chicken irregex))
+  (chicken string)
+  (srfi 1))
 
 (define-constant e #e1e-10)
 
 (define (parse str)
-  (irregex-extract "[0-9]+" str))
+  (filter string->number (string-split str " ")))
 
 (define (import-input)
   (list
