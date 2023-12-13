@@ -1,10 +1,9 @@
 (import
+  (chicken fixnum)
   (chicken io)
   (chicken string)
   (matchable)
   (srfi 1))
-
-(include-relative "utils.scm")
 
 (define (import-input)
   (map (lambda (i) (string-split i " ")) (read-lines)))
@@ -26,16 +25,22 @@
     (((#\. . a)  b) (loop a b))
     (((#\? . a)  b) (+ (loop a b) (loop (cons #\# a) b)))
     ((_ (i . b))
-     (if (or (< (length a) i)
-             (member #\. (_take a i))
-             (char=? #\# (_list-ref a i #\.)))
-       0
-       (loop (_drop a (+ i 1)) b)))))
+     (let ((l (length a)))
+       (if (or      (fx< l i) (member #\. (take a i))
+               (and (fx> l i) (char=? #\# (list-ref a i))))
+         0 (loop (list-tail a (fxmin l (fx+ i 1))) b))))))
+
+(define (id a b)
+  (let*
+    ((a (length a))
+     (b (length b))
+     (_ (fx+ a b)))
+    (fx+ (fx/ (fx* _ (fx+ _ 1)) 2) b)))
 
 (define (process a b)
   (let ((cache (make-vector 10000 #f)))
     (let loop ((a a) (b b))
-      (let ((id (_id a b)))
+      (let ((id (id a b)))
         (let ((acc (vector-ref cache id)))
           (if acc
             acc
