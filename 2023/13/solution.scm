@@ -1,13 +1,14 @@
 (import
   (chicken io)
-  (chicken irregex)
   (srfi 1))
 
 (define (import-input)
-  (map
-    (lambda (i)
-      (map string->list (irregex-split "\n" i)))
-    (irregex-split "\n\n" (read-string))))
+  (foldr
+    (lambda (i acc)
+      (if (string=? i "")
+        (cons '() acc)
+        (cons (cons (string->list i) (car acc)) (cdr acc))))
+    '(()) (read-lines)))
 
 (define (reflection lst n)
   (find
