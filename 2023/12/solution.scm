@@ -23,7 +23,7 @@
     ((()  _) 0)
     (((#\# . _) ()) 0)
     (((#\. . a)  b) (loop a b))
-    (((#\? . a)  b) (+ (loop a b) (loop (cons #\# a) b)))
+    (((#\? . a)  b) (fx+ (loop a b) (loop (cons #\# a) b)))
     ((_ (i . b))
      (let ((l (length a)))
        (if (or      (fx< l i) (member #\. (take a i))
