@@ -5,10 +5,10 @@
 (define (import-input)
   (foldr
     (lambda (i acc)
-      (if (null? i)
+      (if (string=? i "")
         (cons '() acc)
-        (cons (cons i (car acc)) (cdr acc))))
-    '(()) (map string->list (read-lines))))
+        (cons (cons (string->list i) (car acc)) (cdr acc))))
+    '(()) (read-lines)))
 
 (define (compare a b)
   (count (lambda (a b) (not (char=? a b))) a b))
