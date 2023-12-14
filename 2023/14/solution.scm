@@ -1,42 +1,39 @@
 (import
   (chicken io)
   (euler)
-  (srfi 69)
-  (srfi 1))
+  (srfi 69))
 
 (define (import-input)
   (list->array (map string->list (read-lines))))
 
 (define (_tilt! array direction coord)
   (let loop ((i coord))
-    (let ((next (map + i direction)))
-      (if (and (array-exists? array next) (char=? (array-ref array next) #\.))
-        (loop next)
+    (let ((_ (map + i direction)))
+      (if (and (array-exists? array _) (char=? (array-ref array _) #\.))
+        (loop _)
         (begin
           (array-set! array coord #\.)
           (array-set! array i     #\O))))))
 
 (define (tilt! array direction)
   (for-each
-    (lambda (coord)
-      (when (char=? (array-ref array coord) #\O)
-        (_tilt! array direction coord)))
+    (lambda (i)
+      (when (char=? (array-ref array i) #\O)
+        (_tilt! array direction i)))
     (apply product
       (map
-        (lambda (i lst)
-          (if (= i 1) (reverse lst) lst))
-        direction (map iota (array-dimensions array))))))
+        (lambda (i n)
+          (if (= i 1) (range n 0) (range n)))
+        direction (map sub1 (array-dimensions array))))))
 
 (define (score array)
-  (let ((dimensions (array-dimensions array)))
-    (apply +
-      (map
-        (lambda (coord)
-          (- (car dimensions) (car coord)))
-        (filter
-          (lambda (coord)
-            (char=? (array-ref array coord) #\O))
-          (array-indexes array))))))
+  (let ((_ (car (array-dimensions array))))
+    (foldl
+      (lambda (acc i)
+        (if (char=? (array-ref array i) #\O)
+          (+ acc (- _ (car i)))
+          acc))
+      0 (array-indexes array))))
 
 (define (id array)
   (apply string-append (map list->string (array->list array))))
