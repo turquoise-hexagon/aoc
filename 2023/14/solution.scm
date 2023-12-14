@@ -1,6 +1,7 @@
 (import
   (chicken io)
   (euler)
+  (euler-syntax)
   (srfi 69))
 
 (define (import-input)
@@ -15,16 +16,19 @@
           (array-set! array coord #\.)
           (array-set! array i     #\O))))))
 
+(define-memoized (indexes dimensions direction)
+  (apply product
+    (map
+      (lambda (i n)
+        (if (= i 1) (range n 0) (range n)))
+      direction (map sub1 dimensions))))
+
 (define (tilt! array direction)
   (for-each
     (lambda (i)
       (when (char=? (array-ref array i) #\O)
         (_tilt! array direction i)))
-    (apply product
-      (map
-        (lambda (i n)
-          (if (= i 1) (range n 0) (range n)))
-        direction (map sub1 (array-dimensions array))))))
+    (indexes (array-dimensions array) direction)))
 
 (define (score array)
   (let ((_ (car (array-dimensions array))))
