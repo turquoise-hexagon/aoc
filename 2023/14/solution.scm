@@ -70,10 +70,6 @@
                 (hash-table-set! cache id i)
                 (loop (+ i 1) acc)))))))))
 
-(define (output array)
-  (for-each print (map list->string (array->list array)))
-  (print))
-
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
     (print part/1) (assert (= part/1 108641)))
