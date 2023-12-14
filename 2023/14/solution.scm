@@ -7,28 +7,25 @@
 (define (import-input)
   (list->array (map string->list (read-lines))))
 
-(define (indexes array direction)
-  (apply product
-    (map
-      (lambda (i lst)
-        (case i
-          ((-1) lst)
-          (( 0) lst)
-          (( 1) (reverse lst))))
-      direction (map iota (array-dimensions array)))))
+(define (_tilt! array direction coord)
+  (let loop ((i coord))
+    (let ((next (map + i direction)))
+      (if (and (array-exists? array next) (char=? (array-ref array next) #\.))
+        (loop next)
+        (begin
+          (array-set! array coord #\.)
+          (array-set! array i     #\O))))))
 
 (define (tilt! array direction)
   (for-each
     (lambda (coord)
       (when (char=? (array-ref array coord) #\O)
-        (let loop ((i coord))
-          (let ((next (map + i direction)))
-            (if (and (array-exists? array next) (char=? (array-ref array next) #\.))
-              (loop next)
-              (unless (equal? coord i)
-                (array-set! array coord #\.)
-                (array-set! array i     #\O)))))))
-    (indexes array direction)))
+        (_tilt! array direction coord)))
+    (apply product
+      (map
+        (lambda (i lst)
+          (if (= i 1) (reverse lst) lst))
+        direction (map iota (array-dimensions array))))))
 
 (define (score array)
   (let ((dimensions (array-dimensions array)))
