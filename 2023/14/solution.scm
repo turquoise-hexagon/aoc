@@ -7,13 +7,6 @@
 (define (import-input)
   (list->array (map string->list (read-lines))))
 
-(define (search array coord direction)
-  (let loop ((i coord))
-    (let ((next (map + i direction)))
-      (if (and (array-exists? array next) (char=? (array-ref array next) #\.))
-        (loop next)
-        i))))
-
 (define (indexes array direction)
   (apply product
     (map
@@ -28,10 +21,13 @@
   (for-each
     (lambda (coord)
       (when (char=? (array-ref array coord) #\O)
-        (let ((next (search array coord direction)))
-          (unless (equal? coord next)
-            (array-set! array coord #\.)
-            (array-set! array next  #\O)))))
+        (let loop ((i coord))
+          (let ((next (map + i direction)))
+            (if (and (array-exists? array next) (char=? (array-ref array next) #\.))
+              (loop next)
+              (unless (equal? coord i)
+                (array-set! array coord #\.)
+                (array-set! array i     #\O)))))))
     (indexes array direction)))
 
 (define (score array)
