@@ -56,8 +56,8 @@
       (lambda (box-id lst acc)
         (fold
           (lambda (value index acc)
-            (+ acc (* (+ box-id 1) (string->number (cdr value)) (+ index 1))))
-          acc (reverse lst) (iota (length lst))))
+            (+ acc (* (+ box-id 1) (string->number (cdr value)))))
+          acc (reverse lst) (iota (length lst) 1)))
       0)))
 
 (let ((input (import-input)))
