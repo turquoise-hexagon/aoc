@@ -21,11 +21,8 @@
     (lambda (lst)
       (apply
         (case-lambda
-          (() (alist-delete label lst string=?))
-          ((value)
-           (if (assoc label lst string=?)
-             (alist-update label value lst string=?)
-             (alist-cons   label value lst))))
+          (()      (alist-delete label       lst string=?))
+          ((value) (alist-update label value lst string=?)))
         args))))
 
 (define (focusing-power table)
@@ -34,7 +31,7 @@
       (fold
         (lambda (pair index acc)
           (+ acc (* (+ id 1) (+ index 1) (string->number (cdr pair)))))
-        acc (reverse lst) (iota (length lst))))
+        acc lst (iota (length lst))))
     0))
 
 (define (solve/1 input)
