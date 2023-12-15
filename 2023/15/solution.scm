@@ -17,7 +17,7 @@
   (string-split str "-="))
 
 (define (process! table label . args)
-  (hash-table-update! table (HASH label)
+  (hash-table-update! table (+ (HASH label) 1)
     (lambda (lst)
       (apply
         (case-lambda
@@ -30,8 +30,8 @@
     (lambda (id lst acc)
       (fold
         (lambda (pair index acc)
-          (+ acc (* (+ id 1) (+ index 1) (string->number (cdr pair)))))
-        acc lst (iota (length lst))))
+          (+ acc (* id index (string->number (cdr pair)))))
+        acc lst (iota (length lst) 1)))
     0))
 
 (define (solve/1 input)
