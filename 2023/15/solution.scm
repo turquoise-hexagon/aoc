@@ -21,19 +21,17 @@
         (irregex-match-substring _ i))
       (iota (irregex-match-num-submatches _) 1))))
 
-(define-inline (_adjoin lst)
-  (if (assoc label lst)
-    (alist-update label value lst string=?)
-    (alist-cons label value lst)))
-
-(define-inline (_delete lst)
-  (alist-delete label lst string=?))
-
 (define (process! table label operator value)
   (let ((pair (cons label value)))
-    (cond
-      ((string=? operator "=") (hash-table-update! table (HASH label) _adjoin))
-      ((string=? operator "-") (hash-table-update! table (HASH label) _delete)))))
+    (hash-table-update! table (HASH label)
+      (lambda (lst)
+        (cond
+          ((string=? operator "=")
+           (if (assoc label lst string=?)
+             (alist-update label value lst string=?)
+             (alist-cons   label value lst)))
+          ((string=? operator "-")
+           (alist-delete label lst string=?)))))))
 
 (define (solve/1 input)
   (apply + (map HASH input)))
