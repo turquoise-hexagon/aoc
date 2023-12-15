@@ -2,7 +2,6 @@
   (chicken io)
   (chicken string)
   (chicken irregex)
-  (euler)
   (srfi 1)
   (srfi 69))
 
@@ -22,26 +21,19 @@
         (irregex-match-substring _ i))
       (iota (irregex-match-num-submatches _) 1))))
 
-(define (compare? a b)
-  (string=? (car a) (car b)))
+(define-inline (_adjoin lst)
+  (if (assoc label lst)
+    (alist-update label value lst string=?)
+    (cons (cons label value) lst)))
 
 (define-inline (_delete lst)
-  (delete-first lst _ compare?))
+  (alist-delete label lst string=?))
 
-(define-inline (_adjoin lst)
-  (cond
-    ((find
-       (lambda (i)
-         (compare? i _))
-       lst)
-     => (lambda (i) (replace lst i _ compare?)))
-    (else (cons _ lst))))
-
-(define (process! table l o v)
-  (let ((_ (cons l v)))
-    (case (string->symbol o)
-      ((-) (hash-table-update! table (HASH l) _delete))
-      ((=) (hash-table-update! table (HASH l) _adjoin)))))
+(define (process! table label operator value)
+  (let ((pair (cons label value)))
+    (cond
+      ((string=? operator "=") (hash-table-update! table (HASH label) _adjoin))
+      ((string=? operator "-") (hash-table-update! table (HASH label) _delete)))))
 
 (define (solve/1 input)
   (apply + (map HASH input)))
@@ -50,14 +42,14 @@
   (let ((acc (make-hash-table #:initial '())))
     (for-each
       (lambda (i)
-        (apply process! acc i))
-      (map parse input))
+        (apply process! acc (parse i)))
+      input)
     (hash-table-fold acc
-      (lambda (box-id lst acc)
+      (lambda (id lst acc)
         (fold
-          (lambda (value index acc)
-            (+ acc (* (+ box-id 1) (string->number (cdr value)))))
-          acc (reverse lst) (iota (length lst) 1)))
+          (lambda (pair index acc)
+            (+ acc (* (+ id 1) (+ index 1) (string->number (cdr pair)))))
+          acc (reverse lst) (iota (length lst))))
       0)))
 
 (let ((input (import-input)))
