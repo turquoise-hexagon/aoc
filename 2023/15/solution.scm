@@ -27,6 +27,15 @@
           (alist-update label value lst string=?)
           (alist-cons   label value lst))))))
 
+(define (focusing-power table)
+  (hash-table-fold table
+    (lambda (id lst acc)
+      (fold
+        (lambda (pair index acc)
+          (+ acc (* (+ id 1) (+ index 1) (string->number (cdr pair)))))
+        acc (reverse lst) (iota (length lst))))
+    0))
+
 (define (solve/1 input)
   (apply + (map HASH input)))
 
@@ -36,13 +45,7 @@
       (lambda (i)
         (apply process! acc (parse i)))
       input)
-    (hash-table-fold acc
-      (lambda (id lst acc)
-        (fold
-          (lambda (pair index acc)
-            (+ acc (* (+ id 1) (+ index 1) (string->number (cdr pair)))))
-          acc (reverse lst) (iota (length lst))))
-      0)))
+    (focusing-power acc)))
 
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
