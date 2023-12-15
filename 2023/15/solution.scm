@@ -22,16 +22,15 @@
       (iota (irregex-match-num-submatches _) 1))))
 
 (define (process! table label operator value)
-  (let ((pair (cons label value)))
-    (hash-table-update! table (HASH label)
-      (lambda (lst)
-        (cond
-          ((string=? operator "=")
-           (if (assoc label lst string=?)
-             (alist-update label value lst string=?)
-             (alist-cons   label value lst)))
-          ((string=? operator "-")
-           (alist-delete label lst string=?)))))))
+  (hash-table-update! table (HASH label)
+    (lambda (lst)
+      (cond
+        ((string=? operator "=")
+         (if (assoc label lst string=?)
+           (alist-update label value lst string=?)
+           (alist-cons   label value lst)))
+        ((string=? operator "-")
+         (alist-delete label lst string=?))))))
 
 (define (solve/1 input)
   (apply + (map HASH input)))
