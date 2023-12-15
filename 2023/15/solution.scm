@@ -14,18 +14,19 @@
     0 (string->list str)))
 
 (define (parse str)
-  (if (substring-index "-" str)
-    (cons "-" (string-split str "-"))
-    (cons "=" (string-split str "="))))
+  (string-split str "-="))
 
-(define (process! table operator label #!optional value)
+(define (process! table label . args)
   (hash-table-update! table (HASH label)
     (lambda (lst)
-      (if (string=? operator "-")
-        (alist-delete label lst string=?)
-        (if (assoc label lst string=?)
-          (alist-update label value lst string=?)
-          (alist-cons   label value lst))))))
+      (apply
+        (case-lambda
+          (() (alist-delete label lst string=?))
+          ((value)
+           (if (assoc label lst string=?)
+             (alist-update label value lst string=?)
+             (alist-cons   label value lst))))
+        args))))
 
 (define (focusing-power table)
   (hash-table-fold table
