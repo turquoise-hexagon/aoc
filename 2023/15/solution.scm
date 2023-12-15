@@ -14,10 +14,9 @@
     0 (string->list str)))
 
 (define (parse str)
-  (let ((_ (string-split str "-=")))
-    (if (substring-index "-" str)
-      (cons "-" _)
-      (cons "=" _))))
+  (if (substring-index "-" str)
+    (cons "-" (string-split str "-"))
+    (cons "=" (string-split str "="))))
 
 (define (process! table operator label #!optional value)
   (hash-table-update! table (HASH label)
