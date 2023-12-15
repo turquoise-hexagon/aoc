@@ -24,7 +24,7 @@
 (define-inline (_adjoin lst)
   (if (assoc label lst)
     (alist-update label value lst string=?)
-    (cons (cons label value) lst)))
+    (alist-cons label value lst)))
 
 (define-inline (_delete lst)
   (alist-delete label lst string=?))
