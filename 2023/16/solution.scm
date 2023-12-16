@@ -33,7 +33,7 @@
       (define (next dir)
         (loop dir (map + coord (vector-ref dirs dir))))
       (when (array-exists? array coord)
-        (array-set! acc  coord #\#)
+        (array-set! acc coord #\#)
         (case (array-ref array coord)
           ((#\/) (next (modulo (+ dir 4 (if (even? dir) 1 -1)) 4)))
           ((#\\) (next (modulo (+ dir 4 (if (odd?  dir) 1 -1)) 4)))
