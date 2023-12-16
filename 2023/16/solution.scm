@@ -11,8 +11,6 @@
     ( 1  0)
     ( 0 -1)))
 
-(define-constant nb-dirs (vector-length dirs))
-
 (define (import-input)
   (list->array (map string->list (read-lines))))
 
@@ -38,8 +36,8 @@
         (array-set! acc  coord #\#)
         (case (array-ref array coord)
           ((#\.) (next dir))
-          ((#\/) (next (modulo (+ dir nb-dirs (if (even? dir) +1 -1)) nb-dirs)))
-          ((#\\) (next (modulo (+ dir nb-dirs (if (odd?  dir) +1 -1)) nb-dirs)))
+          ((#\/) (next (modulo (+ dir 4 (if (even? dir) +1 -1)) 4)))
+          ((#\\) (next (modulo (+ dir 4 (if (odd?  dir) +1 -1)) 4)))
           ((#\|) (split odd?  0 2))
           ((#\-) (split even? 1 3)))))
     (count (lambda (i) (char=? (array-ref acc i) #\#)) (array-indexes acc))))
