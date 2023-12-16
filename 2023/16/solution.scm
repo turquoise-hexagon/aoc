@@ -37,8 +37,8 @@
         (case (array-ref array coord)
           ((#\/) (next (modulo (+ dir 4 (if (even? dir) 1 -1)) 4)))
           ((#\\) (next (modulo (+ dir 4 (if (odd?  dir) 1 -1)) 4)))
-          ((#\|) (split odd?  0 2))
           ((#\-) (split even? 1 3))
+          ((#\|) (split odd?  0 2))
           ((#\.) (next dir)))))
     (count (lambda (i) (char=? (array-ref acc i) #\#)) (array-indexes acc))))
 
