@@ -42,10 +42,7 @@
           ((#\\) (next (modulo (+ dir nb-dirs (if (odd?  dir) +1 -1)) nb-dirs)))
           ((#\|) (split odd?  0 2))
           ((#\-) (split even? 1 3)))))
-    (count
-      (lambda (coord)
-        (char=? (array-ref acc coord) #\#))
-      (array-indexes acc))))
+    (count (lambda (i) (char=? (array-ref acc i) #\#)) (array-indexes acc))))
 
 (define (solve/1 input)
   (run input 1 '(0 0)))
