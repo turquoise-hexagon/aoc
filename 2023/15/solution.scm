@@ -1,6 +1,7 @@
 (import
   (chicken io)
   (chicken string)
+  (chicken fixnum)
   (srfi 1))
 
 (define-constant SIZE 256)
@@ -11,7 +12,7 @@
 (define (HASH str)
   (foldl
     (lambda (acc i)
-      (modulo (* (+ acc (char->integer i)) 17) SIZE))
+      (fxmod (fx* (fx+ acc (char->integer i)) 17) SIZE))
     0 (string->list str)))
 
 (define (parse str)
