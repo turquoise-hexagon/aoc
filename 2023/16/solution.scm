@@ -1,6 +1,7 @@
 (import
   (chicken io)
   (chicken string)
+  (chicken fixnum)
   (euler)
   (srfi 1)
   (srfi 69))
@@ -19,23 +20,30 @@
 (define (cantor a b)
   (let ((_ (+ a b))) (+ (quotient (* _ (+ _ 1)) 2) b)))
 
+(define (split mem test? lst dir coord)
+  (let ((id (foldl cantor dir coord)))
+    (if (hash-table-exists? mem id) '()
+      (begin
+        (hash-table-set! mem id #t)
+        (if (test? dir) lst `(,dir))))))
+
+(define (bouce test? dir)
+  `(,(modulo (+ dir nb-dirs (if (test? dir) +1 -1)) nb-dirs)))
+
 (define (run array dir coord)
   (let ((acc (array-copy array)) (mem (make-hash-table)))
     (let loop ((dir dir) (coord coord))
       (when (array-exists? array coord)
-        (let ((id (foldl cantor dir coord)))
-          (unless (hash-table-exists? mem id)
-            (hash-table-set! mem id #t)
-            (array-set! acc  coord #\#)
-            (for-each
-              (lambda (dir)
-                (loop dir (map + coord (vector-ref dirs dir))))
-              (case (array-ref array coord)
-                ((#\.) `(,dir))
-                ((#\/) `(,(modulo (+ dir nb-dirs (if (even? dir) +1 -1)) nb-dirs)))
-                ((#\\) `(,(modulo (+ dir nb-dirs (if (odd?  dir) +1 -1)) nb-dirs)))
-                ((#\|) (if (odd?  dir) '(0 2) `(,dir)))
-                ((#\-) (if (even? dir) '(1 3) `(,dir)))))))))
+        (array-set! acc  coord #\#)
+        (for-each
+          (lambda (dir)
+            (loop dir (map + coord (vector-ref dirs dir))))
+          (case (array-ref array coord)
+            ((#\.) `(,dir))
+            ((#\/) (bouce even? dir))
+            ((#\\) (bouce odd?  dir))
+            ((#\|) (split mem odd?  '(0 2) dir coord))
+            ((#\-) (split mem even? '(1 3) dir coord))))))
     (count
       (lambda (coord)
         (char=? (array-ref acc coord) #\#))
@@ -59,5 +67,7 @@
     (map sub1 (array-dimensions input))))
 
 (let ((input (import-input)))
-  (print (solve/1 input))
-  (print (solve/2 input)))
+  (let ((part/1 (solve/1 input)))
+    (print part/1) (assert (= part/1 8249)))
+  (let ((part/2 (solve/2 input)))
+    (print part/2) (assert (= part/2 8444))))
