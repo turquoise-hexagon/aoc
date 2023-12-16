@@ -12,7 +12,7 @@
     (let ((_ (map + i direction)))
       (if (and (array-exists? array _) (char=? (array-ref array _) #\.))
         (loop _)
-        (begin
+        (unless (equal? coord i)
           (array-set! array coord #\.)
           (array-set! array i     #\O))))))
 
