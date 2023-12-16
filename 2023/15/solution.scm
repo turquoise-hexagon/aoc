@@ -1,8 +1,9 @@
 (import
   (chicken io)
   (chicken string)
-  (srfi 1)
-  (srfi 69))
+  (srfi 1))
+
+(define-constant SIZE 256)
 
 (define (import-input)
   (string-split (read-line) ","))
@@ -10,35 +11,36 @@
 (define (HASH str)
   (foldl
     (lambda (acc i)
-      (modulo (* (+ acc (char->integer i)) 17) 256))
+      (modulo (* (+ acc (char->integer i)) 17) SIZE))
     0 (string->list str)))
 
 (define (parse str)
   (string-split str "-="))
 
-(define (process! table label . args)
-  (hash-table-update! table (+ (HASH label) 1)
-    (lambda (lst)
-      (apply
-        (case-lambda
-          (()      (alist-delete label       lst string=?))
-          ((value) (alist-update label value lst string=?)))
-        args))))
+(define (process! HASHMAP label . args)
+  (let ((HASH (+ (HASH label) 1)))
+    (vector-set! HASHMAP HASH
+      (let ((lst (vector-ref HASHMAP HASH)))
+        (apply
+          (case-lambda
+            (()      (alist-delete label       lst string=?))
+            ((value) (alist-update label value lst string=?)))
+          args)))))
 
-(define (focusing-power table)
-  (hash-table-fold table
-    (lambda (id lst acc)
-      (fold
-        (lambda (pair index acc)
-          (+ acc (* id index (string->number (cdr pair)))))
-        acc lst (iota (length lst) 1)))
-    0))
+(define (focusing-power HASHMAP)
+  (do ((i 1 (+ i 1))
+       (acc 0 (let ((lst (vector-ref HASHMAP i)))
+                (fold
+                  (lambda (pair index acc)
+                    (+ acc (* i index (string->number (cdr pair)))))
+                  acc lst (iota (length lst) 1)))))
+    ((> i SIZE) acc)))
 
 (define (solve/1 input)
   (apply + (map HASH input)))
 
 (define (solve/2 input)
-  (let ((acc (make-hash-table #:initial '())))
+  (let ((acc (make-vector (+ SIZE 1) '())))
     (for-each
       (lambda (i)
         (apply process! acc (parse i)))
