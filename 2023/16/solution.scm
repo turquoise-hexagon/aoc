@@ -16,17 +16,14 @@
 (define (import-input)
   (list->array (map string->list (read-lines))))
 
-(define (cantor2 a b)
+(define (cantor a b)
   (let ((_ (+ a b))) (+ (quotient (* _ (+ _ 1)) 2) b)))
-
-(define (cantor3 a b c)
-  (cantor2 (cantor2 a b) c))
 
 (define (run array dir coord)
   (let ((acc (array-copy array)) (mem (make-hash-table)))
     (let loop ((dir dir) (coord coord))
       (when (array-exists? array coord)
-        (let ((id (apply cantor3 (cons dir coord))))
+        (let ((id (foldl cantor dir coord)))
           (unless (hash-table-exists? mem id)
             (hash-table-set! mem id #t)
             (array-set! acc  coord #\#)
