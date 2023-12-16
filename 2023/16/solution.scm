@@ -27,7 +27,7 @@
         (hash-table-set! mem id #t)
         (if (test? dir) lst `(,dir))))))
 
-(define (bouce test? dir)
+(define (bounce test? dir)
   `(,(modulo (+ dir nb-dirs (if (test? dir) +1 -1)) nb-dirs)))
 
 (define (run array dir coord)
@@ -40,8 +40,8 @@
             (loop dir (map + coord (vector-ref dirs dir))))
           (case (array-ref array coord)
             ((#\.) `(,dir))
-            ((#\/) (bouce even? dir))
-            ((#\\) (bouce odd?  dir))
+            ((#\/) (bounce even? dir))
+            ((#\\) (bounce odd?  dir))
             ((#\|) (split mem odd?  '(0 2) dir coord))
             ((#\-) (split mem even? '(1 3) dir coord))))))
     (count
