@@ -3,11 +3,10 @@
   (chicken string)
   (chicken fixnum)
   (euler)
-  (srfi 1)
-  (srfi 69))
+  (srfi 1))
 
 (define-constant dirs
-  '((-1  0)
+  #((-1  0)
     ( 0  1)
     ( 1  0)
     ( 0 -1)))
@@ -25,41 +24,32 @@
     (car b)))
 
 (define-inline (generate dir)
-  (let loop ((i 1) (cost cost) (coord coord))
-    (if (fx> i M) '()
-      (let ((coord (map fx+ coord dir)))
-        (if (not (array-exists? array coord)) '()
-          (let ((cost (fx+ cost (array-ref array coord))))
-            (if (fx< i m)
-              (loop (fx+ i 1) cost coord)
-              (cons (list cost coord dir) (loop (fx+ i 1) cost coord)))))))))
+  (let ((offset (vector-ref dirs dir)))
+    (let loop ((i 1) (cost cost) (coord coord))
+      (if (fx> i M) '()
+        (let ((coord (map fx+ coord offset)))
+          (if (not (array-exists? array coord)) '()
+            (let ((cost (fx+ cost (array-ref array coord))))
+              (if (fx< i m)
+                (loop (fx+ i 1) cost coord)
+                (cons (list cost coord dir) (loop (fx+ i 1) cost coord))))))))))
 
 (define (neighbors array m M cost coord dir)
-  (let ((_ (reverse dir)))
-    (append
-      (generate            _)
-      (generate (map fxneg _)))))
-
-(define (cantor a b)
-  (let ((_ (fx+ a b)))
-    (fx+ (fx/ (fx* _ (fx+ _ 1)) 2) b)))
-
-(define (id a b)
-  (cantor
-    (apply cantor a)
-    (apply cantor b)))
+  (append
+    (generate (modulo (+ dir +1 4) 4))
+    (generate (modulo (+ dir -1 4) 4))))
 
 (define (path array m M coord)
-  (let ((acc (make-hash-table)))
-    (do ((queue (list->priority-queue (map (lambda (i) (list 0 coord i)) dirs) ?)
+  (let ((acc (make-array (cons 4 (array-dimensions array)) #e1e6)))
+    (do ((queue (list->priority-queue (map (lambda (i) (list 0 coord i)) '(0 1 2 3)) ?)
            (foldl
              (lambda (queue i)
                (apply
                  (lambda (cost coord dir)
-                   (let ((id (id coord dir)))
-                     (if (fx< cost (hash-table-ref/default acc id #e1e6))
+                   (let ((id (cons dir coord)))
+                     (if (fx< cost (array-ref acc id))
                        (begin
-                         (hash-table-set! acc id cost)
+                         (array-set! acc id cost)
                          (priority-queue-insert queue i))
                        queue)))
                  i))
@@ -71,8 +61,8 @@
     (apply min
       (map
         (lambda (i)
-          (hash-table-ref/default acc (id coord i) #e1e6))
-        dirs))))
+          (array-ref acc (cons i coord)))
+        '(0 1 2 3)))))
 
 (let ((input (import-input)))
   (let ((part/1 (solve input 1 3)))
