@@ -24,10 +24,10 @@
     (car b)))
 
 (define-inline (_iterate dir)
-  (let ((offset (vector-ref dirs dir)))
+  (let ((_ (vector-ref dirs dir)))
     (let loop ((i 1) (queue queue) (cost cost) (coord coord))
       (if (fx> i M) queue
-        (let ((coord (map fx+ coord offset)))
+        (let ((coord (list (fx+ (car coord) (car _)) (fx+ (cadr coord) (cadr _)))))
           (if (not (array-exists? array coord)) queue
             (let ((cost (fx+ cost (array-ref array coord))))
               (if (fx< i m)
