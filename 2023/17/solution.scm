@@ -6,11 +6,6 @@
   (srfi 1)
   (srfi 69))
 
-(define-syntax bind
-  (syntax-rules ()
-    ((_ pat data expr expr* ...)
-     (apply (lambda pat expr expr* ...) data))))
-
 (define-constant dirs
   '((-1  0)
     ( 0  1)
@@ -59,13 +54,15 @@
     (do ((queue (list->priority-queue (map (lambda (i) (list 0 coord i)) dirs) ?)
            (foldl
              (lambda (queue i)
-               (bind (cost coord dir) i
-                 (let ((id (id coord dir)))
-                   (if (fx< cost (hash-table-ref/default acc id #e1e6))
-                     (begin
-                       (hash-table-set! acc id cost)
-                       (priority-queue-insert queue i))
-                     queue))))
+               (apply
+                 (lambda (cost coord dir)
+                   (let ((id (id coord dir)))
+                     (if (fx< cost (hash-table-ref/default acc id #e1e6))
+                       (begin
+                         (hash-table-set! acc id cost)
+                         (priority-queue-insert queue i))
+                       queue)))
+                 i))
              (priority-queue-rest queue) (apply neighbors array m M (priority-queue-first queue)))))
       ((priority-queue-empty? queue) acc))))
 
