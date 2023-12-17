@@ -23,37 +23,34 @@
     (car a)
     (car b)))
 
-(define-inline (generate dir)
+(define-inline (_iterate dir)
   (let ((offset (vector-ref dirs dir)))
-    (let loop ((i 1) (cost cost) (coord coord))
-      (if (fx> i M) '()
+    (let loop ((i 1) (queue queue) (cost cost) (coord coord))
+      (if (fx> i M) queue
         (let ((coord (map fx+ coord offset)))
-          (if (not (array-exists? array coord)) '()
+          (if (not (array-exists? array coord)) queue
             (let ((cost (fx+ cost (array-ref array coord))))
               (if (fx< i m)
-                (loop (fx+ i 1) cost coord)
-                (cons (list cost coord dir) (loop (fx+ i 1) cost coord))))))))))
+                (loop (fx+ i 1) queue cost coord)
+                (let ((id (cons dir coord)))
+                  (if (fx< cost (array-ref acc id))
+                    (begin
+                      (array-set! acc id cost)
+                      (loop (fx+ i 1) (priority-queue-insert queue (list cost coord dir)) cost coord))
+                    (loop (fx+ i 1) queue cost coord)))))))))))
 
-(define (neighbors array m M cost coord dir)
-  (append
-    (generate (fxmod (fx+ (fx+ dir 1) 4) 4))
-    (generate (fxmod (fx+ (fx- dir 1) 4) 4))))
+(define (iterate array m M acc queue cost coord dir)
+  (let*
+    ((queue (_iterate (fxmod (fx+ (fx+ dir 1) 4) 4)))
+     (queue (_iterate (fxmod (fx+ (fx- dir 1) 4) 4))))
+    queue))
 
 (define (path array m M coord)
   (let ((acc (make-array (cons 4 (array-dimensions array)) #e1e6)))
     (do ((queue (list->priority-queue (map (lambda (i) (list 0 coord i)) '(0 1 2 3)) ?)
-           (foldl
-             (lambda (queue i)
-               (apply
-                 (lambda (cost coord dir)
-                   (let ((id (cons dir coord)))
-                     (if (fx< cost (array-ref acc id))
-                       (begin
-                         (array-set! acc id cost)
-                         (priority-queue-insert queue i))
-                       queue)))
-                 i))
-             (priority-queue-rest queue) (apply neighbors array m M (priority-queue-first queue)))))
+                (apply iterate array m M acc
+                  (priority-queue-rest  queue)
+                  (priority-queue-first queue))))
       ((priority-queue-empty? queue) acc))))
 
 (define (solve input m M)
