@@ -1,6 +1,7 @@
 (import
   (chicken io)
   (chicken string)
+  (chicken fixnum)
   (euler)
   (srfi 1)
   (srfi 69))
@@ -24,27 +25,29 @@
       (read-lines))))
 
 (define (? a b)
-  (< (car a)
-     (car b)))
+  (fx<
+    (car a)
+    (car b)))
 
 (define-inline (generate dir)
   (let loop ((i 1) (cost cost) (coord coord))
-    (if (> i M) '()
-      (let ((coord (map + coord dir)))
+    (if (fx> i M) '()
+      (let ((coord (map fx+ coord dir)))
         (if (not (array-exists? array coord)) '()
-          (let ((cost (+ cost (array-ref array coord))))
-            (if (< i m)
-              (loop (+ i 1) cost coord)
-              (cons (list cost coord dir) (loop (+ i 1) cost coord)))))))))
+          (let ((cost (fx+ cost (array-ref array coord))))
+            (if (fx< i m)
+              (loop (fx+ i 1) cost coord)
+              (cons (list cost coord dir) (loop (fx+ i 1) cost coord)))))))))
 
 (define (neighbors array m M cost coord dir)
-  (append
-    (generate (map + (reverse dir)))
-    (generate (map - (reverse dir)))))
+  (let ((_ (reverse dir)))
+    (append
+      (generate            _)
+      (generate (map fxneg _)))))
 
 (define (cantor a b)
-  (let ((_ (+ a b)))
-    (+ (quotient (* _ (+ _ 1)) 2) b)))
+  (let ((_ (fx+ a b)))
+    (fx+ (fx/ (fx* _ (fx+ _ 1)) 2) b)))
 
 (define (id a b)
   (cantor
@@ -58,7 +61,7 @@
              (lambda (queue i)
                (bind (cost coord dir) i
                  (let ((id (id coord dir)))
-                   (if (< cost (hash-table-ref/default acc id #e1e6))
+                   (if (fx< cost (hash-table-ref/default acc id #e1e6))
                      (begin
                        (hash-table-set! acc id cost)
                        (priority-queue-insert queue i))
