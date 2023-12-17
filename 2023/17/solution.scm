@@ -41,8 +41,8 @@
 
 (define (iterate array m M acc queue cost coord dir)
   (let*
-    ((queue (_iterate (fxmod (fx+ (fx+ dir 1) 4) 4)))
-     (queue (_iterate (fxmod (fx+ (fx- dir 1) 4) 4))))
+    ((queue (_iterate (fxmod (fx+ dir 1) 4)))
+     (queue (_iterate (fxmod (fx- dir 1) 4))))
     queue))
 
 (define (path array m M coord)
