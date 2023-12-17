@@ -30,7 +30,7 @@
   (let ((acc (array-copy array)) (mem (make-hash-table)))
     (let loop ((dir dir) (coord coord))
       (define (next dir)
-        (loop dir (map + coord dir)))
+        (loop dir (list (+ (car coord) (car dir)) (+ (cadr coord) (cadr dir)))))
       (when (array-exists? array coord)
         (array-set! acc coord #\#)
         (case (array-ref array coord)
