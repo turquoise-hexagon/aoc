@@ -36,8 +36,8 @@
 
 (define (neighbors array m M cost coord dir)
   (append
-    (generate (modulo (+ dir +1 4) 4))
-    (generate (modulo (+ dir -1 4) 4))))
+    (generate (fxmod (fx+ (fx+ dir 1) 4) 4))
+    (generate (fxmod (fx+ (fx- dir 1) 4) 4))))
 
 (define (path array m M coord)
   (let ((acc (make-array (cons 4 (array-dimensions array)) #e1e6)))
