@@ -7,28 +7,28 @@
 (define (import-input)
   (list->array (map string->list (read-lines))))
 
-(define (_tilt! array direction coord)
+(define (_tilt! array dir coord)
   (let loop ((i coord))
-    (let ((_ (map + i direction)))
+    (let ((_ (list (+ (car i) (car dir)) (+ (cadr i) (cadr dir)))))
       (if (and (array-exists? array _) (char=? (array-ref array _) #\.))
         (loop _)
         (unless (equal? coord i)
           (array-set! array coord #\.)
           (array-set! array i     #\O))))))
 
-(define-memoized (indexes dimensions direction)
+(define-memoized (indexes dimensions dir)
   (apply product
     (map
       (lambda (i n)
         (if (= i 1) (range n 0) (range n)))
-      direction (map sub1 dimensions))))
+      dir (map sub1 dimensions))))
 
-(define (tilt! array direction)
+(define (tilt! array dir)
   (for-each
     (lambda (i)
       (when (char=? (array-ref array i) #\O)
-        (_tilt! array direction i)))
-    (indexes (array-dimensions array) direction)))
+        (_tilt! array dir i)))
+    (indexes (array-dimensions array) dir)))
 
 (define (score array)
   (let ((_ (car (array-dimensions array))))
