@@ -25,11 +25,7 @@
        (* l w h))))
 
 (define (solve input proc)
-  (apply +
-    (map
-      (lambda (i)
-        (apply proc i))
-      input)))
+  (apply + (map (lambda (i) (apply proc i)) input)))
 
 (let ((input (import-input)))
   (let ((part/1 (solve input proc/1)))
