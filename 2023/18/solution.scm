@@ -8,17 +8,17 @@
      (apply (lambda pat expr expr* ...) data))))
 
 (define (parse/1 lst)
-  (bind (dir distance _) lst
+  (bind (dir dist _) lst
     (list
       (string->symbol dir)
-      (string->number distance))))
+      (string->number dist))))
 
 (define (parse/2 lst)
-  (bind (_ _ color) lst
-    (bind (distance dir) (string-chop (substring color 1) 5)
+  (bind (_ _ hex) lst
+    (bind (dist dir) (string-chop (substring hex 1) 5)
       (list
         (string->number dir 16)
-        (string->number distance 16)))))
+        (string->number dist 16)))))
 
 (define (import-input)
   (map
@@ -34,24 +34,26 @@
     ((3 U) '(-1  0))))
 
 (define (run lst)
-  (let loop ((lst lst) (coord '(0 0)) (peri 0) (points '()))
+  (let loop ((lst lst) (pt '(0 0)) (peri 0) (pts '()))
     (if (null? lst)
-      (list peri (cons '(0 0) points))
+      (list peri pts)
       (bind (dir dist) (car lst)
-        (loop (cdr lst) (map + coord (map * (offset dir) (list dist dist))) (+ peri dist) (cons coord points))))))
-
-(define (compute peri points)
-  (+ (quotient (+ (apply +
-                    (map
-                      (lambda (a b)
-                        (apply * (map (lambda (a b c) (a b c)) (list - +) a b)))
-                      points (cdr points)))
-                  peri)
-               2)
-     1))
+        (loop (cdr lst)
+          (map + pt (map * (offset dir) (list dist dist)))
+          (+ peri dist)
+          (cons pt pts))))))
 
 (define (solve input)
-  (apply compute (run input)))
+  (bind (peri pts) (run input)
+    (+ (quotient
+         (+ (apply +
+              (map
+                (lambda (a b)
+                  (apply * (map (cut <> <> <>) (list - +) a b)))
+                pts (cdr pts)))
+            peri)
+         2)
+       1)))
 
 (let ((input (import-input)))
   (let ((part/1 (solve (map parse/1 input))))
