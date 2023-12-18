@@ -46,12 +46,11 @@
 (define (solve input)
   (bind (peri pts) (run input)
     (+ (quotient
-         (+ (apply +
-              (map
-                (lambda (a b)
-                  (apply * (map (cut <> <> <>) (list - +) a b)))
-                pts (cdr pts)))
-            peri)
+         (apply + peri
+           (map
+             (lambda (a b)
+               (apply * (map (cut <> <> <>) (list - +) a b)))
+             pts (cdr pts)))
          2)
        1)))
 
