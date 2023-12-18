@@ -47,10 +47,11 @@
 
 (define (path array m M coord)
   (let ((acc (make-array (cons 4 (array-dimensions array)) #e1e6)))
-    (do ((queue (list->priority-queue (map (lambda (i) (list 0 coord i)) '(0 1 2 3)) ?)
-                (apply iterate array m M acc
-                  (priority-queue-rest  queue)
-                  (priority-queue-first queue))))
+    (do ((queue
+           (list->priority-queue (map (lambda (i) (list 0 coord i)) '(0 1 2 3)) ?)
+           (apply iterate array m M acc
+             (priority-queue-rest  queue)
+             (priority-queue-first queue))))
       ((priority-queue-empty? queue) acc))))
 
 (define (solve input m M)
