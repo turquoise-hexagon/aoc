@@ -19,10 +19,8 @@
 
 (define (_parse-comparison str ope idb)
   (apply
-    (case-lambda
-      ((ida val)
-       (list ida (eval (string->symbol ope)) (string->number val) idb))
-      (_ #f))
+    (lambda (ida val)
+      (list ida (eval (string->symbol ope)) (string->number val) idb))
     (string-split str ope)))
 
 (define (parse-comparison str)
@@ -30,8 +28,8 @@
     (case-lambda
       ((comp idb)
        (cond
-         ((_parse-comparison comp ">" idb) => identity)
-         ((_parse-comparison comp "<" idb) => identity)))
+         ((substring-index ">" comp) (_parse-comparison comp ">" idb))
+         ((substring-index "<" comp) (_parse-comparison comp "<" idb))))
       (idb idb))
     (string-split str ":")))
 
