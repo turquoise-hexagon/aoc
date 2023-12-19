@@ -57,11 +57,6 @@
     (hash-table-set! acc id val)
     acc))
 
-(define (next rating id val)
-  (let ((acc (hash-table-copy rating)))
-    (hash-table-set! acc id val)
-    acc))
-
 (define (process workflows rating #!optional (id "in"))
   (cond
     ((string=? id "R") '())
