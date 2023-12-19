@@ -4,48 +4,58 @@
   (srfi 1)
   (srfi 69))
 
-(define (rating lst)
-  (alist->hash-table (map cons '("x" "m" "a" "s") lst)))
+(define-syntax bind
+  (syntax-rules ()
+    ((_ pat data expr expr* ...)
+     (apply (lambda pat expr expr* ...) data))))
 
-(define-inline (_parse-comparison ope)
+(define (read-chunks)
+  (foldr
+    (lambda (i acc)
+      (if (string=? i "")
+        (cons '() acc)
+        (cons (cons i (car acc)) (cdr acc))))
+    '(()) (read-lines)))
+
+(define (_parse-comparison str ope idb)
   (apply
-    (lambda (ida val)
-      (list ida (eval (string->symbol ope)) (string->number val) idb))
-    (string-split comparison ope)))
+    (case-lambda
+      ((ida val)
+       (list ida (eval (string->symbol ope)) (string->number val) idb))
+      (_ #f))
+    (string-split str ope)))
 
 (define (parse-comparison str)
   (apply
     (case-lambda
-      ((comparison idb)
+      ((comp idb)
        (cond
-         ((substring-index ">" comparison) (_parse-comparison ">"))
-         ((substring-index "<" comparison) (_parse-comparison "<"))))
+         ((_parse-comparison comp ">" idb) => identity)
+         ((_parse-comparison comp "<" idb) => identity)))
       (idb idb))
     (string-split str ":")))
 
 (define (parse-workflows lst)
-  (alist->hash-table
-    (map
+  (let ((acc (make-hash-table)))
+    (for-each
       (lambda (i)
-        (apply
-          (lambda (id . comparisons)
-            (cons id (map parse-comparison comparisons)))
-          (string-split i "{,}")))
-      lst)))
+        (bind (id . comparisons) (string-split i "{,}")
+          (hash-table-set! acc id (map parse-comparison comparisons))))
+      lst)
+    acc))
 
 (define (parse-rating str)
-  (rating (map list (map string->number (string-split str "{xmas=,}")))))
+  (let ((acc (make-hash-table)))
+    (for-each
+      (lambda (i)
+        (bind (id val) (string-split i "=")
+          (hash-table-set! acc id (list (string->number val)))))
+      (string-split str "{,}"))
+    acc))
 
 (define (import-input)
-  (apply
-    (lambda (workflows ratings)
-      (values (parse-workflows workflows) (map parse-rating ratings)))
-    (foldr
-      (lambda (i acc)
-        (if (string=? i "")
-          (cons '() acc)
-          (cons (cons i (car acc)) (cdr acc))))
-      '(()) (read-lines))))
+  (bind (workflows ratings) (read-chunks)
+    (values (parse-workflows workflows) (map parse-rating ratings))))
 
 (define (next rating id val)
   (let ((acc (hash-table-copy rating)))
@@ -85,7 +95,13 @@
     (map
       (lambda (i)
         (apply * (map length i)))
-      (process workflows (rating (make-list 4 (iota 4000 1)))))))
+      (process workflows
+        (let ((rating (make-hash-table)))
+          (for-each
+            (lambda (i)
+              (hash-table-set! rating i (iota 4000 1)))
+            '("x" "m" "a" "s"))
+          rating)))))
 
 (let-values (((workflows ratings) (import-input)))
   (let ((part/1 (solve/1 workflows ratings)))
