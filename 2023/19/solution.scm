@@ -91,17 +91,16 @@
         ratings))))
 
 (define (solve/2 workflows)
-  (apply +
-    (map
+  (let ((rating (make-hash-table)))
+    (for-each
       (lambda (i)
-        (apply * (map length i)))
-      (process workflows
-        (let ((rating (make-hash-table)))
-          (for-each
-            (lambda (i)
-              (hash-table-set! rating i (iota 4000 1)))
-            '("x" "m" "a" "s"))
-          rating)))))
+        (hash-table-set! rating i (iota 4000 1)))
+      '("x" "m" "a" "s"))
+    (apply +
+      (map
+        (lambda (i)
+          (apply * (map length i)))
+        (process workflows rating)))))
 
 (let-values (((workflows ratings) (import-input)))
   (let ((part/1 (solve/1 workflows ratings)))
