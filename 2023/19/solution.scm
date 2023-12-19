@@ -4,14 +4,6 @@
   (srfi 1)
   (srfi 69))
 
-(define (read-chunks)
-  (foldr
-    (lambda (i acc)
-      (if (string=? i "")
-        (cons '() acc)
-        (cons (cons i (car acc)) (cdr acc))))
-    '(()) (read-lines)))
-
 (define (rating lst)
   (alist->hash-table (map cons '("x" "m" "a" "s") lst)))
 
@@ -45,14 +37,18 @@
     acc))
 
 (define (parse-rating str)
-  (let ((lst (map string->number (string-split str "{xmas=,}"))))
-    (rating (map list lst))))
+  (rating (map list (map string->number (string-split str "{xmas=,}")))))
 
 (define (import-input)
   (apply
     (lambda (workflows ratings)
       (values (parse-workflows workflows) (map parse-rating ratings)))
-    (read-chunks)))
+    (foldr
+      (lambda (i acc)
+        (if (string=? i "")
+          (cons '() acc)
+          (cons (cons i (car acc)) (cdr acc))))
+      '(()) (read-lines))))
 
 (define (next rating id val)
   (let ((acc (hash-table-copy rating)))
