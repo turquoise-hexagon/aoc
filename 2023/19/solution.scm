@@ -24,15 +24,14 @@
     (string-split str ":")))
 
 (define (parse-workflows lst)
-  (let ((acc (make-hash-table)))
-    (for-each
+  (alist->hash-table
+    (map
       (lambda (i)
         (apply
           (lambda (id . comparisons)
-            (hash-table-set! acc id (map parse-comparison comparisons)))
+            (cons id (map parse-comparison comparisons)))
           (string-split i "{,}")))
-      lst)
-    acc))
+      lst)))
 
 (define (parse-rating str)
   (rating (map list (map string->number (string-split str "{xmas=,}")))))
