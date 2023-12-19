@@ -57,11 +57,6 @@
   (bind (workflows ratings) (read-chunks)
     (values (parse-workflows workflows) (map parse-rating ratings))))
 
-(define (next rating id val)
-  (let ((acc (hash-table-copy rating)))
-    (hash-table-set! acc id val)
-    acc))
-
 (define (process workflows rating #!optional (id "in"))
   (cond
     ((string=? id "R") '())
@@ -76,9 +71,10 @@
                 ((null? a) (loop (cdr lst)))
                 ((null? b) (process workflows rating idb))
                 (else
-                 (append
-                   (process workflows (next rating ida a) idb)
-                   (process workflows (next rating ida b) id))))))
+                 (let ((_ (hash-table-copy rating)))
+                   (hash-table-set!      _ ida a)
+                   (hash-table-set! rating ida b)
+                   (append (process workflows _ idb) (loop (cdr lst))))))))
            ((idb) (process workflows rating idb)))
          (car lst))))))
 
