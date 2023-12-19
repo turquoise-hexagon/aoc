@@ -12,6 +12,9 @@
         (cons (cons i (car acc)) (cdr acc))))
     '(()) (read-lines)))
 
+(define (rating lst)
+  (alist->hash-table (map cons '("x" "m" "a" "s") lst)))
+
 (define (_parse-comparison str ope idb)
   (apply
     (case-lambda
@@ -42,15 +45,8 @@
     acc))
 
 (define (parse-rating str)
-  (let ((acc (make-hash-table)))
-    (for-each
-      (lambda (i)
-        (apply
-          (lambda (id val)
-            (hash-table-set! acc id (list (string->number val))))
-          (string-split i "=")))
-      (string-split str "{,}"))
-    acc))
+  (let ((lst (map string->number (string-split str "{xmas=,}"))))
+    (rating (map list lst))))
 
 (define (import-input)
   (apply
@@ -92,16 +88,11 @@
         ratings))))
 
 (define (solve/2 workflows)
-  (let ((rating (make-hash-table)))
-    (for-each
+  (apply +
+    (map
       (lambda (i)
-        (hash-table-set! rating i (iota 4000 1)))
-      (list "x" "m" "a" "s"))
-    (apply +
-      (map
-        (lambda (i)
-          (apply * (map length i)))
-        (process workflows rating)))))
+        (apply * (map length i)))
+      (process workflows (rating (make-list 4 (iota 4000 1)))))))
 
 (let-values (((workflows ratings) (import-input)))
   (let ((part/1 (solve/1 workflows ratings)))
