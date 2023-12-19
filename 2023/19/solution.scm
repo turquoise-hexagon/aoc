@@ -7,21 +7,19 @@
 (define (rating lst)
   (alist->hash-table (map cons '("x" "m" "a" "s") lst)))
 
-(define (_parse-comparison str ope idb)
+(define-inline (_parse-comparison ope)
   (apply
-    (case-lambda
-      ((ida val)
-       (list ida (eval (string->symbol ope)) (string->number val) idb))
-      (_ #f))
-    (string-split str ope)))
+    (lambda (ida val)
+      (list ida (eval (string->symbol ope)) (string->number val) idb))
+    (string-split comparison ope)))
 
 (define (parse-comparison str)
   (apply
     (case-lambda
       ((comparison idb)
        (cond
-         ((_parse-comparison comparison ">" idb) => identity)
-         ((_parse-comparison comparison "<" idb) => identity)))
+         ((substring-index ">" comparison) (_parse-comparison ">"))
+         ((substring-index "<" comparison) (_parse-comparison "<"))))
       (idb idb))
     (string-split str ":")))
 
