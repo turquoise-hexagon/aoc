@@ -10,7 +10,7 @@
   (substring (string->md5sum (string-append input (number->string i))) 0 n))
 
 (define (solve input n)
-  (let ((str (apply string-append (make-list n "0"))))
+  (let ((str (make-string n #\0)))
     (do ((i 1 (+ i 1)))
       ((string=? str (generate input i n))
        i))))
