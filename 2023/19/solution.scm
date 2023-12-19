@@ -1,34 +1,43 @@
 (import
   (chicken io)
-  (chicken irregex)
   (chicken string)
   (srfi 1)
   (srfi 69))
 
-(define-syntax bind
-  (syntax-rules ()
-    ((_ pat data expr expr* ...)
-     (apply (lambda pat expr expr* ...) data))))
+(define (read-chunks)
+  (foldr
+    (lambda (i acc)
+      (if (string=? i "")
+        (cons '() acc)
+        (cons (cons i (car acc)) (cdr acc))))
+    '(()) (read-lines)))
 
-(define-constant regex "([A-z]+)([<>])([0-9]+):([A-z]+)")
+(define (_parse-comparison str ope idb)
+  (apply
+    (case-lambda
+      ((ida val)
+       (list ida (eval (string->symbol ope)) (string->number val) idb))
+      (_ #f))
+    (string-split str ope)))
 
-(define (parse-condition str)
-  (let ((match (irregex-match regex str)))
-    (if match
-      (bind (ida ope val idb)
-        (map
-          (lambda (i)
-            (irregex-match-substring match i))
-          (iota 4 1))
-        (list ida (eval (string->symbol ope)) (string->number val) idb))
-      (list str))))
+(define (parse-comparison str)
+  (apply
+    (case-lambda
+      ((comparison idb)
+       (cond
+         ((_parse-comparison comparison ">" idb) => identity)
+         ((_parse-comparison comparison "<" idb) => identity)))
+      (idb idb))
+    (string-split str ":")))
 
 (define (parse-workflows lst)
   (let ((acc (make-hash-table)))
     (for-each
       (lambda (i)
-        (bind (id . conditions) (string-split i "{,}")
-          (hash-table-set! acc id (map parse-condition conditions))))
+        (apply
+          (lambda (id . comparisons)
+            (hash-table-set! acc id (map parse-comparison comparisons)))
+          (string-split i "{,}")))
       lst)
     acc))
 
@@ -36,21 +45,18 @@
   (let ((acc (make-hash-table)))
     (for-each
       (lambda (i)
-        (bind (id val) i
-          (let ((val (string->number val)))
-            (hash-table-set! acc id (list val)))))
-      (chop (string-split str "{=,}") 2))
+        (apply
+          (lambda (id val)
+            (hash-table-set! acc id (list (string->number val))))
+          (string-split i "=")))
+      (string-split str "{,}"))
     acc))
 
 (define (import-input)
-  (bind (workflows ratings)
-    (foldr
-      (lambda (i acc)
-        (if (string=? i "")
-          (cons '() acc)
-          (cons (cons i (car acc)) (cdr acc))))
-      '(()) (read-lines))
-    (values (parse-workflows workflows) (map parse-rating ratings))))
+  (apply
+    (lambda (workflows ratings)
+      (values (parse-workflows workflows) (map parse-rating ratings)))
+    (read-chunks)))
 
 (define (next rating id val)
   (let ((acc (hash-table-copy rating)))
@@ -66,14 +72,14 @@
        (apply
          (case-lambda
            ((ida ope val idb)
-            (let-values (((a b) (partition (cut ope <> val) (hash-table-ref rating ida))))
+            (let-values (((a b) (partition (lambda (i) (ope i val)) (hash-table-ref rating ida))))
               (cond
                 ((null? a) (loop (cdr lst)))
                 ((null? b) (process workflows rating idb))
                 (else
-                  (append
-                    (process workflows (next rating ida a) idb)
-                    (process workflows (next rating ida b) id))))))
+                 (append
+                   (process workflows (next rating ida a) idb)
+                   (process workflows (next rating ida b) id))))))
            ((idb) (process workflows rating idb)))
          (car lst))))))
 
@@ -86,7 +92,11 @@
         ratings))))
 
 (define (solve/2 workflows)
-  (let ((rating (alist->hash-table (map cons '("x" "m" "a" "s") (make-list 4 (iota 4000 1))))))
+  (let ((rating (make-hash-table)))
+    (for-each
+      (lambda (i)
+        (hash-table-set! rating i (iota 4000 1)))
+      (list "x" "m" "a" "s"))
     (apply +
       (map
         (lambda (i)
