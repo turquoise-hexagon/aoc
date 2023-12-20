@@ -16,6 +16,17 @@
     ((#\%) (values (substring str 1) '%))
     (else  (values str 'B))))
 
+(define (analyse table)
+  (let ((parent
+          (find
+            (lambda (name)
+              (bind (_ _ match) (hash-table-ref table name) (member "rx" match)))
+            (hash-table-keys table))))
+    (filter
+      (lambda (name)
+        (bind (_ _ match) (hash-table-ref table name) (member parent match)))
+      (hash-table-keys table))))
+
 (define (import-input)
   (let ((acc (make-hash-table)))
     (for-each
@@ -38,18 +49,7 @@
                   (case type
                     ((&) (hash-table-set! state name 0))))))
             destinations))))
-    acc))
-
-(define (analyse table)
-  (let ((parent
-          (find
-            (lambda (name)
-              (bind (_ _ match) (hash-table-ref table name) (member "rx" match)))
-            (hash-table-keys table))))
-    (filter
-      (lambda (name)
-        (bind (_ _ match) (hash-table-ref table name) (member parent match)))
-      (hash-table-keys table))))
+    (values acc (analyse acc))))
 
 (define (compare? a b)
   (< (car a)
@@ -97,7 +97,7 @@
                   (loop (priority-queue-rest queue))))))
           (main (+ i 1)))))))
 
-(let ((input (import-input)))
-  (let ((parts (solve input 1000 (analyse input))))
+(let-values (((input analysis) (import-input)))
+  (let ((parts (solve input 1000 analysis)))
     (for-each print parts)
     (assert (equal? parts '(812721756 233338595643977)))))
