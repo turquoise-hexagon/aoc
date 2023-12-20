@@ -1,6 +1,7 @@
 (import
   (chicken io)
   (chicken string)
+  (euler)
   (srfi 1)
   (srfi 69))
 
@@ -45,22 +46,12 @@
     (fix! acc)
     acc))
 
-(define (split lst item)
-  (bind (_ name _) item
-    (let loop ((lst lst) (acc '()))
-      (if (null? lst)
-        (values (reverse acc) lst)
-        (bind (_ match _) (car lst)
-          (if (string=? name match)
-            (loop (cdr lst) (cons (car lst) acc))
-            (values (reverse acc) lst)))))))
-
 (define-inline (iterate value)
-  (subloop (cdr todo)
+  (loop
     (foldl
-      (lambda (stack destination)
-        (cons (list destination name value) stack))
-      stack destinations)))
+      (lambda (queue destination)
+        (priority-queue-insert queue (list (+ priority 1) destination name value)))
+      (priority-queue-rest queue) destinations)))
 
 (define (destinations? table name match)
   (bind (_ _ destinations) (hash-table-ref table name)
@@ -77,46 +68,46 @@
         (destinations? table name parent))
       (hash-table-keys table))))
 
+(define (compare? a b)
+  (< (car a)
+     (car b)))
+
 (define (solve table iterations analysis)
   (call/cc
     (lambda (return)
       (let
         ((counts (make-hash-table))
          (cycles (make-hash-table)))
-        (let main ((i 0))
-          (let loop ((stack (list (list "broadcaster" "button" L))))
-            (unless (null? stack)
-              (let-values (((todo stack) (split stack (car stack))))
-                (let subloop ((todo todo) (stack stack))
-                  (if (null? todo)
-                    (loop stack)
-                    (bind (name sender value) (car todo)
-                      (when (and (member name analysis) (= value L))
-                        (hash-table-set! cycles name i)
-                        (when (every (cut hash-table-exists? cycles <>) analysis)
-                          (return
-                            (list
-                              (apply * (hash-table-values counts))
-                              (apply * (hash-table-values cycles))))))
-                      (unless (> i iterations)
-                        (hash-table-update!/default counts value add1 0))
-                      (if (hash-table-exists? table name)
-                        (bind (type state destinations) (hash-table-ref table name)
-                          (case type
-                            ((&)
-                             (hash-table-set! state sender value)
-                             (iterate (if (every (cut = <> H) (hash-table-values state)) L H)))
-                            ((%)
-                             (if (= value H)
-                               (subloop (cdr todo) stack)
-                               (begin
-                                 (hash-table-set! table name (list type (not state) destinations))
-                                 (iterate (if state L H)))))
-                            ((B) (iterate value))))
-                        (subloop (cdr todo) stack))))))))
+        (let main ((i 1))
+          (let loop ((queue (priority-queue-insert (priority-queue compare?) (list 0 "broadcaster" "button" L))))
+            (unless (priority-queue-empty? queue)
+              (bind (priority name sender value) (priority-queue-first queue)
+                (when (and (member name analysis) (= value L))
+                  (hash-table-set! cycles name i)
+                  (when (every (cut hash-table-exists? cycles <>) analysis)
+                    (return
+                      (list
+                        (apply * (hash-table-values counts))
+                        (apply * (hash-table-values cycles))))))
+                (unless (> i iterations)
+                  (hash-table-update!/default counts value add1 0))
+                (if (hash-table-exists? table name)
+                  (bind (type state destinations) (hash-table-ref table name)
+                    (case type
+                      ((&)
+                       (hash-table-set! state sender value)
+                       (iterate (if (every (cut = <> H) (hash-table-values state)) L H)))
+                      ((%)
+                       (if (= value H)
+                         (loop (priority-queue-rest queue))
+                         (begin
+                           (hash-table-set! table name (list type (not state) destinations))
+                           (iterate (if state L H)))))
+                      ((B) (iterate value))))
+                  (loop (priority-queue-rest queue))))))
           (main (+ i 1)))))))
 
 (let ((input (import-input)))
   (let ((parts (solve input 1000 (analyse input))))
     (for-each print parts)
-    (assert (equal? parts '(812721756 7284368133192)))))
+    (assert (equal? parts '(812721756 233338595643977)))))
