@@ -56,11 +56,10 @@
      (car b)))
 
 (define-inline (iterate value)
-  (loop
-    (foldl
-      (lambda (queue destination)
-        (priority-queue-insert queue (list (+ priority 1) destination name value)))
-      (priority-queue-rest queue) destinations)))
+  (foldl
+    (lambda (queue destination)
+      (priority-queue-insert queue (list (+ priority 1) destination name value)))
+    (priority-queue-rest queue) destinations))
 
 (define (solve table iterations analysis)
   (call/cc
@@ -68,34 +67,33 @@
       (let
         ((counts (make-hash-table))
          (cycles (make-hash-table)))
-        (let main ((i 1))
-          (let loop ((queue (list->priority-queue (list (list 0 "broadcaster" "button" 0)) compare?)))
-            (unless (priority-queue-empty? queue)
-              (bind (priority name sender value) (priority-queue-first queue)
-                (when (and (member name analysis) (= value 0))
-                  (hash-table-set! cycles name i)
-                  (when (every (cut hash-table-exists? cycles <>) analysis)
-                    (return
-                      (list
-                        (apply * (hash-table-values counts))
-                        (apply * (hash-table-values cycles))))))
-                (unless (> i iterations)
-                  (hash-table-update!/default counts value add1 0))
-                (if (hash-table-exists? table name)
-                  (bind (type state destinations) (hash-table-ref table name)
-                    (case type
-                      ((&)
-                       (hash-table-set! state sender value)
-                       (iterate (if (every (cut = <> 1) (hash-table-values state)) 0 1)))
-                      ((%)
-                       (if (= value 1)
-                         (loop (priority-queue-rest queue))
-                         (begin
-                           (hash-table-set! table name (list type (not state) destinations))
-                           (iterate (if state 0 1)))))
-                      ((B) (iterate value))))
-                  (loop (priority-queue-rest queue))))))
-          (main (+ i 1)))))))
+        (do ((i 1 (+ i 1))) (#f)
+          (do ((queue (list->priority-queue (list (list 0 "broadcaster" "button" 0)) compare?)
+                 (bind (priority name sender value) (priority-queue-first queue)
+                   (when (and (member name analysis) (= value 0))
+                     (hash-table-set! cycles name i)
+                     (when (every (cut hash-table-exists? cycles <>) analysis)
+                       (return
+                         (list
+                           (apply * (hash-table-values counts))
+                           (apply * (hash-table-values cycles))))))
+                   (unless (> i iterations)
+                     (hash-table-update!/default counts value add1 0))
+                   (if (hash-table-exists? table name)
+                     (bind (type state destinations) (hash-table-ref table name)
+                       (case type
+                         ((&)
+                          (hash-table-set! state sender value)
+                          (iterate (if (every (cut = <> 1) (hash-table-values state)) 0 1)))
+                         ((%)
+                          (if (= value 1)
+                            (priority-queue-rest queue)
+                            (begin
+                              (hash-table-set! table name (list type (not state) destinations))
+                              (iterate (if state 0 1)))))
+                         ((B) (iterate value))))
+                     (priority-queue-rest queue)))))
+            ((priority-queue-empty? queue))))))))
 
 (let-values (((input analysis) (import-input)))
   (let ((parts (solve input 1000 analysis)))
