@@ -19,18 +19,6 @@
     ((#\%) (values (substring str 1) '%))
     (else  (values str 'B))))
 
-(define (fix! table)
-  (hash-table-for-each table
-    (lambda (name data)
-      (bind (_ _ destinations) data
-        (for-each
-          (lambda (destination)
-            (when (hash-table-exists? table destination)
-              (bind (type state _) (hash-table-ref table destination)
-                (case type
-                  ((&) (hash-table-set! state name L))))))
-          destinations)))))
-
 (define (import-input)
   (let ((acc (make-hash-table)))
     (for-each
@@ -43,7 +31,16 @@
                 ((%) (list type #f destinations))
                 ((B) (list type #f destinations)))))))
       (read-lines))
-    (fix! acc)
+    (hash-table-for-each acc
+      (lambda (name data)
+        (bind (_ _ destinations) data
+          (for-each
+            (lambda (destination)
+              (when (hash-table-exists? acc destination)
+                (bind (type state _) (hash-table-ref acc destination)
+                  (case type
+                    ((&) (hash-table-set! state name L))))))
+            destinations))))
     acc))
 
 (define-inline (iterate value)
