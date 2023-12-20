@@ -27,6 +27,18 @@
         (bind (_ _ match) (hash-table-ref table name) (member parent match)))
       (hash-table-keys table))))
 
+(define (fix! table)
+  (hash-table-for-each table
+    (lambda (name data)
+      (bind (_ _ destinations) data
+        (for-each
+          (lambda (destination)
+            (when (hash-table-exists? table destination)
+              (bind (type state _) (hash-table-ref table destination)
+                (case type
+                  ((&) (hash-table-set! state name 0))))))
+          destinations)))))
+
 (define (import-input)
   (let ((acc (make-hash-table)))
     (for-each
@@ -39,16 +51,7 @@
                 ((%) (list type #f destinations))
                 ((B) (list type #f destinations)))))))
       (read-lines))
-    (hash-table-for-each acc
-      (lambda (name data)
-        (bind (_ _ destinations) data
-          (for-each
-            (lambda (destination)
-              (when (hash-table-exists? acc destination)
-                (bind (type state _) (hash-table-ref acc destination)
-                  (case type
-                    ((&) (hash-table-set! state name 0))))))
-            destinations))))
+    (fix! acc)
     (values acc (analyse acc))))
 
 (define (compare? a b)
