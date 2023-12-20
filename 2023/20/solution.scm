@@ -10,9 +10,6 @@
     ((_ pat data expr expr* ...)
      (apply (lambda pat expr expr* ...) data))))
 
-(define-constant L 0)
-(define-constant H 1)
-
 (define (parse-name str)
   (case (string-ref str 0)
     ((#\&) (values (substring str 1) '&))
@@ -39,7 +36,7 @@
               (when (hash-table-exists? acc destination)
                 (bind (type state _) (hash-table-ref acc destination)
                   (case type
-                    ((&) (hash-table-set! state name L))))))
+                    ((&) (hash-table-set! state name 0))))))
             destinations))))
     acc))
 
@@ -72,10 +69,10 @@
         ((counts (make-hash-table))
          (cycles (make-hash-table)))
         (let main ((i 1))
-          (let loop ((queue (priority-queue-insert (priority-queue compare?) (list 0 "broadcaster" "button" L))))
+          (let loop ((queue (priority-queue-insert (priority-queue compare?) (list 0 "broadcaster" "button" 0))))
             (unless (priority-queue-empty? queue)
               (bind (priority name sender value) (priority-queue-first queue)
-                (when (and (member name analysis) (= value L))
+                (when (and (member name analysis) (= value 0))
                   (hash-table-set! cycles name i)
                   (when (every (cut hash-table-exists? cycles <>) analysis)
                     (return
@@ -89,13 +86,13 @@
                     (case type
                       ((&)
                        (hash-table-set! state sender value)
-                       (iterate (if (every (cut = <> H) (hash-table-values state)) L H)))
+                       (iterate (if (every (cut = <> 1) (hash-table-values state)) 0 1)))
                       ((%)
-                       (if (= value H)
+                       (if (= value 1)
                          (loop (priority-queue-rest queue))
                          (begin
                            (hash-table-set! table name (list type (not state) destinations))
-                           (iterate (if state L H)))))
+                           (iterate (if state 0 1)))))
                       ((B) (iterate value))))
                   (loop (priority-queue-rest queue))))))
           (main (+ i 1)))))))
