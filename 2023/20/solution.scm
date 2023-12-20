@@ -1,7 +1,6 @@
 (import
   (chicken io)
   (chicken string)
-  (euler)
   (srfi 1)
   (srfi 69))
 
@@ -54,15 +53,12 @@
     (fix! acc)
     (values acc (analyse acc))))
 
-(define (compare? a b)
-  (< (car a)
-     (car b)))
-
 (define-inline (iterate value)
-  (foldl
-    (lambda (queue destination)
-      (priority-queue-insert queue (list (+ priority 1) destination name value)))
-    (priority-queue-rest queue) destinations))
+  (append (cdr stack)
+    (foldl
+      (lambda (acc destination)
+        (cons (list destination name value) acc))
+      '() destinations)))
 
 (define (solve table iterations analysis)
   (call/cc
@@ -71,8 +67,8 @@
         ((counts (make-hash-table))
          (cycles (make-hash-table)))
         (do ((i 1 (+ i 1))) (#f)
-          (do ((queue (list->priority-queue (list (list 0 "broadcaster" "button" 0)) compare?)
-                 (bind (priority name sender value) (priority-queue-first queue)
+          (do ((stack (list (list "broadcaster" "button" 0))
+                 (bind (name sender value) (car stack)
                    (when (and (member name analysis) (= value 0))
                      (hash-table-set! cycles name i)
                      (when (every (cut hash-table-exists? cycles <>) analysis)
@@ -90,13 +86,13 @@
                           (iterate (if (every (cut = <> 1) (hash-table-values state)) 0 1)))
                          ((%)
                           (if (= value 1)
-                            (priority-queue-rest queue)
+                            (cdr stack)
                             (begin
                               (hash-table-set! table name (list type (not state) destinations))
                               (iterate (if state 0 1)))))
                          ((B) (iterate value))))
-                     (priority-queue-rest queue)))))
-            ((priority-queue-empty? queue))))))))
+                     (cdr stack)))))
+            ((null? stack))))))))
 
 (let-values (((input analysis) (import-input)))
   (let ((parts (solve input 1000 analysis)))
