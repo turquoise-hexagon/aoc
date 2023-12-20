@@ -69,7 +69,7 @@
         ((counts (make-hash-table))
          (cycles (make-hash-table)))
         (let main ((i 1))
-          (let loop ((queue (priority-queue-insert (priority-queue compare?) (list 0 "broadcaster" "button" 0))))
+          (let loop ((queue (list->priority-queue (list (list 0 "broadcaster" "button" 0)) compare?)))
             (unless (priority-queue-empty? queue)
               (bind (priority name sender value) (priority-queue-first queue)
                 (when (and (member name analysis) (= value 0))
