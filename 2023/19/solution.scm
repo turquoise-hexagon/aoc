@@ -17,19 +17,19 @@
         (cons (cons i (car acc)) (cdr acc))))
     '(()) (read-lines)))
 
-(define (_parse-comparison str ope idb)
+(define-inline (_parse-comparison ope)
   (apply
     (lambda (ida val)
       (list ida (eval (string->symbol ope)) (string->number val) idb))
-    (string-split str ope)))
+    (string-split comp ope)))
 
 (define (parse-comparison str)
   (apply
     (case-lambda
       ((comp idb)
        (cond
-         ((substring-index ">" comp) (_parse-comparison comp ">" idb))
-         ((substring-index "<" comp) (_parse-comparison comp "<" idb))))
+         ((substring-index ">" comp) (_parse-comparison ">"))
+         ((substring-index "<" comp) (_parse-comparison "<"))))
       (idb idb))
     (string-split str ":")))
 
