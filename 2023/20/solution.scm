@@ -43,13 +43,6 @@
             destinations))))
     acc))
 
-(define-inline (iterate value)
-  (loop
-    (foldl
-      (lambda (queue destination)
-        (priority-queue-insert queue (list (+ priority 1) destination name value)))
-      (priority-queue-rest queue) destinations)))
-
 (define (analyse table)
   (let ((parent
           (find
@@ -64,6 +57,13 @@
 (define (compare? a b)
   (< (car a)
      (car b)))
+
+(define-inline (iterate value)
+  (loop
+    (foldl
+      (lambda (queue destination)
+        (priority-queue-insert queue (list (+ priority 1) destination name value)))
+      (priority-queue-rest queue) destinations)))
 
 (define (solve table iterations analysis)
   (call/cc
