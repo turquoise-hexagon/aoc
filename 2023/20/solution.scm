@@ -53,19 +53,15 @@
         (priority-queue-insert queue (list (+ priority 1) destination name value)))
       (priority-queue-rest queue) destinations)))
 
-(define (destinations? table name match)
-  (bind (_ _ destinations) (hash-table-ref table name)
-    (member match destinations)))
-
 (define (analyse table)
   (let ((parent
           (find
             (lambda (name)
-              (destinations? table name "rx"))
+              (bind (_ _ match) (hash-table-ref table name) (member "rx" match)))
             (hash-table-keys table))))
     (filter
       (lambda (name)
-        (destinations? table name parent))
+        (bind (_ _ match) (hash-table-ref table name) (member parent match)))
       (hash-table-keys table))))
 
 (define (compare? a b)
