@@ -47,7 +47,7 @@
     (fx+ (fx/ (fx* _ (fx+ _ 1)) 2) b)))
 
 (define (compute array n)
-  (let ((cache (make-vector (+ n 1) #f)))
+  (let ((cache (make-vector (+ n 1))))
     (let loop ((lst (list (start array))) (i 0))
       (vector-set! cache i (length lst))
       (if (= i n) cache
