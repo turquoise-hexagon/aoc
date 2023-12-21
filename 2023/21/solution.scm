@@ -36,8 +36,8 @@
 
 (define-inline (adjust n)
   (if (fx< n 0)
-    (fx- (fx* -2 n) 1)
-    (fx* 2 n)))
+    (fx- -1 (fx+ n n))
+    (fx+ n n)))
 
 (define (id a b)
   (let*
