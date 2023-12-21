@@ -27,12 +27,12 @@
 
 (define (neighbors array coord)
   (let ((dimensions (array-dimensions array)))
-    (let loop ((lst offsets) (acc '()))
-      (if (null? lst) acc
-        (let* ((coord (map2 fx+ coord (car lst))))
+    (let loop ((l offsets) (acc '()))
+      (if (null? l) acc
+        (let* ((coord (map2 fx+ coord (car l))))
           (if (char=? (array-ref array (map2 fxmod coord dimensions)) #\#)
-            (loop (cdr lst) acc)
-            (loop (cdr lst) (cons coord acc))))))))
+            (loop (cdr l) acc)
+            (loop (cdr l) (cons coord acc))))))))
 
 (define-inline (adjust n)
   (if (fx< n 0)
@@ -48,8 +48,8 @@
 
 (define (compute array n)
   (let ((acc (make-vector (+ n 1))))
-    (let loop ((lst (list (start array))) (i 0))
-      (vector-set! acc i (length lst))
+    (let loop ((l (list (start array))) (i 0))
+      (vector-set! acc i (length l))
       (if (= i n) acc
         (let ((mem (make-hash-table)))
           (for-each
@@ -58,7 +58,7 @@
                 (lambda (i)
                   (hash-table-set! mem (apply id i) i))
                 (neighbors array i)))
-            lst)
+            l)
           (loop (hash-table-values mem) (+ i 1)))))))
 
 (define (interpolate n a b c)
