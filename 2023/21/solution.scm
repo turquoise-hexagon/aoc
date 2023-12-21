@@ -70,12 +70,12 @@
     (+ x (* y n) (* (quotient (* n (- n 1)) 2) (- z y)))))
 
 (define (solve input n)
-  (let* ((h (first (array-dimensions input))) (i (modulo n h)) (acc (compute input (+ i (* 2 h)))))
+  (let* ((h (first (array-dimensions input))) (i (modulo n h)) (acc (compute input (+ i h h))))
     (list (vector-ref acc 64)
       (interpolate (quotient n h)
-        (vector-ref acc (+ i (* 0 h)))
-        (vector-ref acc (+ i (* 1 h)))
-        (vector-ref acc (+ i (* 2 h)))))))
+        (vector-ref acc (+ i))
+        (vector-ref acc (+ i h))
+        (vector-ref acc (+ i h h))))))
 
 (let ((input (import-input)))
   (let ((parts (solve input 26501365)))
