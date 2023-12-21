@@ -27,13 +27,12 @@
 
 (define (neighbors array coord)
   (let ((dimensions (array-dimensions array)))
-    (remove
-      (lambda (i)
-        (char=? (array-ref array (map2 fxmod i dimensions)) #\#))
-      (map
-        (lambda (i)
-          (map2 fx+ coord i))
-        offsets))))
+    (let loop ((lst offsets) (acc '()))
+      (if (null? lst) acc
+        (let* ((coord (map2 fx+ coord (car lst))))
+          (if (char=? (array-ref array (map2 fxmod coord dimensions)) #\#)
+            (loop (cdr lst) acc)
+            (loop (cdr lst) (cons coord acc))))))))
 
 (define-inline (adjust n)
   (if (fx< n 0)
