@@ -47,19 +47,19 @@
     (fx+ (fx/ (fx* _ (fx+ _ 1)) 2) b)))
 
 (define (compute array n)
-  (let ((cache (make-vector (+ n 1))))
+  (let ((acc (make-vector (+ n 1))))
     (let loop ((lst (list (start array))) (i 0))
-      (vector-set! cache i (length lst))
-      (if (= i n) cache
-        (let ((table (make-hash-table)))
+      (vector-set! acc i (length lst))
+      (if (= i n) acc
+        (let ((mem (make-hash-table)))
           (for-each
             (lambda (i)
               (for-each
                 (lambda (i)
-                  (hash-table-set! table (apply id i) i))
+                  (hash-table-set! mem (apply id i) i))
                 (neighbors array i)))
             lst)
-          (loop (hash-table-values table) (+ i 1)))))))
+          (loop (hash-table-values mem) (+ i 1)))))))
 
 (define (interpolate n a b c)
   (let
