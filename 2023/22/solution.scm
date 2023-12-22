@@ -11,8 +11,11 @@
   (let ((_ (fx+ a b)))
     (fx+ (fx/ (fx* _ (fx+ _ 1)) 2) b)))
 
-(define-inline (id-coord a b c)
-  (cantor (cantor a b) c))
+(define-inline (id-coord coord)
+  (apply
+    (lambda (a b c)
+      (cantor (cantor a b) c))
+    coord))
 
 (define-inline (id-brick brick)
   (string-intersperse (map number->string brick)))
@@ -29,13 +32,16 @@
       (apply product
         (map
           (lambda (a b)
-            (let ((_ (max a 0)))
-              (if (= a b) (list _) (range _ b))))
+            (let ((_ (fxmax a 0)))
+              (if (fx= a b) (list _) (range _ b))))
           a b)))
     (chop brick 3)))
 
 (define (down brick)
-  (map + brick '(0 0 -1 0 0 -1)))
+  (apply
+    (lambda (a b c d e f)
+      (list a b (fx- c 1) d e (fx- f 1)))
+    brick))
 
 (define (gravity! mem bricks)
   (foldl
@@ -45,12 +51,12 @@
           (if (or (= (list-ref brick 2) 0)
                   (any
                     (lambda (coord)
-                      (hash-table-exists? mem (apply id-coord coord)))
+                      (array-ref mem coord))
                     (coordinates next)))
             (begin
               (for-each
                 (lambda (coord)
-                  (hash-table-set! mem (apply id-coord coord) brick))
+                  (array-set! mem coord brick))
                 (coordinates brick))
               (cons brick acc))
             (loop next)))))
@@ -60,7 +66,7 @@
                (list-ref b 2))))))
 
 (define (gravity bricks)
-  (let* ((mem (make-hash-table)) (fell (gravity! mem bricks)))
+  (let* ((mem (make-array '(10 10 300) #f)) (fell (gravity! mem bricks)))
     (values mem fell)))
 
 (define (process mem fell)
@@ -72,15 +78,14 @@
         (let ((tmp (make-hash-table)))
           (for-each
             (lambda (coord)
-              (hash-table-set! tmp (apply id-coord coord) #t))
+              (hash-table-set! tmp (id-coord coord) #t))
             (coordinates brick))
           (for-each
             (lambda (coord)
-              (let ((id (apply id-coord coord)))
-                (when (and (hash-table-exists? mem id) (not (hash-table-exists? tmp id)))
-                  (let ((value (hash-table-ref mem id)))
-                    (hash-table-update! above (id-brick value) (cut cons brick <>))
-                    (hash-table-update! below (id-brick brick) (cut cons value <>))))))
+              (when (and (array-ref mem coord) (not (hash-table-exists? tmp (id-coord coord))))
+                (let ((value (array-ref mem coord)))
+                  (hash-table-update! above (id-brick value) (cut cons brick <>))
+                  (hash-table-update! below (id-brick brick) (cut cons value <>)))))
             (coordinates (down brick)))))
       fell)
     (values above below)))
