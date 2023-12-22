@@ -25,15 +25,6 @@
     (fun (car  a) (car  b))
     (fun (cadr a) (cadr b))))
 
-(define (neighbors array coord)
-  (let ((dimensions (array-dimensions array)))
-    (let loop ((l offsets) (acc '()))
-      (if (null? l) acc
-        (let* ((coord (map2 fx+ coord (car l))))
-          (if (char=? (array-ref array (map2 fxmod coord dimensions)) #\#)
-            (loop (cdr l) acc)
-            (loop (cdr l) (cons coord acc))))))))
-
 (define-inline (adjust n)
   (if (fx< n 0)
     (fx- -1 (fx+ n n))
@@ -47,18 +38,19 @@
     (fx+ (fx/ (fx* _ (fx+ _ 1)) 2) b)))
 
 (define (compute array n)
-  (let ((acc (make-vector (+ n 1))))
+  (let ((acc (make-vector (+ n 1))) (d (array-dimensions array)))
     (let loop ((l (list (start array))) (i 0))
       (vector-set! acc i (length l))
       (if (= i n) acc
         (let ((mem (make-hash-table)))
           (for-each
             (lambda (i)
-              (for-each
-                (lambda (i)
-                  (hash-table-set! mem (apply id i) i))
-                (neighbors array i)))
-            l)
+              (let loop ((l offsets))
+                (unless (null? l)
+                  (let ((i (map2 fx+ i (car l))))
+                    (unless (char=? (array-ref array (map2 fxmod i d)) #\#)
+                      (hash-table-set! mem (apply id i) i)))
+                  (loop (cdr l))))) l)
           (loop (hash-table-values mem) (+ i 1)))))))
 
 (define (interpolate n a b c)
