@@ -39,19 +39,20 @@
 
 (define (compute array n)
   (let ((acc (make-vector (+ n 1))) (d (array-dimensions array)))
-    (let loop ((l (list (start array))) (i 0))
-      (vector-set! acc i (length l))
-      (if (= i n) acc
-        (let ((mem (make-hash-table #:size #e1e5)))
-          (for-each
-            (lambda (i)
-              (let loop ((l offsets))
-                (unless (null? l)
-                  (let ((i (map2 fx+ i (car l))))
-                    (unless (char=? (array-ref array (map2 fxmod i d)) #\#)
-                      (hash-table-set! mem (apply id i) i)))
-                  (loop (cdr l))))) l)
-          (loop (hash-table-values mem) (+ i 1)))))))
+    (do ((i 0 (+ i 1))
+         (l (list (start array))
+           (let ((mem (make-hash-table #:size #e1e5)))
+             (for-each
+               (lambda (i)
+                 (let loop ((l offsets))
+                   (unless (null? l)
+                     (let ((i (map2 fx+ i (car l))))
+                       (unless (char=? (array-ref array (map2 fxmod i d)) #\#)
+                         (hash-table-set! mem (apply id i) i)))
+                     (loop (cdr l))))) l)
+             (hash-table-values mem))))
+      ((> i n) acc)
+      (vector-set! acc i (length l)))))
 
 (define (interpolate n a b c)
   (let
