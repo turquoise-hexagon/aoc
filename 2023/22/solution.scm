@@ -1,24 +1,10 @@
 (import
-  (chicken fixnum)
   (chicken io)
   (chicken sort)
   (chicken string)
   (euler)
   (srfi 1)
   (srfi 69))
-
-(define-inline (cantor a b)
-  (let ((_ (fx+ a b)))
-    (fx+ (fx/ (fx* _ (fx+ _ 1)) 2) b)))
-
-(define-inline (id-coord coord)
-  (apply
-    (lambda (a b c)
-      (cantor (cantor a b) c))
-    coord))
-
-(define-inline (id-brick brick)
-  (string-intersperse (map number->string brick)))
 
 (define (import-input)
   (map
@@ -32,15 +18,15 @@
       (apply product
         (map
           (lambda (a b)
-            (let ((_ (fxmax a 0)))
-              (if (fx= a b) (list _) (range _ b))))
+            (let ((_ (max a 0)))
+              (if (= a b) (list _) (range _ b))))
           a b)))
     (chop brick 3)))
 
 (define (down brick)
   (apply
     (lambda (a b c d e f)
-      (list a b (fx- c 1) d e (fx- f 1)))
+      (list a b (- c 1) d e (- f 1)))
     brick))
 
 (define (gravity! mem bricks)
@@ -69,20 +55,19 @@
   (let* ((mem (make-array '(10 10 300) #f)) (fell (gravity! mem bricks)))
     (values mem fell)))
 
+(define-inline (id-brick brick)
+  (string-intersperse (map number->string brick)))
+
 (define (process mem fell)
   (let
     ((above (make-hash-table #:initial '()))
      (below (make-hash-table #:initial '())))
     (for-each
       (lambda (brick)
-        (let ((tmp (make-hash-table)))
+        (let ((tmp (coordinates brick)))
           (for-each
             (lambda (coord)
-              (hash-table-set! tmp (id-coord coord) #t))
-            (coordinates brick))
-          (for-each
-            (lambda (coord)
-              (when (and (array-ref mem coord) (not (hash-table-exists? tmp (id-coord coord))))
+              (when (and (array-ref mem coord) (not (member coord tmp)))
                 (let ((value (array-ref mem coord)))
                   (hash-table-update! above (id-brick value) (cut cons brick <>))
                   (hash-table-update! below (id-brick brick) (cut cons value <>)))))
