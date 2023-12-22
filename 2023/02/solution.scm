@@ -41,4 +41,5 @@
             (+ acc/2 (* r g b))))))))
 
 (let ((parts (solve (import-input))))
-  (for-each print parts) (assert (equal? parts '(2006 84911))))
+  (for-each print parts)
+  (assert (equal? parts '(2006 84911))))
