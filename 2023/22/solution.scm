@@ -31,7 +31,7 @@
       (map string->number (string-split i ",~")))
     (read-lines)))
 
-(define (positions brick)
+(define (coordinates brick)
   (apply
     (lambda (a b)
       (apply product
@@ -52,13 +52,13 @@
           (if (or (any
                     (lambda (coord)
                       (hash-table-exists? mem (apply id-coord coord)))
-                    (positions next))
+                    (coordinates next))
                   (= (list-ref brick 2) 0))
             (begin
               (for-each
                 (lambda (coord)
                   (hash-table-set! mem (apply id-coord coord) brick))
-                (positions brick))
+                (coordinates brick))
               (cons brick acc))
             (loop next)))))
     '() (sort bricks
@@ -80,7 +80,7 @@
           (for-each
             (lambda (coord)
               (hash-table-set! tmp (apply id-coord coord) #t))
-            (positions brick))
+            (coordinates brick))
           (for-each
             (lambda (coord)
               (let ((id (apply id-coord coord)))
@@ -88,7 +88,7 @@
                   (let ((value (hash-table-ref mem id)))
                     (hash-table-update! above (id-brick value) (lambda (_) (cons brick _)))
                     (hash-table-update! below (id-brick brick) (lambda (_) (cons value _)))))))
-            (positions (down brick)))))
+            (coordinates (down brick)))))
       fell)
     (values above below)))
 
