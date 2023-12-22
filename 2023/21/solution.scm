@@ -69,7 +69,6 @@
         (vector-ref acc (+ i h))
         (vector-ref acc (+ i h h))))))
 
-(let ((input (import-input)))
-  (let ((parts (solve input 26501365)))
-    (for-each print parts)
-    (assert (equal? parts '(3682 609012263058042)))))
+(let ((parts (solve (import-input) 26501365)))
+  (for-each print parts)
+  (assert (equal? parts '(3682 609012263058042))))
