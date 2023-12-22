@@ -55,7 +55,7 @@
   (let* ((mem (make-array '(10 10 300) #f)) (fell (gravity! mem bricks)))
     (values mem fell)))
 
-(define-inline (id-brick brick)
+(define-inline (id brick)
   (string-intersperse (map number->string brick)))
 
 (define (process mem fell)
@@ -69,8 +69,8 @@
             (lambda (coord)
               (when (and (array-ref mem coord) (not (member coord tmp)))
                 (let ((value (array-ref mem coord)))
-                  (hash-table-update! above (id-brick value) (cut cons brick <>))
-                  (hash-table-update! below (id-brick brick) (cut cons value <>)))))
+                  (hash-table-update! above (id value) (cut cons brick <>))
+                  (hash-table-update! below (id brick) (cut cons value <>)))))
             (coordinates (down brick)))))
       fell)
     (values above below)))
@@ -78,17 +78,17 @@
 (define (desintegrate above below brick)
   (let ((acc (make-hash-table)))
     (let loop ((brick brick))
-      (let ((id (id-brick brick)))
-        (unless (hash-table-exists? acc id)
-          (hash-table-set! acc id #t)
+      (let ((tmp (id brick)))
+        (unless (hash-table-exists? acc tmp)
+          (hash-table-set! acc tmp #t)
           (for-each
             (lambda (brick)
               (when (every
                       (lambda (brick)
-                        (hash-table-exists? acc (id-brick brick)))
-                      (hash-table-ref below (id-brick brick)))
+                        (hash-table-exists? acc (id brick)))
+                      (hash-table-ref below (id brick)))
                 (loop brick)))
-            (hash-table-ref/default above id '())))))
+            (hash-table-ref/default above tmp '())))))
     (hash-table-size acc)))
 
 (define (solve bricks)
