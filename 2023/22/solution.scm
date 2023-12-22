@@ -7,16 +7,8 @@
   (srfi 1)
   (srfi 69))
 
-(define-inline (adjust n)
-  (if (fx< n 0)
-    (fx- -1 (fx+ n n))
-    (fx+ n n)))
-
 (define-inline (cantor a b)
-  (let*
-    ((a (adjust a))
-     (b (adjust b))
-     (_ (fx+ a b)))
+  (let ((_ (fx+ a b)))
     (fx+ (fx/ (fx* _ (fx+ _ 1)) 2) b)))
 
 (define-inline (id-coord a b c)
@@ -37,7 +29,8 @@
       (apply product
         (map
           (lambda (a b)
-            (if (= a b) (list a) (range a b)))
+            (let ((_ (max a 0)))
+              (if (= a b) (list _) (range _ b))))
           a b)))
     (chop brick 3)))
 
