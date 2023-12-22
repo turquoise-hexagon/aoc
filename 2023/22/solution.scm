@@ -49,11 +49,11 @@
     (lambda (acc brick)
       (let loop ((brick brick))
         (let ((next (down brick)))
-          (if (or (any
+          (if (or (= (list-ref brick 2) 0)
+                  (any
                     (lambda (coord)
                       (hash-table-exists? mem (apply id-coord coord)))
-                    (coordinates next))
-                  (= (list-ref brick 2) 0))
+                    (coordinates next)))
             (begin
               (for-each
                 (lambda (coord)
