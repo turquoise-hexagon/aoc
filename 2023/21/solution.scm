@@ -42,7 +42,7 @@
     (let loop ((l (list (start array))) (i 0))
       (vector-set! acc i (length l))
       (if (= i n) acc
-        (let ((mem (make-hash-table)))
+        (let ((mem (make-hash-table #:size #e1e5)))
           (for-each
             (lambda (i)
               (let loop ((l offsets))
