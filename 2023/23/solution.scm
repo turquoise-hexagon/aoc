@@ -3,11 +3,6 @@
   (euler)
   (srfi 1))
 
-(define-syntax bind
-  (syntax-rules ()
-    ((_ pat data expr expr* ...)
-     (apply (lambda pat expr expr* ...) data))))
-
 (define-constant offsets
   '((-1  0)
     ( 0  1)
@@ -32,7 +27,6 @@
       (lambda (coord)
         (array-set! acc coord
           (case (array-ref array coord)
-            ((#\#) (list))
             ((#\^) (list (list (map + coord '(-1  0)) 1)))
             ((#\>) (list (list (map + coord '( 0  1)) 1)))
             ((#\v) (list (list (map + coord '( 1  0)) 1)))
@@ -73,11 +67,13 @@
             (array-set! cache coord #t)
           (let ((acc (foldl
                        (lambda (acc i)
-                         (bind (next dist) i
-                           (if (not (array-ref cache next))
-                             (max acc (loop next (+ total dist)))
-                             acc)))
-                       0 (array-ref graph coord))))
+                         (apply
+                           (lambda (next dist)
+                             (if (not (array-ref cache next))
+                               (max acc (loop next (+ total dist)))
+                               acc))
+                           i))
+                       total (array-ref graph coord))))
             (array-set! cache coord #f)
             acc))))))
 
