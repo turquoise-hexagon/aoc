@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./convert < input > solution.dzn
+
+minizinc -p 8 --solver cp solution.mzn solution.dzn

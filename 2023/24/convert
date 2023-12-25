@@ -1,0 +1,12 @@
+#!/usr/bin/csi -s
+
+(import
+  (chicken io)
+  (chicken string))
+
+(let ((lst (map (lambda (i) (string-split i "@")) (read-lines))))
+  (print "N = " (length lst) ";")
+  (print "COORDS = [|"     (string-intersperse (map car  lst) "|") "|];")
+  (print "VELOCITIES = [|" (string-intersperse (map cadr lst) "|") "|];"))
+
+; vim: ft=scheme
