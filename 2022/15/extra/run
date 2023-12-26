@@ -1,6 +1,14 @@
-#!/usr/bin/env bash
+#!/bin/sh
+#
+set -e
 
-./convert > input.dzn
+./convert < ../input > solution.dzn
 
-minizinc -p 8 --solver or-tools \
-    solution.mzn input.dzn
+minizinc \
+    --solver cp -p 8 -f      \
+    --no-output-comments     \
+    --solution-separator  '' \
+    --search-complete-msg '' \
+    solution.mzn solution.dzn
+
+rm -f solution.dzn

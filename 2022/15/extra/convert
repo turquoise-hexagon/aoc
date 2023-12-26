@@ -1,24 +1,11 @@
-#!/usr/bin/env bash
+#!/usr/bin/csi -s
 
-mem=()
+(import
+  (chicken io)
+  (chicken string)
+  (srfi 1))
 
-while IFS= read -r line; do
-    read -r a b c d <<< ${line//[^0-9 -]}
-
-    mem+=("|$a, $b, $c, $d")
-done
-
-echo "length = ${#mem[@]};"
-echo "input =";
-
-flag=1
-
-for i in "${mem[@]}"; do
-    ((flag))          \
-        && echo "[$i" \
-        || echo " $i"
-
-    flag=0
-done
-
-echo " |];"
+(let ((lst (map (lambda (i) (string-intersperse (filter string->number (string-split i " =,:")) ",")) (read-lines))))
+  (print "N = " (length lst) ";")
+  (print "INPUT = [|" (string-intersperse lst "|") "|];"))
+; vim: ft=scheme
