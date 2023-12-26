@@ -45,4 +45,5 @@
           (loop))))))
 
 (let ((part (solve (import-input))))
+  ; warning : probabilistic
   (print part) (assert (= part 582692)))

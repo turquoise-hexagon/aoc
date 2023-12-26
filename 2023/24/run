@@ -2,4 +2,5 @@
 
 ./convert < input > solution.dzn
 
+# warning : probabilistic
 minizinc -p 8 --solver cp solution.mzn solution.dzn
