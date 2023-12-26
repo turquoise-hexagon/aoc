@@ -16,7 +16,7 @@
                 (hash-table-update! acc a (cut cons b <>))
                 (hash-table-update! acc b (cut cons a <>)))
               lst))
-          (string-split i ": ,")))
+          (string-split i ": ")))
       (read-lines))
     acc))
 
