@@ -2,9 +2,7 @@
 
 ./convert < input > solution.dzn
 
-minizinc                            \
-    -p 8                            \
-    --no-output-comments            \
-    --solver com.google.ortools.sat \
-    solution.mzn                    \
-    solution.dzn
+minizinc                 \
+    --solver cp -p 8 -f  \
+    --no-output-comments \
+    solution.mzn solution.dzn
