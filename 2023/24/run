@@ -2,5 +2,9 @@
 
 ./convert < input > solution.dzn
 
-# warning : probabilistic
-minizinc -p 8 --solver cp solution.mzn solution.dzn
+minizinc                            \
+    -p 8                            \
+    --no-output-comments            \
+    --solver com.google.ortools.sat \
+    solution.mzn                    \
+    solution.dzn
