@@ -21,8 +21,8 @@
                  (oa (- ya1 (* sa xa1)))
                  (ob (- yb1 (* sb xb1))))
             (if (= sa sb) #f
-              (let* ((_ (/ (- oa ob) (- sb sa)))
-                     (xi _) (yi (+ (* sa _) oa)))
+              (let* ((xi (/ (- oa ob) (- sb sa)))
+                     (yi (+ (* sa xi) oa)))
                 (and (= (signum (- xi xa1)) (signum dxa))
                      (= (signum (- yi ya1)) (signum dya))
                      (= (signum (- xi xb1)) (signum dxb))
