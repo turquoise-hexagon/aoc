@@ -1,8 +1,7 @@
 usage
 -----
-    ./run < input
+    ./run
 
 depends on
 ----------
     * minizinc
-    * or-tools
