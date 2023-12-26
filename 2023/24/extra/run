@@ -2,7 +2,7 @@
 
 set -e
 
-./convert < input > solution.dzn
+./convert < ../input > solution.dzn
 
 minizinc                     \
     --solver cp -p 8 -f      \
