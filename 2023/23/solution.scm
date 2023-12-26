@@ -58,8 +58,8 @@
         (array-indexes array)))
     acc))
 
-(define (solve input graph)
-  (let* ((dimensions (array-dimensions input)) (cache (make-array dimensions #f)) (goal (map - dimensions '(1 2))))
+(define (solve graph)
+  (let* ((dimensions (array-dimensions graph)) (cache (make-array dimensions #f)) (goal (map - dimensions '(1 2))))
     (let loop ((coord '(0 1)) (total 0))
       (if (equal? coord goal)
         total
@@ -77,7 +77,7 @@
             acc))))))
 
 (let ((input (import-input)))
-  (let ((part/1 (solve input (graph/1 input))))
+  (let ((part/1 (solve (graph/1 input))))
     (print part/1) (assert (= part/1 2306)))
-  (let ((part/2 (solve input (graph/2 input))))
+  (let ((part/2 (solve (graph/2 input))))
     (print part/2) (assert (= part/2 6718))))
