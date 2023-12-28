@@ -39,6 +39,6 @@
 
 (let ((input (import-input)))
   (let ((part/1 (solve input min)))
-    (print part/1))
+    (print part/1) (assert (= part/1 117)))
   (let ((part/2 (solve input max)))
-    (print part/2)))
+    (print part/2) (assert (= part/2 909))))
