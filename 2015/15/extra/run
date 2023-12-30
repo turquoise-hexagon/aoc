@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+./convert < ../input > solution.dzn
+
+for solution in *.mzn; do
+    minizinc                     \
+        --solver cp -p 8 -f      \
+        --no-output-comments     \
+        --solution-separator  '' \
+        --search-complete-msg '' \
+        "$solution" solution.dzn
+done
+
+rm -f solution.dzn

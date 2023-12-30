@@ -1,0 +1,7 @@
+usage
+-----
+    ./run
+
+depends on
+----------
+    * minizinc
