@@ -71,7 +71,7 @@
 
 (define (fight player boss)
   (apply
-    (lambda (player-hp player-damage player-armor
+    (lambda (          player-damage player-armor
              boss-hp   boss-damage   boss-armor)
       (let loop ((i 0) (player-hp player-hp) (boss-hp boss-hp))
         (cond
@@ -88,7 +88,7 @@
     (map budget
       (filter
         (lambda (i)
-          (fight (cons player-hp (stats i)) input))
+          (fight (stats i) input))
         (selections)))))
 
 (define (solve/2 input)
@@ -96,7 +96,7 @@
     (map budget
       (remove
         (lambda (i)
-          (fight (cons player-hp (stats i)) input))
+          (fight (stats i) input))
         (selections)))))
 
 (let ((input (import-input)))
