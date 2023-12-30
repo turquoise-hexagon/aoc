@@ -18,8 +18,8 @@
 (define (proc/2 str)
   (let*
     ((_ str)
-     (_ (irregex-replace/all "\\\\" _ "\\\\"))
-     (_ (irregex-replace/all "\""   _ "\\\"")))
+     (_ (irregex-replace/all "\\\\" _ "##"))
+     (_ (irregex-replace/all "\""   _ "##")))
     (- (string-length _)
        (string-length str)
        -2)))
