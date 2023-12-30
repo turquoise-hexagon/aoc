@@ -26,10 +26,16 @@
     #( 40 0 2)
     #( 80 0 3)))
 
+(define-constant options-weapons '(1))
+(define-constant options-armor   '(0 1))
+(define-constant options-rings   '(0 1 2))
+
+(define-constant player-hp 100)
+
 (define (import-input)
   (filter-map string->number (string-split (read-string) " \n")))
 
-(define (selections options-weapons options-armor options-rings)
+(define (selections)
   (let ((selection-weapons (range (- (vector-length weapons) 1)))
         (selection-armor   (range (- (vector-length armor)   1)))
         (selection-rings   (range (- (vector-length rings)   1))))
@@ -82,16 +88,16 @@
     (map budget
       (filter
         (lambda (i)
-          (fight (cons 100 (stats i)) input))
-        (selections '(1) '(0 1) '(0 1 2))))))
+          (fight (cons player-hp (stats i)) input))
+        (selections)))))
 
 (define (solve/2 input)
   (apply max
     (map budget
       (remove
         (lambda (i)
-          (fight (cons 100 (stats i)) input))
-        (selections '(1) '(0 1) '(0 1 2))))))
+          (fight (cons player-hp (stats i)) input))
+        (selections)))))
 
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
