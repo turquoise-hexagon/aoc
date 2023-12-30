@@ -36,9 +36,10 @@
   (filter-map string->number (string-split (read-string) " \n")))
 
 (define (selections)
-  (let ((selection-weapons (range (- (vector-length weapons) 1)))
-        (selection-armor   (range (- (vector-length armor)   1)))
-        (selection-rings   (range (- (vector-length rings)   1))))
+  (let
+    ((selection-weapons (range (- (vector-length weapons) 1)))
+     (selection-armor   (range (- (vector-length armor)   1)))
+     (selection-rings   (range (- (vector-length rings)   1))))
     (product
       (join (map (lambda (i) (combinations selection-weapons i)) options-weapons))
       (join (map (lambda (i) (combinations selection-armor i))   options-armor))
