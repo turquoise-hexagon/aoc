@@ -14,9 +14,8 @@
     (map
       (lambda (i)
         (apply
-          (case-lambda
-            ((op a)   (list (string->symbol op) (convert a)))
-            ((op a b) (list (string->symbol op) (convert a) (convert b))))
+          (lambda (op . lst)
+            (cons (string->symbol op) (map convert lst)))
           (string-split i " ,")))
       (read-lines))))
 
