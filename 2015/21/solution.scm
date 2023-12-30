@@ -42,8 +42,8 @@
      (selection-rings   (range (- (vector-length rings)   1))))
     (product
       (join (map (lambda (i) (combinations selection-weapons i)) options-weapons))
-      (join (map (lambda (i) (combinations selection-armor i))   options-armor))
-      (join (map (lambda (i) (combinations selection-rings i))   options-rings)))))
+      (join (map (lambda (i) (combinations selection-armor   i)) options-armor))
+      (join (map (lambda (i) (combinations selection-rings   i)) options-rings)))))
 
 (define (budget selection)
   (apply +
