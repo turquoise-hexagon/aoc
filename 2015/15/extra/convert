@@ -8,7 +8,7 @@
 (let ((lst
         (map
           (lambda (i)
-            (string-intersperse (filter string->number (string-split i ":, ")) ","))
+            (string-intersperse (filter string->number (string-split i ": ,")) ","))
           (read-lines))))
   (print "N = " (length lst) ";")
   (print "INGREDIENTS = [|" (string-intersperse lst "|") "|];"))
