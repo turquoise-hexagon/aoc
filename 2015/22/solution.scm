@@ -77,6 +77,6 @@
 
 (let ((input (import-input)))
   (let ((part/1 (apply solve #f input)))
-    (print part/1))
+    (print part/1) (assert (= part/1 900)))
   (let ((part/2 (apply solve #t input)))
-    (print part/2)))
+    (print part/2) (assert (= part/2 1216))))
