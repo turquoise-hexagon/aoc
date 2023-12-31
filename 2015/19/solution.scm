@@ -38,8 +38,8 @@
   (let ((rules (map reverse rules)))
     (call/cc
       (lambda (return)
-        (define-memoized (loop cur acc)
-          (if (string=? cur "e")
+        (define-memoized (loop str acc)
+          (if (string=? str "e")
             (return acc)
             (for-each
               (lambda (i)
@@ -48,7 +48,7 @@
                 (join
                   (map
                     (lambda (i)
-                      (apply run cur i))
+                      (apply run str i))
                     rules))
                 (lambda (a b)
                   (< (string-length a)
