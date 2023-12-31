@@ -2,7 +2,7 @@
   (chicken io)
   (chicken string))
 
-(define-constant magic 100000)
+(define-constant magic #e1e5)
 
 (define-constant offsets
   #((-1  0)
