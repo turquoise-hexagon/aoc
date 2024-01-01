@@ -1,6 +1,7 @@
 (import
   (chicken io)
   (chicken irregex)
+  (chicken string)
   (euler)
   (srfi 1))
 
@@ -14,12 +15,12 @@
         (apply
           (lambda (t a b)
             (case t
-              ((rect)   (for-each (lambda (i) (array-set! next i #\#)) (product (iota b) (iota a))))
+              ((rect)   (for-each (lambda (i) (array-set! next i "█")) (product (iota b) (iota a))))
               ((row)    (for-each (lambda (i) (array-set! next i (array-ref acc (map modulo (map - i (list 0 b)) (list h w))))) (product (list a) (iota w))))
               ((column) (for-each (lambda (i) (array-set! next i (array-ref acc (map modulo (map - i (list b 0)) (list h w))))) (product (iota h) (list a))))))
           i)
         next))
-    (make-array (list h w) #\ ) input))
+    (make-array (list h w) " ") input))
 
 (define (import-input)
   (process
@@ -37,10 +38,10 @@
 (define (solve input)
   (count
     (lambda (i)
-      (char=? (array-ref input i) #\#))
+      (string=? (array-ref input i) "█"))
     (array-indexes input)))
 
 (let ((input (import-input)))
   (let ((part (solve input)))
     (print part) (assert (= part 110)))
-  (for-each print (map list->string (array->list input))))
+  (for-each (lambda (i) (print (apply string-append i))) (array->list input)))
