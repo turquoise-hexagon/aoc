@@ -51,7 +51,7 @@
 (define (path input end flag)
   (call/cc
     (lambda (return)
-      (let ((acc (make-array '(100 100) #f)))
+      (let ((acc (make-array '(50 50) #f)))
         (do
           ((queue
              (priority-queue-insert (priority-queue compare?) '(0 (1 1)))
@@ -77,7 +77,7 @@
   (path input '(31 39) #f))
 
 (define (solve/2 input)
-  (let ((acc (path input '(31 39) #t)))
+  (let ((acc (path input '(50 50) #t)))
     (count
       (lambda (i)
         (array-ref acc i))
