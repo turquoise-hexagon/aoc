@@ -25,10 +25,9 @@
 (define (open? input coord)
   (apply
     (lambda (a b)
-      (if (or (fx< a 0)
-              (fx< b 0))
-        #f
-        (_open? input a b)))
+      (and (fx>= a 0)
+           (fx>= b 0)
+           (_open? input a b)))
     coord))
 
 (define (compare? a b)
