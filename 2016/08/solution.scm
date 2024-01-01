@@ -1,7 +1,6 @@
 (import
   (chicken io)
   (chicken irregex)
-  (chicken string)
   (euler)
   (srfi 1))
 
