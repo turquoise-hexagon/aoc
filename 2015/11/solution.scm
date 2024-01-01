@@ -55,4 +55,4 @@
   (let ((part/1 (solve input)))
     (print part/1) (assert (string=? part/1 "hepxxyzz"))
     (let ((part/2 (solve part/1)))
-      (print part/2) (assert (string=? part/2 "heqaabcc)))))
+      (print part/2) (assert (string=? part/2 "heqaabcc")))))
