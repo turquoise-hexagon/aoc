@@ -1,18 +1,16 @@
 (import
   (chicken io)
+  (chicken string)
   (srfi 1)
   (simple-md5))
 
 (define (import-input)
   (read-line))
 
-(define (generate input i n)
-  (substring (string->md5sum (string-append input (number->string i))) 0 n))
-
 (define (solve input n)
-  (let ((str (make-string n #\0)))
+  (let ((match (make-string n #\0)))
     (do ((i 1 (+ i 1)))
-      ((string=? str (generate input i n))
+      ((substring=? match (string->md5sum (string-append input (number->string i))))
        i))))
 
 (let ((input (import-input)))
