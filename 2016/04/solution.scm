@@ -4,7 +4,7 @@
   (chicken string)
   (srfi 1))
 
-(define-constant _a (char->integer #\a))
+(define-constant a (char->integer #\a))
 
 (define-syntax bind
   (syntax-rules ()
@@ -12,7 +12,7 @@
      (apply (lambda pat expr expr* ...) data))))
 
 (define (string->numeric str)
-  (map (lambda (i) (- (char->integer i) _a)) (string->list str)))
+  (map (lambda (i) (- (char->integer i) a)) (string->list str)))
 
 (define match (map string->numeric (string-split "northpole object storage")))
 
