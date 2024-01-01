@@ -14,9 +14,10 @@
     (lambda (i)
       (apply
         (lambda (a b c)
-          (and (> (+ a b) c)
-               (> (+ a c) b)
-               (> (+ b c) a)))
+          (and
+            (> (+ a b) c)
+            (> (+ a c) b)
+            (> (+ b c) a)))
         i))
     input))
 
