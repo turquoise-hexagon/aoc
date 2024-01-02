@@ -19,7 +19,7 @@
   (let* ((len (vector-length vec)) (vec (vector vec (make-vector len))))
     (let main ((iteration 0) (flag 0) (acc 0))
       (if (fx= iteration iterations)
-        acc
+        (fx- (fx* iterations len) acc)
         (let*
           ((next (fxxor flag 1))
            (a (vector-ref vec flag))
@@ -33,7 +33,7 @@
                  (value (fxior (fxshl value 1) (_vector-ref a (fx+ index  0))))
                  (value (fxior (fxshl value 1) (_vector-ref a (fx+ index +1)))))
                 (vector-set! b index (fxand (fxshr rule value) 1))
-                (loop (fx+ index 1) (fx+ acc (fxxor (vector-ref a index) 1)))))))))))
+                (loop (fx+ index 1) (fx+ acc (vector-ref a index)))))))))))
 
 (let ((input (import-input)))
   (let ((part/1 (solve (list->vector input) 40 90)))
