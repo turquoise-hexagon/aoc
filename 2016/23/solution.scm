@@ -3,8 +3,14 @@
 
 (include-relative "assembunny.scm")
 
-(let ((input (parse (read-lines))))
-  (let ((part/1 (solve (list->vector input) "a" "a" 7)))
-    (print part/1) (assert (= part/1 318077)))
-  (let ((part/2 (solve (list->vector input) "a" "a" 12)))
-    (print part/2) (assert (= part/2 9227731))))
+(define (import-input)
+  (parse (read-lines)))
+
+(define (solve input n)
+  (car (run (list->vector input) "a" "a" n)))
+
+(let ((input (import-input)))
+  (let ((part/1 (solve input 7)))
+    (print part/1) (assert (= part/1 10880)))
+  (let ((part/2 (solve input 12)))
+    (print part/2) (assert (= part/2 479007440))))
