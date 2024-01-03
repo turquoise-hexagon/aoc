@@ -19,8 +19,8 @@
 (define-inline (_open? input a b)
   (let loop ((i (fx+ input (_function a b))) (acc 0))
     (if (fx= i 0)
-      (fxeven? acc)
-      (loop (fxshr i 1) (fx+ acc (fxand i 1))))))
+      (fx= acc 0)
+      (loop (fxshr i 1) (fxxor acc (fxand i 1))))))
 
 (define (open? input coord)
   (apply
