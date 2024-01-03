@@ -8,7 +8,10 @@
 (define (import-input)
   (map
     (lambda (i)
-      (string-split i " "))
+      (map
+        (lambda (i)
+          (let ((_ (string->number i))) (if _ _ i)))
+        (string-split i " ")))
     (read-lines)))
 
 (define (string-swap! str a b)
@@ -28,34 +31,25 @@
     (lambda (str i)
       (match i
         (("swap" "position" a _ _ b)
-         (string-swap! str
-           (string->number a)
-           (string->number b))
+         (string-swap! str a b)
          str)
         (("swap" "letter" a _ _ b)
          (string-swap! str
            (substring-index a str)
            (substring-index b str))
          str)
-        (("rotate" "left"  a _) (string-rotate str (+ (string->number a))))
-        (("rotate" "right" a _) (string-rotate str (- (string->number a))))
+        (("rotate" "left"  a _) (string-rotate str (+ a)))
+        (("rotate" "right" a _) (string-rotate str (- a)))
         (("rotate" _ _ _ _ _ a)
          (let ((n (substring-index a str)))
            (string-rotate str (- (+ n (if (>= n 4) 2 1))))))
         (("reverse" _ a _ b)
-         (let
-           ((acc (string-copy str))
-            (a (string->number a))
-            (b (string->number b)))
+         (let ((acc (string-copy str)))
            (do ((i 0 (+ i 1)))
              ((> (+ a i) b) acc)
              (string-set! acc (+ a i) (string-ref str (- b i))))))
         (("move" _ a _ _ b)
-         (let*
-           ((a (string->number a))
-            (b (string->number b))
-            (v (string-ref str a))
-            (len (string-length str)))
+         (let ((len (string-length str)) (v (string-ref str a)))
            (do ((i a (+ i 1))) ((= (+ i 1) len)) (string-set! str i (string-ref str (+ i 1))))
            (do ((i (- len 1) (- i 1))) ((= i b)) (string-set! str i (string-ref str (- i 1))))
            (string-set! str b v)
