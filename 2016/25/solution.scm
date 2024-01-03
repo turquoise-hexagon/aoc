@@ -2,7 +2,7 @@
   (chicken io)
   (srfi 1))
 
-(include "assembunny.scm")
+(include-relative "../assembunny.scm")
 
 (define (import-input)
   (parse (read-lines)))

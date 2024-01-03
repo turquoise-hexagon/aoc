@@ -1,7 +1,7 @@
 (import
   (chicken io))
 
-(include-relative "assembunny.scm")
+(include-relative "../assembunny.scm")
 
 (define (import-input)
   (parse (read-lines)))
