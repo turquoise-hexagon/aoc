@@ -48,29 +48,27 @@
           offsets)))))
 
 (define (path input end flag)
-  (call/cc
-    (lambda (return)
-      (let ((acc (make-array '(50 50) #f)))
-        (do
-          ((queue
-             (priority-queue-insert (priority-queue compare?) '(0 (1 1)))
-             (apply
-               (lambda (cost coord)
-                 (if (equal? coord end)
-                   (return cost)
-                   (foldl
-                     (lambda (queue i)
-                       (apply
-                         (lambda (cost coord)
-                           (if (and (or (not (array-ref acc coord)) (fx< cost (array-ref acc coord))) (if flag (fx<= cost 50) #t))
-                             (begin
-                               (array-set! acc coord cost)
-                               (priority-queue-insert queue i))
-                             queue))
-                         i))
-                     (priority-queue-rest queue) (next input cost coord))))
-               (priority-queue-first queue))))
-          ((priority-queue-empty? queue) acc))))))
+  (let ((acc (make-array '(50 50) #f)))
+    (let loop ((queue (priority-queue-insert (priority-queue compare?) '(0 (1 1)))))
+      (if (priority-queue-empty? queue)
+        acc
+        (apply
+          (lambda (cost coord)
+            (if (equal? coord end)
+              cost
+              (loop
+                (foldl
+                  (lambda (queue i)
+                    (apply
+                      (lambda (cost coord)
+                        (if (and (or (not (array-ref acc coord)) (fx< cost (array-ref acc coord))) (if flag (fx<= cost 50) #t))
+                          (begin
+                            (array-set! acc coord cost)
+                            (priority-queue-insert queue i))
+                          queue))
+                      i))
+                  (priority-queue-rest queue) (next input cost coord)))))
+          (priority-queue-first queue))))))
 
 (define (solve/1 input)
   (path input '(31 39) #f))
