@@ -8,25 +8,22 @@
     (lambda (i)
       (map
         (lambda (i)
-          (let ((_ (string->number i)))
-            (if _ _ i)))
+          (let ((_  (string->number i)))
+            (if _ _ (string->symbol i))))
         (string-split i " ")))
     (read-lines)))
 
 (define (condition? mem a op v)
   (let ((_ (hash-table-ref/default mem a 0)))
-    (case (string->symbol op)
-      ((< )      (<  _ v))
-      ((<=)      (<= _ v))
-      ((> )      (>  _ v))
-      ((>=)      (>= _ v))
-      ((==)      (=  _ v))
-      ((!=) (not (=  _ v))))))
+    (case op
+      ((==)         (= _ v))
+      ((!=)    (not (= _ v)))
+      (else ((eval op) _ v)))))
 
 (define (execute! mem a op v)
   (let ((_ (hash-table-ref/default mem a 0)))
     (hash-table-set! mem a
-      (case (string->symbol op)
+      (case op
         ((inc) (+ _ v))
         ((dec) (- _ v))))))
 
