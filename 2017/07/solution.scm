@@ -6,9 +6,7 @@
   (srfi 69))
 
 (define (import-input)
-  (let
-    ((vals (make-hash-table))
-     (lsts (make-hash-table)))
+  (let ((vals (make-hash-table)) (lsts (make-hash-table)))
     (for-each
       (lambda (i)
         (apply
