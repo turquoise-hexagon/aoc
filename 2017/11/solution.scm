@@ -18,10 +18,10 @@
   (quotient (apply + (map abs coord)) 2))
 
 (define (run lst)
-  (let loop ((lst lst) (coord '(0 0 0)) (acc '()))
-    (if (null? lst)
-      (cons coord acc)
-      (loop (cdr lst) (map + coord (offset (car lst))) (cons coord acc)))))
+  (foldl
+    (lambda (acc i)
+      (cons (map + (car acc) (offset i)) acc))
+    '((0 0 0)) lst))
 
 (define (solve input)
   (let ((acc (map distance (run input))))
