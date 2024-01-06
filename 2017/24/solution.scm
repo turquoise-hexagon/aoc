@@ -29,7 +29,7 @@
       (read-lines))
     (map
       (lambda (i)
-        (cons (length i) (apply + (map (cut apply + <>) i))))
+        (cons (length i) (apply + (join i))))
       (generate acc))))
 
 (define (solve/1 input)
