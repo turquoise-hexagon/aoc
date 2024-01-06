@@ -8,7 +8,7 @@
 Begin in state ([A-Z]+).
 Perform a diagnostic checksum after ([0-9]+) steps.")
 
-(define-constant regex/state "\
+(define-constant regex/rule "\
 In state ([A-Z]+):
   If the current value is ([0-9]+):
     - Write the value ([0-9]+).
@@ -41,7 +41,7 @@ In state ([A-Z]+):
                     (cond
                       ((= val cond1) (vector-set! mem index val1) (list (modulo (+ index move1) len) next1))
                       ((= val cond2) (vector-set! mem index val2) (list (modulo (+ index move2) len) next2))))))))
-          (irregex-extract-submatches regex/state rule)))
+          (irregex-extract-submatches regex/rule rule)))
       rules)
     acc))
 
