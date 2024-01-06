@@ -50,7 +50,7 @@
       (cantor (cantor x y) z))))
 
 (define (convert lst)
-  (let ((acc (make-hash-table #:size iterations #:test = #:hash number-hash)))
+  (let ((acc (make-hash-table)))
     (for-each
       (lambda (i)
         (hash-table-set! acc (id i) #t))
