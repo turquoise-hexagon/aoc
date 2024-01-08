@@ -15,12 +15,13 @@ depends on
         * make
     eggs
         * srfi-1
-        * srfi-69
         * srfi-113
         * srfi-128
         * srfi-133
         * srfi-152
         * srfi-158
         * srfi-180
+        * srfi-69
         * euler
         * matchable
+        * simple-md5
