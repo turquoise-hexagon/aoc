@@ -1,7 +1,6 @@
 (import
   (chicken io)
   (chicken string)
-  (chicken fixnum)
   (euler)
   (srfi 1))
 
