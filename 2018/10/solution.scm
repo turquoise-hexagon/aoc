@@ -42,9 +42,7 @@
           (lambda (i)
             (for-each
               (lambda (j)
-                (if (member (list j i) l)
-                  (display "█")
-                  (display " ")))
+                (display (if (member (list j i) l) "█" " ")))
               (range a c))
             (newline))
           (range b d)))
