@@ -1,5 +1,4 @@
 (import
-  (chicken io)
   (chicken fixnum)
   (euler)
   (srfi 1))
@@ -11,7 +10,7 @@
     ( 0 -1)))
 
 (define (import-input)
-  (string->number (read-line)))
+  (read))
 
 (define-inline (_function a b)
   (fx+ (fx+ (fx+ (fx* a a) (fx* 3 a)) (fx+ (fx* 2 (fx* a b)) (fx* b b))) b))

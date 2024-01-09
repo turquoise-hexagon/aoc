@@ -1,9 +1,8 @@
 (import
-  (chicken io)
   (euler))
 
 (define (import-input)
-  (number->list (string->number (read-line))))
+  (number->list (read)))
 
 (define (solve input iterations)
   (length

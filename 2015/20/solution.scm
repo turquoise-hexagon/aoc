@@ -1,9 +1,8 @@
 (import
-  (chicken io)
   (chicken fixnum))
 
 (define (import-input)
-  (string->number (read-line)))
+  (read))
 
 (define (generate limit multiplier repetitions)
   (let ((acc (make-vector (fx+ limit 1) 0)))

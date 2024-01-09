@@ -1,9 +1,8 @@
 (import
-  (chicken io)
   (srfi 1))
 
 (define (import-input)
-  (string->number (read-line)))
+  (read))
 
 (define (solve input iterations target)
   (let ((acc (circular-list 0)))

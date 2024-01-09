@@ -1,6 +1,5 @@
 (import
   (chicken format)
-  (chicken io)
   (euler)
   (euler-syntax)
   (srfi 1))
@@ -9,7 +8,7 @@
   (- (modulo (quotient (* (+ (* (+ a 10) b) n) (+ a 10)) 100) 10) 5))
 
 (define (import-input)
-  (let ((acc (make-array '(300 300) 0)) (n (string->number (read-line))))
+  (let ((acc (make-array '(300 300) 0)) (n (read)))
     (for-each
       (lambda (i)
         (array-set! acc i (apply function n i)))

@@ -1,5 +1,4 @@
 (import
-  (chicken io)
   (chicken fixnum)
   (euler)
   (srfi 1))
@@ -21,7 +20,7 @@
     (fun (cadr a) (cadr b))))
 
 (define (import-input)
-  (string->number (read-line)))
+  (read))
 
 (define (neighbors mem coord)
   (filter-map

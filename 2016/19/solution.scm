@@ -1,8 +1,5 @@
-(import
-  (chicken io))
-
 (define (import-input)
-  (string->number (read-line)))
+  (read))
 
 (define (solve/1 input)
   (let ((mem (make-vector input)))
