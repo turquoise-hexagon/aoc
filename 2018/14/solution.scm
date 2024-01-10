@@ -13,11 +13,10 @@
     (let loop ((a 0) (b 1) (i 2))
       (if (> i limit)
         acc
-        (let*
+        (let
           ((m (vector-ref acc a))
-           (n (vector-ref acc b))
-           (s (+ m n)))
-          (do ((l (if (= s 0) '(0) (number->list s)) (cdr l))
+           (n (vector-ref acc b)))
+          (do ((l (number->list (+ m n)) (cdr l))
                (i i (+ i 1)))
             ((null? l)
              (loop
@@ -45,6 +44,6 @@
 (let ((input (import-input)))
   (let ((vec (generate)))
     (let ((part/1 (solve/1 vec input)))
-      (print part/1) (assert (= part/1 6126491027)))
+      (print part/1) (assert (string=? part/1 "6126491027")))
     (let ((part/2 (solve/2 vec input)))
       (print part/2) (assert (= part/2 20191616)))))
