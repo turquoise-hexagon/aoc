@@ -30,9 +30,8 @@
 
 (define (compare? a b)
   (cond
-    ((and a (not b)) #t)
-    ((and (not a) b) #f)
-    ((and (not a) (not b)) #f)
+    ((not b) #t)
+    ((not a) #f)
     (else
      (apply
        (lambda (_ _ a b _ _ c d)
