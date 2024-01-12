@@ -56,10 +56,9 @@
       (else  (_move count direction coord)))))
 
 (define (collision carts)
-  (let ((mem (make-hash-table)))
+  (let ((mem (make-hash-table)) (len (vector-length carts)))
     (let loop ((i 0))
-      (if (= i (vector-length carts))
-        #f
+      (if (= i len) #f
         (let ((cart (vector-ref carts i)))
           (if cart
             (bind (_ _ coord) cart
@@ -77,13 +76,13 @@
     (list acc/1 (vector-ref acc/2 0))))
 
 (define (solve input)
-  (let ((carts (carts input)))
+  (let* ((carts (carts input)) (len (vector-length carts)))
     (let main ((acc '()))
       (sort! carts compare?)
       (if (= (vector-count identity carts) 1)
         (output acc carts)
         (let loop ((i 0) (acc acc))
-          (if (= i (vector-length carts))
+          (if (= i len)
             (main acc)
             (let ((cart (vector-ref carts i)))
               (if cart
