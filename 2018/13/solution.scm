@@ -7,6 +7,11 @@
   (srfi 69)
   (only (srfi 133) vector-count))
 
+(define-syntax bind
+  (syntax-rules ()
+    ((_ pat data expr expr* ...)
+     (apply (lambda pat expr expr* ...) data))))
+
 (define-constant directions
   #((-1  0)
     ( 0  1)
@@ -33,35 +38,31 @@
     ((not b) #t)
     ((not a) #f)
     (else
-     (apply
-       (lambda (_ _ a b _ _ c d)
-         (cond
-           ((< a c) #t)
-           ((> a c) #f)
-           (else (< b d))))
-       (flatten a b)))))
+     (bind (_ _ a b _ _ c d) (flatten a b)
+       (cond
+         ((< a c) #t)
+         ((> a c) #f)
+         (else (< b d)))))))
 
 (define (_move count direction coord)
   (list count direction (map + coord (vector-ref directions direction))))
 
 (define (move array cart)
-  (apply
-    (lambda (count direction coord)
-      (case (array-ref array coord)
-        ((#\+)
-         (_move (+ count 1)
-           (modulo
-             (+ direction
-                (case (modulo count 3)
-                  ((0) -1)
-                  ((1)  0)
-                  ((2)  1)))
-             4)
-           coord))
-        ((#\/) (_move count (modulo (+ direction (if (even? direction) 1 -1)) 4) coord))
-        ((#\\) (_move count (modulo (+ direction (if (odd?  direction) 1 -1)) 4) coord))
-        (else  (_move count direction coord))))
-    cart))
+  (bind (count direction coord) cart
+    (case (array-ref array coord)
+      ((#\+)
+       (_move (+ count 1)
+         (modulo
+           (+ direction
+              (case (modulo count 3)
+                ((0) -1)
+                ((1)  0)
+                ((2)  1)))
+           4)
+         coord))
+      ((#\/) (_move count (modulo (+ direction (if (even? direction) 1 -1)) 4) coord))
+      ((#\\) (_move count (modulo (+ direction (if (odd?  direction) 1 -1)) 4) coord))
+      (else  (_move count direction coord)))))
 
 (define (collision carts)
   (let ((mem (make-hash-table)))
@@ -70,14 +71,12 @@
         #f
         (let ((cart (vector-ref carts i)))
           (if cart
-            (apply
-              (lambda (_ _ coord)
-                (if (hash-table-exists? mem coord)
-                  (list i (hash-table-ref mem coord) coord)
-                  (begin
-                    (hash-table-set! mem coord i)
-                    (loop (+ i 1)))))
-              cart)
+            (bind (_ _ coord) cart
+              (if (hash-table-exists? mem coord)
+                (list i (hash-table-ref mem coord) coord)
+                (begin
+                  (hash-table-set! mem coord i)
+                  (loop (+ i 1)))))
             (loop (+ i 1))))))))
 
 (define (output acc/1 acc/2)
@@ -101,12 +100,10 @@
                   (vector-set! carts i (move input cart))
                   (let ((collision (collision carts)))
                     (if collision
-                      (apply
-                        (lambda (a b coord)
-                          (vector-set! carts a #f)
-                          (vector-set! carts b #f)
-                          (loop (+ i 1) (cons coord acc)))
-                        collision)
+                      (bind (a b coord) collision
+                        (vector-set! carts a #f)
+                        (vector-set! carts b #f)
+                        (loop (+ i 1) (cons coord acc)))
                       (loop (+ i 1) acc))))
                 (loop (+ i 1) acc)))))))))
 
