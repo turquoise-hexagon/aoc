@@ -19,5 +19,7 @@
   (apply + (divisors n)))
 
 (let-values (((input/1 input/2) (import-input)))
-  (print (solve input/1))
-  (print (solve input/2)))
+  (let ((part/1 (solve input/1)))
+    (print part/1) (assert (= part/1 2520)))
+  (let ((part/2 (solve input/2)))
+    (print part/2) (assert (= part/2 27941760))))
