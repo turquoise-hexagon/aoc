@@ -50,16 +50,7 @@
 (define (move array cart)
   (bind (count direction coord) cart
     (case (array-ref array coord)
-      ((#\+)
-       (_move (+ count 1)
-         (modulo
-           (+ direction
-              (case (modulo count 3)
-                ((0) -1)
-                ((1)  0)
-                ((2)  1)))
-           4)
-         coord))
+      ((#\+) (_move (+ count 1) (modulo (+ direction (vector-ref #(-1 0 1) (modulo count 3))) 4) coord))
       ((#\/) (_move count (modulo (+ direction (if (even? direction) 1 -1)) 4) coord))
       ((#\\) (_move count (modulo (+ direction (if (odd?  direction) 1 -1)) 4) coord))
       (else  (_move count direction coord)))))
