@@ -43,12 +43,11 @@
     (irregex-split "\n" chunk)))
 
 (define (import-input)
-  (apply
-    (lambda (samples program)
-      (values
-        (parse-samples samples)
-        (parse-program program)))
-    (irregex-split "\n{3}" (read-string))))
+  (match (irregex-split "\n{3}" (read-string))
+    ((samples program)
+     (values
+       (parse-samples samples)
+       (parse-program program)))))
 
 (define (matching sample instructions)
   (match sample
