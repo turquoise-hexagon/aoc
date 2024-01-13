@@ -28,19 +28,10 @@
     ("eqrr" . ,(lambda (mem a b c) (set c (if (= (get a) (get b)) 1 0))))))
 
 (define (parse-samples chunk)
-  (map
-    (lambda (i)
-      (map
-        (lambda (i)
-          (map string->number (irregex-extract "[0-9]+" i)))
-        (irregex-split "\n" i)))
-    (irregex-split "\n{2}" chunk)))
+  (chop (chop (map string->number (irregex-extract "[0-9]+" chunk)) 4) 3))
 
 (define (parse-program chunk)
-  (map
-    (lambda (i)
-      (map string->number (irregex-extract "[0-9]+" i)))
-    (irregex-split "\n" chunk)))
+  (chop (map string->number (irregex-extract "[0-9]+" chunk)) 4))
 
 (define (import-input)
   (match (irregex-split "\n{3}" (read-string))
