@@ -2,6 +2,7 @@
   (chicken io)
   (chicken sort)
   (chicken string)
+  (euler-syntax)
   (srfi 1)
   (srfi 69))
 
@@ -13,29 +14,25 @@
       (read-lines))))
 
 (define (solve/1 input)
-  (apply
-    (lambda (a b)
-      (apply +
-        (map
-          (lambda (i j)
-            (abs (- i j)))
-          (sort a <) (sort b <))))
-    input))
+  (bind (a b) input
+    (apply +
+      (map
+        (lambda (i j)
+          (abs (- i j)))
+        (sort a <) (sort b <)))))
 
 (define (solve/2 input)
-  (apply
-    (lambda (a b)
-      (let ((mem (make-hash-table)))
-        (for-each
+  (bind (a b) input
+    (let ((mem (make-hash-table)))
+      (for-each
+        (lambda (i)
+          (hash-table-update!/default mem i add1 0))
+        b)
+      (apply +
+        (map
           (lambda (i)
-            (hash-table-update!/default mem i add1 0))
-          b)
-        (apply +
-          (map
-            (lambda (i)
-              (* i (hash-table-ref/default mem i 0)))
-            a))))
-    input))
+            (* i (hash-table-ref/default mem i 0)))
+          a)))))
 
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
