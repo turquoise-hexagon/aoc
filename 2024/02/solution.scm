@@ -14,7 +14,7 @@
            (apply > lst))
        (every
          (lambda (a b)
-           (<= 1 (abs (- a b)) 3))
+           (<= (abs (- a b)) 3))
          lst (cdr lst))))
 
 (define (safe?/2 lst)
