@@ -16,13 +16,12 @@
       (cons (append (reverse a) (cdr b)) (loop (cons (car b) a) (cdr b))))))
 
 (define (safe?/1 lst)
-  (let ((tmp (cdr lst)))
-    (and (or (every < lst tmp)
-             (every > lst tmp))
-         (every
-           (lambda (a b)
-             (<= 1 (abs (- a b)) 3))
-           lst tmp))))
+  (and (or (apply < lst)
+           (apply > lst))
+       (every
+         (lambda (a b)
+           (<= 1 (abs (- a b)) 3))
+         lst (cdr lst))))
 
 (define (safe?/2 lst)
   (any safe?/1 (generate lst)))
