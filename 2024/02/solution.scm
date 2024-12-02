@@ -9,12 +9,6 @@
       (map string->number (string-split i)))
     (read-lines)))
 
-(define (generate lst)
-  (let loop ((a '()) (b lst))
-    (if (null? b)
-      '()
-      (cons (append (reverse a) (cdr b)) (loop (cons (car b) a) (cdr b))))))
-
 (define (safe?/1 lst)
   (and (or (apply < lst)
            (apply > lst))
@@ -24,7 +18,12 @@
          lst (cdr lst))))
 
 (define (safe?/2 lst)
-  (any safe?/1 (generate lst)))
+  (let loop ((a '()) (b lst))
+    (if (null? b)
+      #f
+      (if (safe?/1 (append (reverse a) (cdr b)))
+        #t
+        (loop (cons (car b) a) (cdr b))))))
 
 (define (solve input proc)
   (count proc input))
