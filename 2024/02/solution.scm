@@ -1,0 +1,37 @@
+(import
+  (chicken io)
+  (chicken string)
+  (srfi 1))
+
+(define (import-input)
+  (map
+    (lambda (i)
+      (map string->number (string-split i)))
+    (read-lines)))
+
+(define (generate lst)
+  (let loop ((a '()) (b lst))
+    (if (null? b)
+      '()
+      (cons (append (reverse a) (cdr b)) (loop (cons (car b) a) (cdr b))))))
+
+(define (safe?/1 lst)
+  (let ((tmp (cdr lst)))
+    (and (or (every < lst tmp)
+             (every > lst tmp))
+         (every
+           (lambda (a b)
+             (<= 1 (abs (- a b)) 3))
+           lst tmp))))
+
+(define (safe?/2 lst)
+  (any safe?/1 (generate lst)))
+
+(define (solve input proc)
+  (count proc input))
+
+(let ((input (import-input)))
+  (let ((part/1 (solve input safe?/1)))
+    (print part/1) (assert (= part/1 526)))
+  (let ((part/2 (solve input safe?/2)))
+    (print part/2) (assert (= part/2 566))))
