@@ -11,7 +11,7 @@
         ((string=? i "don't()") (set! flag #f) acc)
         ((or part flag) (+ acc (apply * (map string->number (irregex-extract "[0-9]+" i)))))
         (else acc)))
-    0 (irregex-extract "(do\\(\\)|don\'t\\(\\)|mul\\([0-9]+,[0-9]+\\))" input)))
+    0 (irregex-extract "(do(n\'t)?\\(\\)|mul\\([0-9]+,[0-9]+\\))" input)))
 
 (let ((input (read-string)))
   (let ((part/1 (solve input #t)))
