@@ -2,6 +2,9 @@
   (chicken io)
   (chicken irregex))
 
+(define-constant REGEX/1 '(or (: "do" (? "n't") "()") (: "mul(" (+ (/ "09")) "," (+ (/ "09")) ")")))
+(define-constant REGEX/2 '(+ (/ "09")))
+
 (define (solve input part)
   (set! flag #t)
   (foldl
@@ -9,9 +12,9 @@
       (cond
         ((string=? i    "do()") (set! flag #t) acc)
         ((string=? i "don't()") (set! flag #f) acc)
-        ((or part flag) (+ acc (apply * (map string->number (irregex-extract "[0-9]+" i)))))
+        ((or part flag) (+ acc (apply * (map string->number (irregex-extract REGEX/2 i)))))
         (else acc)))
-    0 (irregex-extract "(do(n\'t)?\\(\\)|mul\\([0-9]+,[0-9]+\\))" input)))
+    0 (irregex-extract REGEX/1 input)))
 
 (let ((input (read-string)))
   (let ((part/1 (solve input #t)))
