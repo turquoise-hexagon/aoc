@@ -31,16 +31,13 @@
   (length (search input "XMAS" offsets/1)))
 
 (define (solve/2 input)
-  (let loop/1 ((lst/1 (search input "MAS" offsets/2)) (acc/1 0))
-    (if (null? lst/1)
-      acc/1
-      (let loop/2 ((lst/2 (cdr lst/1)) (acc/2 0))
-        (if (null? lst/2)
-          (loop/1 (cdr lst/1) (+ acc/1 acc/2))
-          (loop/2 (cdr lst/2)
-            (if (equal? (cadar lst/1) (cadar lst/2))
-              (+ acc/2 1)
-              acc/2)))))))
+  (do ((lst/1 (search input "MAS" offsets/2) (cdr lst/1))
+       (acc/1 0 (do ((lst/2 (cdr lst/1) (cdr lst/2))
+                     (acc/2 acc/1 (if (equal? (cadar lst/1) (cadar lst/2))
+                                    (+ acc/2 1)
+                                    acc/2)))
+                  ((null? lst/2) acc/2))))
+    ((null? lst/1) acc/1)))
 
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
