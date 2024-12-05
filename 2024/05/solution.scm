@@ -21,9 +21,7 @@
       (for-each
         (lambda (rule)
           (bind (a b) rule
-            (unless (hash-table-exists? graph a)
-              (hash-table-set! graph a (make-hash-table)))
-            (hash-table-set! (hash-table-ref graph a) b #t)))
+            (hash-table-update!/default graph a (lambda (acc) (hash-table-set! acc b #t) acc) (make-hash-table))))
         rules)
 
       (fold
@@ -36,9 +34,7 @@
 
         (map
           (lambda (page)
-            (sort page
-              (lambda (a b)
-                (hash-table-exists? (hash-table-ref graph a) b))))
+            (sort page (lambda (a b) (hash-table-exists? (hash-table-ref graph a) b))))
           pages)))))
 
 (define (solve input)
