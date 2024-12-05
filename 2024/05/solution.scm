@@ -1,40 +1,45 @@
 (import
   (chicken io)
-  (chicken string)
   (chicken sort)
+  (chicken string)
   (euler-syntax)
-  (srfi 1))
-
-(define (comparator? rules page/a page/b)
-  (any
-    (lambda (rule)
-      (bind (rule/a rule/b) rule (and (= page/a rule/a) (= page/b rule/b))))
-    rules))
-
-(define (process-pages rules pages)
-  (map
-    (lambda (page)
-      (sort page (lambda (a b) (comparator? rules a b))))
-    pages))
-
-(define (process-input unsorted sorted)
-  (fold
-    (lambda (unsorted sorted acc)
-      (bind (invalid valid) acc
-        (if (equal? unsorted sorted)
-          (list invalid (cons sorted valid))
-          (list (cons sorted invalid) valid))))
-    '(() ()) unsorted sorted))
+  (srfi 1)
+  (srfi 69))
 
 (define (import-input)
   (bind (rules pages)
+
     (foldr
       (lambda (line acc)
-        (if (string=? line "") (cons '() acc)
+        (if (string=? line "")
+          (cons '() acc)
           (let ((item (map string->number (string-split line "|,"))))
             (cons (cons item (car acc)) (cdr acc)))))
       '(()) (read-lines))
-    (process-input pages (process-pages rules pages))))
+
+    (let ((graph (make-hash-table)))
+      (for-each
+        (lambda (rule)
+          (bind (a b) rule
+            (unless (hash-table-exists? graph a)
+              (hash-table-set! graph a (make-hash-table)))
+            (hash-table-set! (hash-table-ref graph a) b #t)))
+        rules)
+
+      (fold
+        (lambda (unsorted sorted acc)
+          (bind (invalid valid) acc
+            (if (equal? unsorted sorted)
+              (list invalid (cons sorted valid))
+              (list (cons sorted invalid) valid))))
+        '(() ()) pages
+
+        (map
+          (lambda (page)
+            (sort page
+              (lambda (a b)
+                (hash-table-exists? (hash-table-ref graph a) b))))
+          pages)))))
 
 (define (solve input)
   (apply +
