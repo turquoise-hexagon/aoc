@@ -2,8 +2,8 @@
   (chicken io)
   (chicken sort)
   (chicken string)
-  (euler-syntax)
   (euler)
+  (euler-syntax)
   (srfi 1))
 
 (define (import-input)
