@@ -21,8 +21,7 @@
     (let ((graph (make-vector (* N N) #f)))
       (for-each
         (lambda (rule)
-          (bind (a b) rule
-            (vector-set! graph (+ (* a N) b) #t)))
+          (bind (a b) rule (vector-set! graph (+ (* a N) b) #t)))
         rules)
 
       (fold
