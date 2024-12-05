@@ -3,8 +3,8 @@
   (chicken sort)
   (chicken string)
   (euler-syntax)
-  (srfi 1)
-  (srfi 69))
+  (euler)
+  (srfi 1))
 
 (define (import-input)
   (bind (rules pages)
@@ -17,11 +17,10 @@
             (cons (cons item (car acc)) (cdr acc)))))
       '(()) (read-lines))
 
-    (let ((graph (make-hash-table)))
+    (let ((graph (make-array '(100 100) #f)))
       (for-each
         (lambda (rule)
-          (bind (a b) rule
-            (hash-table-update!/default graph a (lambda (acc) (hash-table-set! acc b #t) acc) (make-hash-table))))
+          (array-set! graph rule #t))
         rules)
 
       (fold
@@ -34,7 +33,7 @@
 
         (map
           (lambda (page)
-            (sort page (lambda (a b) (hash-table-exists? (hash-table-ref graph a) b))))
+            (sort page (lambda (a b) (array-ref graph (list a b)))))
           pages)))))
 
 (define (solve input)
