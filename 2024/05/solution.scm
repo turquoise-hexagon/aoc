@@ -2,9 +2,10 @@
   (chicken io)
   (chicken sort)
   (chicken string)
-  (euler)
   (euler-syntax)
   (srfi 1))
+
+(define-constant N 100)
 
 (define (import-input)
   (bind (rules pages)
@@ -17,10 +18,11 @@
             (cons (cons item (car acc)) (cdr acc)))))
       '(()) (read-lines))
 
-    (let ((graph (make-array '(100 100) #f)))
+    (let ((graph (make-vector (* N N) #f)))
       (for-each
         (lambda (rule)
-          (array-set! graph rule #t))
+          (bind (a b) rule
+            (vector-set! graph (+ (* a N) b) #t)))
         rules)
 
       (fold
@@ -33,7 +35,7 @@
 
         (map
           (lambda (page)
-            (sort page (lambda (a b) (array-ref graph (list a b)))))
+            (sort page (lambda (a b) (vector-ref graph (+ (* a N) b)))))
           pages)))))
 
 (define (solve input)
