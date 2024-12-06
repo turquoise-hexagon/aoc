@@ -8,13 +8,13 @@
 (define (import-input)
   (list->array (map string->list (read-lines))))
 
-(define cache #f)
-
 (define (start array)
   (find
     (lambda (coord)
       (char=? (array-ref array coord) #\^))
     (array-indexes array)))
+
+(define cache #f)
 
 (define (make-run array)
   (unless cache
