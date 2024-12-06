@@ -49,17 +49,14 @@
   (let ((run (make-run input)))
     (count
       (lambda (coord)
-        (if (char=? (array-ref input coord) #\.)
-          (begin
-            (array-set! input coord #\#)
-            (let ((acc (run input)))
-              (array-set! input coord #\.)
-              (not acc)))
-          #f))
+        (array-set! input coord #\#)
+        (let ((acc (run input)))
+          (array-set! input coord #\.)
+          (not acc)))
       (let ((cache (run input)))
         (filter
           (lambda (coord)
-            (not (null? (array-ref cache coord))))
+            (and (not (null? (array-ref cache coord))) (char=? (array-ref input coord) #\.)))
           (array-indexes cache))))))
 
 (let ((input (import-input)))
