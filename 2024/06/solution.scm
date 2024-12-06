@@ -29,14 +29,13 @@
         (let ((value (array-ref cache coord)))
           (if (member index value)
             #f
-            (begin
+            (let ((next (map + coord (vector-ref offsets index))))
               (array-set! cache coord (cons index value))
-              (let ((next (map + coord (vector-ref offsets index))))
-                (if (array-exists? array next)
-                  (if (char=? (array-ref array next) #\#)
-                    (loop coord (modulo (+ index 1) 4))
-                    (loop next index))
-                  cache)))))))))
+              (if (array-exists? array next)
+                (if (char=? (array-ref array next) #\#)
+                  (loop coord (modulo (+ index 1) 4))
+                  (loop next index))
+                cache))))))))
 
 (define (solve/1 input)
   (let* ((run (make-run input)) (acc (run input)))
