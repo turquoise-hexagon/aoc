@@ -3,14 +3,12 @@
   (euler)
   (srfi 1))
 
-(define-constant OFFSETS
-  #((-1  0)
-    ( 0  1)
-    ( 1  0)
-    ( 0 -1)))
+(define-constant offsets #((-1 0) (0 1) (1 0) (0 -1)))
 
 (define (import-input)
   (list->array (map string->list (read-lines))))
+
+(define cache #f)
 
 (define (start array)
   (find
@@ -18,41 +16,51 @@
       (char=? (array-ref array coord) #\^))
     (array-indexes array)))
 
-(define (run array)
-  (let ((acc (make-array (array-dimensions array) '())))
-    (let loop ((coord (start array)) (index 0))
-      (if (member index (array-ref acc coord))
-        #f
-        (begin
-          (array-set! acc coord (cons index (array-ref acc coord)))
-          (let ((next (map + coord (vector-ref OFFSETS index))))
-            (if (array-exists? array next)
-              (if (char=? (array-ref array next) #\#)
-                (loop coord (modulo (+ index 1) 4))
-                (loop next index))
-              acc)))))))
+(define (make-run array)
+  (unless cache
+    (set! cache (make-array (array-dimensions array) '())))
+  (let ((start (start array)))
+    (lambda (array)
+      (for-each
+        (lambda (coord)
+          (array-set! cache coord '()))
+        (array-indexes cache))
+      (let loop ((coord start) (index 0))
+        (let ((value (array-ref cache coord)))
+          (if (member index value)
+            #f
+            (begin
+              (array-set! cache coord (cons index value))
+              (let ((next (map + coord (vector-ref offsets index))))
+                (if (array-exists? array next)
+                  (if (char=? (array-ref array next) #\#)
+                    (loop coord (modulo (+ index 1) 4))
+                    (loop next index))
+                  cache)))))))))
 
 (define (solve/1 input)
-  (let ((acc (run input)))
+  (let* ((run (make-run input)) (acc (run input)))
     (count
       (lambda (coord)
         (not (null? (array-ref acc coord))))
       (array-indexes acc))))
 
 (define (solve/2 input)
-  (let ((acc (run input)))
+  (let ((run (make-run input)))
     (count
       (lambda (coord)
-        (if (null? (array-ref acc coord))
-          #f
-          (if (char=? (array-ref input coord) #\.)
-            (begin
-              (array-set! input coord #\#)
-              (let ((_ (run input)))
-                (array-set! input coord #\.)
-                (not _)))
-            #f)))
-      (array-indexes input))))
+        (if (char=? (array-ref input coord) #\.)
+          (begin
+            (array-set! input coord #\#)
+            (let ((acc (run input)))
+              (array-set! input coord #\.)
+              (not acc)))
+          #f))
+      (let ((cache (run input)))
+        (filter
+          (lambda (coord)
+            (not (null? (array-ref cache coord))))
+          (array-indexes cache))))))
 
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
