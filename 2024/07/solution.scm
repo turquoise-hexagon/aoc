@@ -19,12 +19,14 @@
 (define (valid? lst operators)
   (let ((n (car lst)))
     (let loop ((i (cadr lst)) (lst (cddr lst)))
-      (if (null? lst)
-        (fx= i n)
-        (any
-          (lambda (op)
-            (loop (op i (car lst)) (cdr lst)))
-          operators)))))
+      (if (fx> i n)
+        #f
+        (if (null? lst)
+          (fx= i n)
+          (any
+            (lambda (op)
+              (loop (op i (car lst)) (cdr lst)))
+            operators))))))
 
 (define (solve input operators)
   (apply +
