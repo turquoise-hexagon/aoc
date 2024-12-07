@@ -23,10 +23,12 @@
         #f
         (if (null? lst)
           (fx= i n)
-          (any
-            (lambda (op)
-              (loop (op i (car lst)) (cdr lst)))
-            operators))))))
+          (let subloop ((operators operators))
+            (if (null? operators)
+              #f
+              (if (loop ((car operators) i (car lst)) (cdr lst))
+                #t
+                (subloop (cdr operators))))))))))
 
 (define (solve input operators)
   (apply +
