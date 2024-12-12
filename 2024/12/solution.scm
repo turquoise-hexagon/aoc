@@ -60,7 +60,7 @@
                    (a (hash-table-exists? table (map + coord offset/a)))
                    (b (hash-table-exists? table (map + coord offset/b)))
                    (c (hash-table-exists? table (map + coord offset/a offset/b))))
-              (or (and (not a) (not b)) (and a b (not c)))))
+              (or (not (or a b)) (and a b (not c)))))
           '(0 1 2 3)))
       (hash-table-keys table))))
 
