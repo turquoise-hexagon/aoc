@@ -5,7 +5,7 @@
   (srfi 69))
 
 (define-constant offsets
-  #((-1  0)
+  '((-1  0)
     ( 0  1)
     ( 1  0)
     ( 0 -1)))
@@ -15,14 +15,14 @@
     (let loop ((coord coord))
       (hash-table-set! acc coord #t)
       (for-each
-        (lambda (index)
-          (let ((next (map + coord (vector-ref offsets index))))
+        (lambda (offset)
+          (let ((next (map + coord offset)))
             (if (and (array-exists? array next)
                      (char=? (array-ref array coord)
                              (array-ref array next))
                      (not (hash-table-exists? acc next)))
               (loop next))))
-        '(0 1 2 3)))
+        offsets))
     acc))
 
 (define (regions array)
@@ -44,9 +44,9 @@
     (map
       (lambda (coord)
         (count
-          (lambda (index)
-            (not (hash-table-exists? table (map + coord (vector-ref offsets index)))))
-          '(0 1 2 3)))
+          (lambda (offset)
+            (not (hash-table-exists? table (map + coord offset))))
+          offsets))
       (hash-table-keys table))))
 
 (define (sides table)
@@ -55,8 +55,8 @@
       (lambda (coord)
         (count
           (lambda (index)
-            (let* ((offset/a (vector-ref offsets (modulo (+ index 0) 4)))
-                   (offset/b (vector-ref offsets (modulo (+ index 1) 4)))
+            (let* ((offset/a (list-ref offsets (modulo (+ index 0) 4)))
+                   (offset/b (list-ref offsets (modulo (+ index 1) 4)))
                    (a (hash-table-exists? table (map + coord offset/a)))
                    (b (hash-table-exists? table (map + coord offset/b)))
                    (c (hash-table-exists? table (map + coord offset/a offset/b))))
