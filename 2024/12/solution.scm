@@ -10,31 +10,27 @@
     ( 1  0)
     ( 0 -1)))
 
-(define (region array coord)
-  (let ((acc (make-hash-table)))
-    (let loop ((coord coord))
-      (hash-table-set! acc coord #t)
-      (for-each
-        (lambda (offset)
-          (let ((next (map + coord offset)))
-            (if (and (array-exists? array next)
-                     (char=? (array-ref array coord)
-                             (array-ref array next))
-                     (not (hash-table-exists? acc next)))
-              (loop next))))
-        offsets))
-    acc))
-
 (define (regions array)
-  (foldl
-    (lambda (acc coord)
-      (if (any
-            (lambda (table)
-              (hash-table-exists? table coord))
-            acc)
-        acc
-        (cons (region array coord) acc)))
-    '() (array-indexes array)))
+  (let ((mem (make-hash-table)))
+    (foldl
+      (lambda (acc coord)
+        (if (hash-table-exists? mem coord)
+          acc
+          (let ((reg (make-hash-table)))
+            (let loop ((coord coord))
+              (hash-table-set! mem coord #t)
+              (hash-table-set! reg coord #t)
+              (for-each
+                (lambda (offset)
+                  (let ((next (map + coord offset)))
+                    (if (and (array-exists? array next)
+                             (char=? (array-ref array coord)
+                                     (array-ref array next))
+                             (not (hash-table-exists? reg next)))
+                      (loop next))))
+                offsets))
+            (cons reg acc))))
+      '() (array-indexes array))))
 
 (define (import-input)
   (regions (list->array (map string->list (read-lines)))))
