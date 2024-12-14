@@ -38,9 +38,9 @@
           (lambda (i)
             (hash-table-set! m (run i n) #t))
           input)
-        (if (= (hash-table-size m) l)
-          n
-          (loop (+ n 1)))))))
+        (if (not (= (hash-table-size m) l))
+          (loop (+ n 1))
+          n)))))
 
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
