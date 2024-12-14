@@ -1,9 +1,9 @@
 (import
   (chicken io)
   (chicken irregex)
+  (euler)
   (euler-syntax)
-  (srfi 1)
-  (srfi 69))
+  (srfi 1))
 
 (define-constant dimensions '(101 103))
 
@@ -20,27 +20,20 @@
         (modulo (+ p (* v n) d) d))
       p v dimensions)))
 
-(define (solve/1 input)
+(define (score l)
   (bind (w h) dimensions
     (let ((mw (quotient w 2))
-          (mh (quotient h 2))
-          (l (map (lambda (i) (run i 100)) input)))
+          (mh (quotient h 2)))
       (* (count (lambda (i) (bind (x y) i (and (> x mw) (> y mh)))) l)
          (count (lambda (i) (bind (x y) i (and (> x mw) (< y mh)))) l)
          (count (lambda (i) (bind (x y) i (and (< x mw) (> y mh)))) l)
          (count (lambda (i) (bind (x y) i (and (< x mw) (< y mh)))) l)))))
 
+(define (solve/1 input)
+  (score (map (lambda (i) (run i 100)) input)))
+
 (define (solve/2 input)
-  (let ((l (length input)))
-    (let loop ((n 0))
-      (let ((m (make-hash-table)))
-        (for-each
-          (lambda (i)
-            (hash-table-set! m (run i n) #t))
-          input)
-        (if (not (= (hash-table-size m) l))
-          (loop (+ n 1))
-          n)))))
+  (extremum (range 1 #e1e4) (lambda (n) (score (map (lambda (i) (run i n)) input))) <))
 
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
