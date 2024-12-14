@@ -13,11 +13,11 @@
       (chop (map string->number (irregex-extract "-?[0-9]+" i)) 2))
     (read-lines)))
 
-(define (run l iterations)
+(define (run l n)
   (bind (p v) l
     (map
       (lambda (p v d)
-        (modulo (+ p (* v iterations) d) d))
+        (modulo (+ p (* v n) d) d))
       p v dimensions)))
 
 (define (solve/1 input)
@@ -32,15 +32,15 @@
 
 (define (solve/2 input)
   (let ((l (length input)))
-    (let loop ((iterations 0))
+    (let loop ((n 0))
       (let ((m (make-hash-table)))
         (for-each
           (lambda (i)
-            (hash-table-set! m (run i iterations) #t))
+            (hash-table-set! m (run i n) #t))
           input)
         (if (= (hash-table-size m) l)
-          iterations
-          (loop (+ iterations 1)))))))
+          n
+          (loop (+ n 1)))))))
 
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
