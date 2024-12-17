@@ -55,9 +55,9 @@
   (let loop ((lst lst) (coord (robot array)) (array (array-copy array)))
     (if (null? lst)
       array
-      (let ((offset (car lst)) (copy (array-copy array)))
-        (if (_run copy coord offset)
-          (loop (cdr lst) (map + coord offset) copy)
+      (let ((copy (array-copy array)))
+        (if (_run copy coord (car lst))
+          (loop (cdr lst) (map + coord (car lst)) copy)
           (loop (cdr lst) coord array))))))
 
 (define (convert array)
