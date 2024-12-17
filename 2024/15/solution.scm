@@ -10,6 +10,13 @@
     ((#\v) '( 1  0))
     ((#\<) '( 0 -1))))
 
+(define (translate value)
+  (case value
+    ((#\#) '(#\# #\#))
+    ((#\.) '(#\. #\.))
+    ((#\@) '(#\@ #\.))
+    ((#\O) '(#\[ #\]))))
+
 (define (import-input)
   (apply
     (lambda (array lst)
@@ -21,19 +28,22 @@
           (cons (cons (string->list line) (car acc)) (cdr acc))))
       '(()) (read-lines))))
 
+(define (__run array a b)
+  (let ((va (array-ref array a))
+        (vb (array-ref array b)))
+    (array-set! array a vb)
+    (array-set! array b va)
+    #t))
+
 (define (_run array coord offset)
   (let loop ((coord coord))
-    (let* ((next (map + coord offset)) (value (array-ref array next)))
-      (if (and (not (char=? value #\#))
-               (or (not (char=? value #\[)) (and (loop (map + next '(0  1))) (loop next)))
-               (or (not (char=? value #\])) (and (loop (map + next '(0 -1))) (loop next)))
-               (or (not (char=? value #\O)) (loop next)))
-        (let ((a (array-ref array coord))
-              (b (array-ref array next)))
-          (array-set! array coord b)
-          (array-set! array next  a)
-          #t)
-        #f))))
+    (let ((next (map + coord offset)))
+      (case (array-ref array next)
+        ((#\[) (if (and (loop (map + next '(0  1))) (loop next)) (__run array coord next) #f))
+        ((#\]) (if (and (loop (map + next '(0 -1))) (loop next)) (__run array coord next) #f))
+        ((#\O) (if (loop next) (__run array coord next) #f))
+        ((#\.) (__run array coord next))
+        ((#\#) #f)))))
 
 (define (robot array)
   (find
@@ -50,18 +60,11 @@
           (loop (cdr lst) (map + coord offset) copy)
           (loop (cdr lst) coord array))))))
 
-(define (_translate value)
-  (case value
-    ((#\#) '(#\# #\#))
-    ((#\.) '(#\. #\.))
-    ((#\@) '(#\@ #\.))
-    ((#\O) '(#\[ #\]))))
-
-(define (translate array)
+(define (convert array)
   (list->array
     (map
       (lambda (lst)
-        (join (map _translate lst)))
+        (join (map translate lst)))
       (array->list array))))
 
 (define (solve array lst)
@@ -76,5 +79,5 @@
 (let-values (((array lst) (import-input)))
   (let ((part/1 (solve array lst)))
     (print part/1) (assert (= part/1 1568399)))
-  (let ((part/2 (solve (translate array) lst)))
+  (let ((part/2 (solve (convert array) lst)))
     (print part/2) (assert (= part/2 1575877))))
