@@ -3,8 +3,7 @@
   (chicken string)
   (euler)
   (euler-syntax)
-  (srfi 1)
-  (srfi 69))
+  (srfi 1))
 
 (define-constant offsets
   '((-1  0)
@@ -17,9 +16,6 @@
     (lambda (i)
       (map string->number (string-split i ",")))
     (read-lines)))
-
-(define (id coord)
-  (string-intersperse (map number->string coord) ","))
 
 (define (compare? a b)
   (< (car a)
@@ -35,21 +31,21 @@
     offsets))
 
 (define (path array start goal)
-  (let ((cache (make-hash-table)) (goal/id (id goal)))
+  (let ((cache (make-array (array-dimensions array) #e1e8)))
     (let loop ((queue (priority-queue-insert (priority-queue compare?) (list 0 start))))
       (if (priority-queue-empty? queue)
         cache
         (bind (cost coord) (priority-queue-first queue)
-          (if (string=? (id coord) goal/id)
+          (if (equal? coord goal)
             cost
             (loop
               (foldl
-                (lambda (queue next/coord)
-                  (let ((next/cost (+ cost 1)) (next/id (id next/coord)))
-                    (if (< next/cost (hash-table-ref/default cache next/id #e1e6))
+                (lambda (queue coord)
+                  (let ((cost (+ cost 1)))
+                    (if (> (array-ref cache coord) cost)
                       (begin
-                        (hash-table-set! cache next/id next/cost)
-                        (priority-queue-insert queue (list next/cost next/coord)))
+                        (array-set! cache coord cost)
+                        (priority-queue-insert queue (list cost coord)))
                       queue)))
                 (priority-queue-rest queue) (neighbors array coord)))))))))
 
@@ -63,12 +59,12 @@
 
 (define (solve/2 input)
   (let* ((goal (apply map max input)) (array (make-array (map add1 goal) #t)))
-    (let loop ((input input))
-      (bind (coord . tail) input
+    (let loop ((lst input))
+      (bind (coord . tail) lst
         (array-set! array coord #f)
-        (if (number? (path array '(0 0) goal))
-          (loop tail)
-          (id coord))))))
+        (if (array? (path array '(0 0) goal))
+          (string-intersperse (map number->string coord) ",")
+          (loop tail))))))
 
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
