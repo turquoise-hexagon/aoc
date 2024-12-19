@@ -1,0 +1,52 @@
+(import
+  (chicken fixnum)
+  (chicken io)
+  (chicken irregex)
+  (chicken string)
+  (srfi 1))
+
+(define (import-input)
+  (apply
+    (lambda (a b c . lst)
+      (values a b c lst))
+    (map string->number (irregex-extract "[0-9]+" (read-string)))))
+
+(define (run a b c lst)
+  (let* ((vec (list->vector lst)) (len (vector-length vec)))
+    (let loop ((i 0) (a a) (b b) (c c))
+      (if (< i len)
+        (let ((combo (vector 0 1 2 3 a b c)) (operand (vector-ref vec (+ i 1))))
+          (case (vector-ref vec i)
+            ((0) (loop (+ i 2) (fxshr a (vector-ref combo operand)) b c))
+            ((1) (loop (+ i 2) a (fxxor b operand) c))
+            ((2) (loop (+ i 2) a (fxand 7 (vector-ref combo operand)) c))
+            ((3) (if (= a 0) (loop (+ i 2) a b c) (loop operand a b c)))
+            ((4) (loop (+ i 2) a (fxxor b c) c))
+            ((5) (cons (fxand 7 (vector-ref combo operand)) (loop (+ i 2) a b c)))
+            ((6) (loop (+ i 2) a (fxshr a (vector-ref combo operand)) c))
+            ((7) (loop (+ i 2) a b (fxshr a (vector-ref combo operand))))))
+        '()))))
+
+(define (solve/1 a b c lst)
+  (string-intersperse (map number->string (run a b c lst)) ","))
+
+(define (solve/2 a b c lst)
+  (let ((len (length lst)))
+    (let loop ((n 0) (a 0))
+      (let ((tmp (run a b c lst)))
+        (if (equal? tmp lst)
+          a
+          (if (or (= n 0) (equal? tmp (drop lst (- len n))))
+            (let subloop ((i 0))
+              (if (= i 8)
+                0
+                (let ((tmp (loop (+ n 1) (+ (* 8 a) i))))
+                  (if (= tmp 0)
+                    (subloop (+ i 1))
+                    tmp)))) 0))))))
+
+(let-values (((a b c lst) (import-input)))
+  (let ((part/1 (solve/1 a b c lst)))
+    (print part/1) (assert (string=? part/1 "7,1,2,3,2,6,7,2,5")))
+  (let ((part/2 (solve/2 a b c lst)))
+    (print part/2) (assert (= part/2 202356708354602))))
