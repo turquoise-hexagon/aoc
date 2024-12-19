@@ -58,13 +58,18 @@
     (path array '(0 0) goal)))
 
 (define (solve/2 input)
-  (let* ((goal (apply map max input)) (array (make-array (map add1 goal) #t)))
-    (let loop ((lst input))
-      (bind (coord . tail) lst
-        (array-set! array coord #f)
-        (if (array? (path array '(0 0) goal))
-          (string-intersperse (map number->string coord) ",")
-          (loop tail))))))
+  (let ((goal (apply map max input)))
+    (let loop ((l 0) (h (length input)))
+      (if (< l h)
+        (let ((m (quotient (+ l h) 2)) (array (make-array (map add1 goal) #t)))
+          (for-each
+            (lambda (coord)
+              (array-set! array coord #f))
+            (take input m))
+          (if (array? (path array '(0 0) goal))
+            (loop l (- m 1))
+            (loop (+ m 1) h)))
+        (string-intersperse (map number->string (list-ref input (- l 1))) ",")))))
 
 (let ((input (import-input)))
   (let ((part/1 (solve/1 input)))
