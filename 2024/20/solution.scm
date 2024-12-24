@@ -1,0 +1,51 @@
+(import
+  (chicken io)
+  (euler)
+  (srfi 1))
+
+(define-constant offsets
+  '((-1  0)
+    ( 0  1)
+    ( 1  0)
+    ( 0 -1)))
+
+(define (import-input)
+  (let* ((array (list->array (map string->list (read-lines)))) (acc (make-array (array-dimensions array) #f)))
+    (let loop ((coord (find
+                        (lambda (coord)
+                          (char=? (array-ref array coord) #\S))
+                        (array-indexes array)))
+               (count 0))
+      (when (and (array-exists? array coord) (not (char=? (array-ref array coord) #\#)) (not (array-ref acc coord)))
+        (array-set! acc coord count)
+        (for-each
+          (lambda (offset)
+            (loop (map + coord offset) (+ count 1)))
+          offsets)))
+    acc))
+
+(define (solve input)
+  (let ((lst (filter
+               (lambda (coord)
+                 (array-ref input coord))
+               (array-indexes input))))
+    (let loop/a ((lst/a lst) (acc/1 0) (acc/2 0))
+      (if (null? lst/a)
+        (list acc/1 acc/2)
+        (let loop/b ((lst/b (cdr lst/a)) (acc/1 acc/1) (acc/2 acc/2))
+          (if (null? lst/b)
+            (loop/a (cdr lst/a) acc/1 acc/2)
+            (let* ((a (car lst/a))
+                   (b (car lst/b))
+                   (d (apply + (map abs (map - a b)))))
+              (if (>= (- (abs (- (array-ref input a)
+                                 (array-ref input b)))
+                         d)
+                      100)
+                (loop/b (cdr lst/b)
+                  (if ( = d 2 ) (+ acc/1 1) acc/1)
+                  (if (<= d 20) (+ acc/2 1) acc/2))
+                (loop/b (cdr lst/b) acc/1 acc/2)))))))))
+
+(let ((parts (solve (import-input))))
+  (for-each print parts) (assert (equal? parts '(1450 1015247))))
