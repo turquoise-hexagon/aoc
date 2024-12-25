@@ -1,6 +1,6 @@
 (import
-  (chicken io)
   (chicken fixnum)
+  (chicken io)
   (chicken string)
   (srfi 1)
   (srfi 69))
