@@ -31,6 +31,6 @@
         (car input)))))
 
 (let ((input (import-input)))
-  (let ((_ (solve input)))
-    (assert (equal? _ '(1040 6027)))
-    (for-each print _)))
+  (let ((parts (solve input)))
+    (assert (equal? parts '(1040 6027)))
+    (for-each print parts)))
