@@ -11,23 +11,23 @@
 
 (define (neighbors array coord)
   (filter
-    (lambda (coord)
-      (array-exists? array coord))
+    (lambda (i)
+      (array-exists? array i))
     (map
-      (lambda (offset)
-        (map + coord offset))
+      (lambda (i)
+        (map + coord i))
       offsets)))
 
 (define (neighbors-rolls-count array coord)
   (count
-    (lambda (coord)
-      (char=? (array-ref array coord) #\@))
+    (lambda (i)
+      (char=? (array-ref array i) #\@))
     (neighbors array coord)))
 
 (define (accessibles array)
   (filter
-    (lambda (coord)
-      (and (char=? (array-ref array coord) #\@) (< (neighbors-rolls-count array coord) 4)))
+    (lambda (i)
+      (and (char=? (array-ref array i) #\@) (< (neighbors-rolls-count array i) 4)))
     (array-indexes array)))
 
 (define (solve/1 input)
@@ -40,8 +40,8 @@
         acc
         (begin
           (for-each
-            (lambda (coord)
-              (array-set! input coord #\.))
+            (lambda (i)
+              (array-set! input i #\.))
             lst)
           (loop (+ acc (length lst))))))))
 
