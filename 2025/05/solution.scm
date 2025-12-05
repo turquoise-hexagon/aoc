@@ -36,7 +36,7 @@
     (if (null? lst)
       acc
       (bind (m n) (car lst)
-        (let ((m (if (<= m i) (+ i 1) m)))
+        (let ((m (max m (+ i 1))))
           (if (<= m n)
             (loop (cdr lst) (max i n) (+ acc (+ (- n m) 1)))
             (loop (cdr lst) i acc)))))))
