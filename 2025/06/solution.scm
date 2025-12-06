@@ -34,7 +34,7 @@
                             (string->symbol n)
                             (string->number m)
                             lst)
-                      acc)))))))))))
+                          acc)))))))))))
 
 (define (solve input proc)
   (apply +
