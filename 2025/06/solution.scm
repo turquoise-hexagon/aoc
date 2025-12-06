@@ -25,11 +25,16 @@
           (if (null? i)
             (loop input lst acc)
             (let-values (((m n) (partition char-numeric? i)))
-              (let ((m (string->number (list->string m)))
-                    (n (string->symbol (list->string n))))
-                (if (equal? n '||)
-                  (loop input (cons m lst) acc)
-                  (loop input '() (cons (cons* n m lst) acc)))))))))))
+              (let ((m (list->string m))
+                    (n (list->string n)))
+                (if (string=? n "")
+                  (loop input (cons (string->number m) lst) acc)
+                  (loop input '()
+                    (cons (cons*
+                            (string->symbol n)
+                            (string->number m)
+                            lst)
+                      acc)))))))))))
 
 (define (solve input proc)
   (apply +
