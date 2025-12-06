@@ -9,17 +9,15 @@
 
 (define (proc/1 input)
   (apply zip
-    (reverse
-      (map
-        (lambda (i)
-          (map
-            (lambda (i)
-              (let ((tmp (string->number i)))
-                (if (not tmp)
-                  (eval (string->symbol i))
-                  tmp)))
-            (string-split i " ")))
-        input))))
+    (map
+      (lambda (i)
+        (map
+          (lambda (i)
+            (cond
+              ((string->number i) => (lambda (i) i))
+              ((string->symbol i) => eval)))
+          (string-split i " ")))
+      (reverse input))))
 
 (define (proc/2 input)
   (let loop ((input (apply zip (map reverse (map string->list input)))) (lst '()) (acc '()))
