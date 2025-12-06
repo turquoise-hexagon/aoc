@@ -43,5 +43,7 @@
       (proc input))))
 
 (let ((input (import-input)))
-  (print (solve input proc/1))
-  (print (solve input proc/2)))
+  (let ((part/1 (solve input proc/1)))
+    (print part/1) (assert (= part/1 4076006202939)))
+  (let ((part/2 (solve input proc/2)))
+    (print part/2) (assert (= part/2 7903168391557))))
