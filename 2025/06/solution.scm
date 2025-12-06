@@ -4,9 +4,6 @@
   (euler-syntax)
   (srfi 1))
 
-(define (import-input)
-  (read-lines))
-
 (define (proc/1 input)
   (apply zip
     (map
@@ -42,7 +39,7 @@
           (apply op lst)))
       (proc input))))
 
-(let ((input (import-input)))
+(let ((input (read-lines)))
   (let ((part/1 (solve input proc/1)))
     (print part/1) (assert (= part/1 4076006202939)))
   (let ((part/2 (solve input proc/2)))
