@@ -11,8 +11,8 @@
         (map
           (lambda (i)
             (cond
-              ((string->number i) => (lambda (i) i))
-              ((string->symbol i) => eval)))
+              ((string->number i) => identity)
+              ((string->symbol i) => identity)))
           (string-split i " ")))
       (reverse input))))
 
@@ -25,18 +25,17 @@
           (if (null? i)
             (loop input lst acc)
             (let-values (((m n) (partition char-numeric? i)))
-              (let ((m (string->number (list->string m))))
-                (if (null? n)
+              (let ((m (string->number (list->string m)))
+                    (n (string->symbol (list->string n))))
+                (if (equal? n '||)
                   (loop input (cons m lst) acc)
-                  (let ((n (eval (string->symbol (list->string n)))))
-                    (loop input '() (cons (cons* n m lst) acc))))))))))))
+                  (loop input '() (cons (cons* n m lst) acc)))))))))))
 
 (define (solve input proc)
   (apply +
     (map
       (lambda (i)
-        (bind (op . lst) i
-          (apply op lst)))
+        (apply (eval (car i)) (cdr i)))
       (proc input))))
 
 (let ((input (read-lines)))
