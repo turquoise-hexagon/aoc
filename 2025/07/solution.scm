@@ -8,9 +8,9 @@
 
 (define (solve input)
   (bind (str . input) input
-    (let* ((len (string-length str)) (acc (make-vector len 0)))
-      (vector-set! acc (string-index str (lambda (i) (char=? i #\S))) 1)
-      (let main ((input input) (acc/1 0) (acc/2 acc))
+    (let ((tmp (make-vector (string-length str) 0)))
+      (vector-set! tmp (string-index str (lambda (i) (char=? i #\S))) 1)
+      (let main ((input input) (acc/1 0) (acc/2 tmp))
         (if (null? input)
           (list acc/1 (apply + (vector->list acc/2)))
           (bind (str . input) input
