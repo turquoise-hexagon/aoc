@@ -38,6 +38,5 @@
                          (loop lst (+ i 1) nxt/1)))))))))
           (else (main input acc/1 acc/2)))))))
 
-(let ((input (import-input)))
-  (let ((parts (solve input)))
-    (for-each print parts) (assert (equal? parts '(1703 171692855075500)))))
+(let* ((input (import-input)) (parts (solve input)))
+  (for-each print parts) (assert (equal? parts '(1703 171692855075500))))
