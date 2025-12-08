@@ -8,17 +8,17 @@
 
 (define (distance pair)
   (apply
-    (lambda (a b c x y z)
-      (let* ((m (- a x)) (m (* m m))
-             (n (- b y)) (n (* n n))
-             (o (- c z)) (o (* o o)))
-        (+ m n o)))
-    (join pair)))
+    (lambda (m n)
+      (let* ((a (- (vector-ref m 0) (vector-ref n 0)))
+             (b (- (vector-ref m 1) (vector-ref n 1)))
+             (c (- (vector-ref m 2) (vector-ref n 2))))
+        (+ (* a a) (* b b) (* c c))))
+    pair))
 
 (define (_import-input)
   (map
     (lambda (i)
-      (map string->number (string-split i ",")))
+      (list->vector (map string->number (string-split i ","))))
     (read-lines)))
 
 (define (import-input)
