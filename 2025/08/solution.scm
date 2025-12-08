@@ -40,7 +40,7 @@
             (hash-table-set! mem i #t))
           i)
         (cons mem acc))
-      (let ((mem (foldl hash-table-merge (make-hash-table) m)))
+      (let ((mem (foldl hash-table-merge (car m) (cdr m))))
         (for-each
           (lambda (i)
             (hash-table-set! mem i #t))
