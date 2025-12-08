@@ -7,11 +7,13 @@
   (srfi 69))
 
 (define (distance pair)
-  (apply +
-    (map
-      (lambda (i)
-        (* i i))
-      (apply map - pair))))
+  (apply
+    (lambda (a b c x y z)
+      (let* ((m (- a x)) (m (* m m))
+             (n (- b y)) (n (* n n))
+             (o (- c z)) (o (* o o)))
+        (+ m n o)))
+    (join pair)))
 
 (define (_import-input)
   (map
