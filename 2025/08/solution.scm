@@ -55,7 +55,7 @@
         (loop lst cnt acc (apply * (take (sort (map hash-table-size acc) >) 3)) p2)
         (let* ((i (car lst)) (acc (_solve i acc)))
           (if (= (hash-table-size (car acc)) len)
-            (loop (cdr lst) (+ cnt 1) acc p1 (apply * (map car i)))
+            (loop (cdr lst) (+ cnt 1) acc p1 (apply * (map (lambda (i) (vector-ref i 0)) i)))
             (loop (cdr lst) (+ cnt 1) acc p1 p2)))))))
 
 (let-values (((lst len) (import-input)))
