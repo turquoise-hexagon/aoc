@@ -1,7 +1,7 @@
 (import
   (chicken io)
-  (chicken string)
   (chicken sort)
+  (chicken string)
   (euler)
   (srfi 1)
   (srfi 69))
