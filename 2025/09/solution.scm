@@ -36,8 +36,8 @@
       (if (null? rs)
         (list p1 p2)
         (bind (a b c d) (car rs)
-          (let ((_ (* (+ (abs (- a c)) 1)
-                      (+ (abs (- b d)) 1))))
+          (let ((_ (* (- a c -1)
+                      (- b d -1))))
             (loop (cdr rs)
               (max p1 _)
               (if (not (any
