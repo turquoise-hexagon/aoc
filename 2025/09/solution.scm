@@ -29,15 +29,14 @@
                       (- d b -1))))
             (loop (cdr rs)
               (max p1 _)
-              (if (not (any
-                         (lambda (i)
-                           (bind (p q r s) i
-                             (and
-                               (< p c) (< q d)
-                               (> r a) (> s b))))
-                         gs))
-                (max p2 _)
-                p2))))))))
+              (if (any
+                    (lambda (i)
+                      (bind (p q r s) i
+                        (and
+                          (< p c) (< q d)
+                          (> r a) (> s b))))
+                    gs)
+                p2 (max p2 _)))))))))
 
 (let* ((input (import-input)) (_ (solve input)))
   (for-each print _) (assert (equal? _ '(4741848414 1508918480))))
