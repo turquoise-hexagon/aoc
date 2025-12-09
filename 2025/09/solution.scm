@@ -19,20 +19,9 @@
               (max a c) (max b d))))
     l))
 
-(define (red l)
-  (combinations l 2))
-
-(define (green l)
-  (let loop ((a l) (b (cdr l)))
-    (if (null? b)
-      (list (list (car a) (car l)))
-      (cons (list (car a) (car b))
-            (loop (cdr a) (cdr b))))))
-
 (define (solve l)
-  (let ((rs (process (red   l)))
-        (gs (process (green l))))
-    (let loop ((rs rs) (p1 0) (p2 0))
+  (let ((gs (process (zip l (foldr cons (list (car l)) (cdr l))))))
+    (let loop ((rs (process (combinations l 2))) (p1 0) (p2 0))
       (if (null? rs)
         (list p1 p2)
         (bind (a b c d) (car rs)
