@@ -1,0 +1,54 @@
+(import
+  (chicken io)
+  (chicken string)
+  (euler)
+  (euler-syntax)
+  (srfi 1))
+
+(define (import-input)
+  (map
+    (lambda (i)
+      (map string->number (string-split i ",")))
+    (read-lines)))
+
+(define (process l)
+  (map
+    (lambda (i)
+      (bind (a b c d) (join i)
+        (list (min a c) (min b d)
+              (max a c) (max b d))))
+    l))
+
+(define (red l)
+  (combinations l 2))
+
+(define (green l)
+  (let loop ((a l) (b (cdr l)))
+    (if (null? b)
+      (list (list (car a) (car l)))
+      (cons (list (car a) (car b))
+            (loop (cdr a) (cdr b))))))
+
+(define (solve l)
+  (let ((rs (process (red   l)))
+        (gs (process (green l))))
+    (let loop ((rs rs) (p1 0) (p2 0))
+      (if (null? rs)
+        (list p1 p2)
+        (bind (a b c d) (car rs)
+          (let ((_ (* (+ (abs (- a c)) 1)
+                      (+ (abs (- b d)) 1))))
+            (loop (cdr rs)
+              (max p1 _)
+              (if (not (any
+                         (lambda (i)
+                           (bind (p q r s) i
+                             (and
+                               (< p c) (< q d)
+                               (> r a) (> s b))))
+                         gs))
+                (max p2 _)
+                p2))))))))
+
+(let* ((input (import-input)) (_ (solve input)))
+  (for-each print _) (assert (equal? _ '(4741848414 1508918480))))
