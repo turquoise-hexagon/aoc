@@ -59,15 +59,15 @@ output+='];'
 # joltages
 output+='_Js=['
 
-for pb in "${input[@]}"; do
+for pb in "${input[@]}"; {
     IFS=' ' read -r -a ps <<< $pb
 
     IFS=' ' read -r -a js <<< ${ps[-1]//[^0-9]/ }
 
-    for ((i = 0; i < NB_Js; ++i)) do
+    for ((i = 0; i < NB_Js; ++i)) {
         output+="$((js[i])),"
-    done
-done
+    }
+}
 
 output+='];'
 
