@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+mapfile -t input < ../input
+
+output=''
+
+# problem size
+((
+NB_PBs = ${#input[@]},
+NB_Bs = 0,
+NB_Js = 0
+))
+
+for pb in "${input[@]}"; {
+    IFS=' ' read -r -a ps <<< $pb
+
+    IFS=' ' read -r -a js <<< ${ps[-1]//[^0-9]/ }
+
+    ((
+    nb_bs = ${#ps[@]} - 2, nb_js = ${#js[@]},
+    NB_Bs = NB_Bs > nb_bs ? NB_Bs : nb_bs,
+    NB_Js = NB_Js > nb_js ? NB_Js : nb_js
+    ))
+}
+
+output+="NB_PBs=$NB_PBs;"
+output+="NB_Js=$NB_Js;"
+output+="NB_Bs=$NB_Bs;"
+
+# buttons
+output+='_Bs=['
+
+for pb in "${input[@]}"; {
+    IFS=' ' read -r -a ps <<< $pb
+
+    for ((i = 1; i < ${#ps[@]} - 1; ++i)) {
+        IFS=' ' read -r -a bs <<< ${ps[i]//[^0-9]/ }
+
+        array=()
+
+        for n in "${bs[@]}"; {
+            ((array[n] = 1))
+        }
+
+        for ((n = 0; n < NB_Js; ++n)) {
+            output+="$((array[n])),"
+        }
+    }
+
+    for ((i = 0; i < NB_Bs - (${#ps[@]} - 2); ++i)) {
+        for ((n = 0; n < NB_Js; ++n)) {
+            output+='0,'
+        }
+    }
+}
+
+output+='];'
+
+# joltages
+output+='_Js=['
+
+for pb in "${input[@]}"; do
+    IFS=' ' read -r -a ps <<< $pb
+
+    IFS=' ' read -r -a js <<< ${ps[-1]//[^0-9]/ }
+
+    for ((i = 0; i < NB_Js; ++i)) do
+        output+="$((js[i])),"
+    done
+done
+
+output+='];'
+
+echo "$output" > solution.dzn
+
+minizinc                     \
+    --solver cp -p 8 -f      \
+    --no-output-comments     \
+    --solution-separator  '' \
+    --search-complete-msg '' \
+    solution.mzn solution.dzn
+
+rm solution.dzn
