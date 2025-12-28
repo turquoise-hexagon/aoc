@@ -128,4 +128,5 @@
     regions))
 
 (let-values (((regions shapes) (import-input)))
-  (print (solve regions shapes)))
+  (let ((part (solve regions shapes)))
+    (print part) (assert (= part 512))))
